@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.BuildConfig
 import com.example.ads.UnityAdsManager
 import com.example.ui.components.AdPromptDialog
 import com.example.ui.components.AdPurpose
@@ -40,7 +41,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // Initialize Unity Ads SDK with Game ID: 800370319
-        UnityAdsManager.initialize(this, testMode = true)
+        // testMode=true in debug so Unity returns test ads for registered GAID;
+        // false in release for live ads. Dashboard "Override client test mode" must be ON for testing.
+        UnityAdsManager.initialize(this, testMode = BuildConfig.DEBUG)
 
         setContent {
             MyApplicationTheme {
@@ -59,6 +62,7 @@ fun LogoQuizApp(
     val context = LocalContext.current
     val activity = context as? Activity
     val isUnityAdLoaded by UnityAdsManager.isAdLoaded.collectAsState()
+    val deviceGaid by UnityAdsManager.deviceAdvertisingId.collectAsState()
     var isUnityAdLoading by remember { mutableStateOf(false) }
     var unityError by remember { mutableStateOf<String?>(null) }
     var showFallbackModal by remember { mutableStateOf(false) }
@@ -224,6 +228,7 @@ fun LogoQuizApp(
     // Unity Ad Loading Screen while retrieving ad from Unity Servers for this test device
     if (showAdPlayer && isUnityAdLoading) {
         UnityAdLoadingModal(
+            deviceGaid = deviceGaid,
             onDismiss = {
                 isUnityAdLoading = false
                 viewModel.onCloseAdPlayer()

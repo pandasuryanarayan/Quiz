@@ -461,6 +461,7 @@ fun RewardedAdPlayerModal(
 
 @Composable
 fun UnityAdLoadingModal(
+    deviceGaid: String? = null,
     onDismiss: () -> Unit
 ) {
     Dialog(
@@ -496,7 +497,9 @@ fun UnityAdLoadingModal(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Placement: Rewarded_Android\nTest device connected",
+                    text = "Placement: Rewarded_Android\n" +
+                            if (deviceGaid.isNullOrBlank()) "Reading test-device GAID…"
+                            else "GAID: $deviceGaid",
                     fontSize = 12.sp,
                     color = Slate700,
                     textAlign = TextAlign.Center
