@@ -1,0 +1,7 @@
+{
+  "name": "Logo Quiz",
+  "description": "Guess famous logos and trivia icons by spelling scrambled letter tiles with level packs, hints, and rewarded stage unlocks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
