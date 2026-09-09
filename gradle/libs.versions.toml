@@ -42,11 +42,17 @@ googleServices = "4.5.0"
 credentials = "1.5.0"
 googleid = "1.1.1"
 unityAds = "4.12.5"
+levelplayMediation = "9.5.0"
 playServicesAdsIdentifier = "18.2.0"
+playServicesAppset = "16.0.0"
+playServicesBasement = "18.1.0"
 
 
 [libraries]
 play-services-ads-identifier = { group = "com.google.android.gms", name = "play-services-ads-identifier", version.ref = "playServicesAdsIdentifier" }
+play-services-appset = { group = "com.google.android.gms", name = "play-services-appset", version.ref = "playServicesAppset" }
+play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
+levelplay-mediation = { group = "com.unity3d.ads-mediation", name = "mediation-sdk", version.ref = "levelplayMediation" }
 unity-ads = { group = "com.unity3d.ads", name = "unity-ads", version.ref = "unityAds" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

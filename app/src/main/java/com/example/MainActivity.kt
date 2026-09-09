@@ -22,13 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.BuildConfig
-import com.example.ads.UnityAdsManager
+import com.example.ads.LevelPlayAdsManager
 import com.example.ui.components.AdPromptDialog
 import com.example.ui.components.AdPurpose
 import com.example.ui.components.RewardedAdPlayerModal
-import com.example.ui.components.UnityAdErrorModal
-import com.example.ui.components.UnityAdLoadingModal
+import com.example.ui.components.LevelPlayAdErrorModal
+import com.example.ui.components.LevelPlayAdLoadingModal
 import com.example.ui.screens.LevelGridScreen
 import com.example.ui.screens.PackSelectionScreen
 import com.example.ui.screens.QuizPlayScreen
@@ -40,10 +39,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Initialize Unity Ads SDK with Game ID: 800370319
-        // testMode=true in debug so Unity returns test ads for registered GAID;
-        // false in release for live ads. Dashboard "Override client test mode" must be ON for testing.
-        UnityAdsManager.initialize(this, testMode = BuildConfig.DEBUG)
+        // Initialize LevelPlay mediation with App Key: 28098d405.
+        // No testMode flag: app stays in Test Mode until disabled in LevelPlay dashboard.
+        LevelPlayAdsManager.initialize(this)
 
         setContent {
             MyApplicationTheme {
@@ -61,10 +59,9 @@ fun LogoQuizApp(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    val isUnityAdLoaded by UnityAdsManager.isAdLoaded.collectAsState()
-    val deviceGaid by UnityAdsManager.deviceAdvertisingId.collectAsState()
-    var isUnityAdLoading by remember { mutableStateOf(false) }
-    var unityError by remember { mutableStateOf<String?>(null) }
+    val isAdLoaded by LevelPlayAdsManager.isAdLoaded.collectAsState()
+    var isAdLoading by remember { mutableStateOf(false) }
+    var adError by remember { mutableStateOf<String?>(null) }
     var showFallbackModal by remember { mutableStateOf(false) }
 
     val userProfile by viewModel.userProfile.collectAsState()
@@ -177,21 +174,21 @@ fun LogoQuizApp(
     // Reset transient ad states when showAdPlayer turns false
     LaunchedEffect(showAdPlayer) {
         if (!showAdPlayer) {
-            isUnityAdLoading = false
-            unityError = null
+            isAdLoading = false
+            adError = null
             showFallbackModal = false
         }
     }
 
-    // Global Rewarded Video Ad Player (Direct Unity Ads with responsive loading & error resilience)
+    // Global Rewarded Video Ad Player (LevelPlay with responsive loading & error resilience)
     LaunchedEffect(showAdPlayer) {
         if (showAdPlayer && activity != null) {
-            unityError = null
+            adError = null
             showFallbackModal = false
-            if (isUnityAdLoaded) {
+            if (isAdLoaded) {
                 // Ad is ready in memory: show immediately!
-                isUnityAdLoading = false
-                UnityAdsManager.showRewardedAd(
+                isAdLoading = false
+                LevelPlayAdsManager.showRewardedAd(
                     activity = activity,
                     onRewarded = {
                         viewModel.onAdPlayerFinished(pendingAdPurpose)
@@ -200,73 +197,72 @@ fun LogoQuizApp(
                         viewModel.onCloseAdPlayer()
                     },
                     onError = { err ->
-                        unityError = err
+                        adError = err
                     }
                 )
             } else {
                 // Ad not preloaded yet: trigger load & show with active loading indicator
-                isUnityAdLoading = true
-                UnityAdsManager.loadAndShowRewardedAd(
+                isAdLoading = true
+                LevelPlayAdsManager.loadAndShowRewardedAd(
                     activity = activity,
                     onRewarded = {
-                        isUnityAdLoading = false
+                        isAdLoading = false
                         viewModel.onAdPlayerFinished(pendingAdPurpose)
                     },
                     onClosed = {
-                        isUnityAdLoading = false
+                        isAdLoading = false
                         viewModel.onCloseAdPlayer()
                     },
                     onError = { err ->
-                        isUnityAdLoading = false
-                        unityError = err
+                        isAdLoading = false
+                        adError = err
                     }
                 )
             }
         }
     }
 
-    // Unity Ad Loading Screen while retrieving ad from Unity Servers for this test device
-    if (showAdPlayer && isUnityAdLoading) {
-        UnityAdLoadingModal(
-            deviceGaid = deviceGaid,
+    // Ad Loading Screen while retrieving ad from LevelPlay mediation
+    if (showAdPlayer && isAdLoading) {
+        LevelPlayAdLoadingModal(
             onDismiss = {
-                isUnityAdLoading = false
+                isAdLoading = false
                 viewModel.onCloseAdPlayer()
             }
         )
     }
 
-    // Notice dialog if Unity Servers return an issue
-    if (showAdPlayer && unityError != null) {
-        UnityAdErrorModal(
-            errorMessage = unityError ?: "Ad request could not be completed.",
+    // Notice dialog if LevelPlay returns an issue
+    if (showAdPlayer && adError != null) {
+        LevelPlayAdErrorModal(
+            errorMessage = adError ?: "Ad request could not be completed.",
             onRetry = {
-                unityError = null
+                adError = null
                 if (activity != null) {
-                    isUnityAdLoading = true
-                    UnityAdsManager.loadAndShowRewardedAd(
+                    isAdLoading = true
+                    LevelPlayAdsManager.loadAndShowRewardedAd(
                         activity = activity,
                         onRewarded = {
-                            isUnityAdLoading = false
+                            isAdLoading = false
                             viewModel.onAdPlayerFinished(pendingAdPurpose)
                         },
                         onClosed = {
-                            isUnityAdLoading = false
+                            isAdLoading = false
                             viewModel.onCloseAdPlayer()
                         },
                         onError = { err ->
-                            isUnityAdLoading = false
-                            unityError = err
+                            isAdLoading = false
+                            adError = err
                         }
                     )
                 }
             },
             onFallback = {
-                unityError = null
+                adError = null
                 showFallbackModal = true
             },
             onDismiss = {
-                unityError = null
+                adError = null
                 viewModel.onCloseAdPlayer()
             }
         )
@@ -287,4 +283,3 @@ fun LogoQuizApp(
         )
     }
 }
-

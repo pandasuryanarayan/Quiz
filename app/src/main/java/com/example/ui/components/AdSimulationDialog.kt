@@ -143,7 +143,7 @@ fun AdPromptDialog(
                     color = Color(0xFFF1F5F9)
                 ) {
                     Text(
-                        text = "Unity Ads · Placement: Rewarded_Android",
+                        text = "LevelPlay · Rewarded Ad",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Slate700,
@@ -244,7 +244,7 @@ fun RewardedAdPlayerModal(
                         color = Color.White.copy(alpha = 0.2f)
                     ) {
                         Text(
-                            text = "Unity Ads · Rewarded_Android",
+                            text = "LevelPlay · Rewarded",
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -460,8 +460,7 @@ fun RewardedAdPlayerModal(
 }
 
 @Composable
-fun UnityAdLoadingModal(
-    deviceGaid: String? = null,
+fun LevelPlayAdLoadingModal(
     onDismiss: () -> Unit
 ) {
     Dialog(
@@ -488,7 +487,7 @@ fun UnityAdLoadingModal(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Loading Unity Ad...",
+                    text = "Loading LevelPlay Ad...",
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = Slate900
@@ -497,9 +496,7 @@ fun UnityAdLoadingModal(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Placement: Rewarded_Android\n" +
-                            if (deviceGaid.isNullOrBlank()) "Reading test-device GAID…"
-                            else "GAID: $deviceGaid",
+                    text = "Placement: LevelPlay Rewarded\nAd Unit: wljj57ixzqvzvcxo",
                     fontSize = 12.sp,
                     color = Slate700,
                     textAlign = TextAlign.Center
@@ -520,7 +517,7 @@ fun UnityAdLoadingModal(
 }
 
 @Composable
-fun UnityAdErrorModal(
+fun LevelPlayAdErrorModal(
     errorMessage: String,
     onRetry: () -> Unit,
     onFallback: () -> Unit,
@@ -560,7 +557,7 @@ fun UnityAdErrorModal(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Unity Ad Notice",
+                    text = "Ad Notice",
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = Slate900
@@ -585,7 +582,7 @@ fun UnityAdErrorModal(
                         .fillMaxWidth()
                         .height(44.dp)
                 ) {
-                    Text("Retry Unity Ad", fontWeight = FontWeight.SemiBold)
+                    Text("Retry Ad", fontWeight = FontWeight.SemiBold)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
