@@ -373,6 +373,192 @@ object QuizPackData {
             hintSentence = "World football governing body and organizer of the World Cup",
             triviaFact = "FIFA was founded in Paris in 1904 and today has 211 national member associations—more than the United Nations.",
             logoKey = "fifa"
+        ),
+
+        // FOOD & TREATS PACK (1..10)
+        QuizLevel(
+            id = "food_1",
+            packId = "food",
+            levelNumber = 1,
+            answer = "PEPSI",
+            hintSentence = "Carbonated cola giant with a red, white and blue globe logo",
+            triviaFact = "Originally called 'Brad's Drink' in 1893, Pepsi was invented by pharmacist Caleb Bradham in North Carolina.",
+            logoKey = "pepsi"
+        ),
+        QuizLevel(
+            id = "food_2",
+            packId = "food",
+            levelNumber = 2,
+            answer = "BURGERKING",
+            hintSentence = "Home of the Whopper with two golden bun halves framing its name",
+            triviaFact = "Burger King operates in Australia under the trademark name 'Hungry Jack's' due to a pre-existing trademark.",
+            logoKey = "burgerking"
+        ),
+        QuizLevel(
+            id = "food_3",
+            packId = "food",
+            levelNumber = 3,
+            answer = "SUBWAY",
+            hintSentence = "Fresh sub sandwich chain with green and yellow directional arrows",
+            triviaFact = "Subway serves more than 5,300 sandwiches every single minute across more than 37,000 global restaurants.",
+            logoKey = "subway"
+        ),
+        QuizLevel(
+            id = "food_4",
+            packId = "food",
+            levelNumber = 4,
+            answer = "PRINGLES",
+            hintSentence = "Stackable potato crisp can featuring a mustachioed mascot",
+            triviaFact = "The shape of a Pringle is mathematically known as a hyperbolic paraboloid, engineered to resist breakage.",
+            logoKey = "pringles"
+        ),
+        QuizLevel(
+            id = "food_5",
+            packId = "food",
+            levelNumber = 5,
+            answer = "DOMINOS",
+            hintSentence = "Pizza delivery empire with a tilted red and blue domino tile",
+            triviaFact = "The three dots on the domino represented the original three franchise stores opened in the 1960s.",
+            logoKey = "dominos"
+        ),
+        // Ad Gated Levels (6..10)
+        QuizLevel(
+            id = "food_6",
+            packId = "food",
+            levelNumber = 6,
+            answer = "OREO",
+            hintSentence = "World's favorite sandwich cookie with embossed chocolate wafers",
+            triviaFact = "Over 500 billion Oreo cookies have been produced since their introduction in 1912 in New York City.",
+            logoKey = "oreo"
+        ),
+        QuizLevel(
+            id = "food_7",
+            packId = "food",
+            levelNumber = 7,
+            answer = "KFC",
+            hintSentence = "Fried chicken legend founded in Corbin, Kentucky by the Colonel",
+            triviaFact = "Colonel Harland Sanders was made an honorary Kentucky Colonel by the state governor in 1935.",
+            logoKey = "kfc"
+        ),
+        QuizLevel(
+            id = "food_8",
+            packId = "food",
+            levelNumber = 8,
+            answer = "NUTELLA",
+            hintSentence = "Famous cocoa and hazelnut breakfast spread in a distinctive jar",
+            triviaFact = "One jar of Nutella is sold somewhere in the world every 2.5 seconds, using 25% of global hazelnuts.",
+            logoKey = "nutella"
+        ),
+        QuizLevel(
+            id = "food_9",
+            packId = "food",
+            levelNumber = 9,
+            answer = "FANTA",
+            hintSentence = "Bubbly fruit-flavored soda with an orange slice and leaf motif",
+            triviaFact = "Fanta originated in 1940 during WWII when trade embargos made importing Coca-Cola syrup impossible.",
+            logoKey = "fanta"
+        ),
+        QuizLevel(
+            id = "food_10",
+            packId = "food",
+            levelNumber = 10,
+            answer = "TACOBELL",
+            hintSentence = "Mexican-inspired fast food famous for a magenta bell and crunchy tacos",
+            triviaFact = "Glen Bell opened the first Taco Bell in Downey, California in 1962, inspiring a nationwide Mexican craze.",
+            logoKey = "tacobell"
+        ),
+
+        // WORLD WONDERS PACK (1..10)
+        QuizLevel(
+            id = "world_1",
+            packId = "world",
+            levelNumber = 1,
+            answer = "EIFFEL",
+            hintSentence = "Iconic wrought-iron Parisian tower rising on the Champ de Mars",
+            triviaFact = "Gustave Eiffel's tower was built for the 1889 World's Fair and expands up to 15 cm during hot summer days.",
+            logoKey = "eiffel"
+        ),
+        QuizLevel(
+            id = "world_2",
+            packId = "world",
+            levelNumber = 2,
+            answer = "PYRAMIDS",
+            hintSentence = "Monumental stone wonders rising over the golden desert of Giza",
+            triviaFact = "The Great Pyramid of Giza is the oldest of the ancient Seven Wonders and the only one still largely intact.",
+            logoKey = "pyramids"
+        ),
+        QuizLevel(
+            id = "world_3",
+            packId = "world",
+            levelNumber = 3,
+            answer = "LIBERTY",
+            hintSentence = "Copper colossus holding a radiant torch in New York Harbor",
+            triviaFact = "A gift from France in 1886, the statue's green patina formed naturally through oxidation of copper.",
+            logoKey = "liberty"
+        ),
+        QuizLevel(
+            id = "world_4",
+            packId = "world",
+            levelNumber = 4,
+            answer = "COLOSSEUM",
+            hintSentence = "Massive ancient amphitheater of arches in the heart of Rome",
+            triviaFact = "Completed in 80 AD under Emperor Titus, the Colosseum could seat over 50,000 spectators for gladiatorial games.",
+            logoKey = "colosseum"
+        ),
+        QuizLevel(
+            id = "world_5",
+            packId = "world",
+            levelNumber = 5,
+            answer = "TAJMAHAL",
+            hintSentence = "White marble mausoleum with grand domes and minarets in Agra",
+            triviaFact = "Emperor Shah Jahan commissioned the jewel-inlaid palace in 1631 in memory of his beloved wife Mumtaz Mahal.",
+            logoKey = "tajmahal"
+        ),
+        // Ad Gated Levels (6..10)
+        QuizLevel(
+            id = "world_6",
+            packId = "world",
+            levelNumber = 6,
+            answer = "BIGBEN",
+            hintSentence = "Famed four-faced chiming clock tower in London beside Parliament",
+            triviaFact = "'Big Ben' is officially the nickname for the massive 13.7-tonne Great Bell inside the Elizabeth Tower.",
+            logoKey = "bigben"
+        ),
+        QuizLevel(
+            id = "world_7",
+            packId = "world",
+            levelNumber = 7,
+            answer = "FUJI",
+            hintSentence = "Japan's sacred snow-capped volcanic peak rising gracefully",
+            triviaFact = "Mount Fuji stands at 3,776 meters and is recognized worldwide as a sacred UNESCO cultural symbol of Japan.",
+            logoKey = "fuji"
+        ),
+        QuizLevel(
+            id = "world_8",
+            packId = "world",
+            levelNumber = 8,
+            answer = "PISA",
+            hintSentence = "Freestanding marble bell tower famously tilted in Tuscany, Italy",
+            triviaFact = "Construction began in 1173; the tilt began early on due to soft clay soil on one side of the foundation.",
+            logoKey = "pisa"
+        ),
+        QuizLevel(
+            id = "world_9",
+            packId = "world",
+            levelNumber = 9,
+            answer = "SPHINX",
+            hintSentence = "Limestone statue of a lion with a pharaoh head guarding Giza",
+            triviaFact = "Carved directly from bedrock, the Great Sphinx measures 73 meters from paw to tail and 20 meters high.",
+            logoKey = "sphinx"
+        ),
+        QuizLevel(
+            id = "world_10",
+            packId = "world",
+            levelNumber = 10,
+            answer = "SYDNEY",
+            hintSentence = "Multi-venue performing arts centre with soaring sail-shaped roofs",
+            triviaFact = "Designed by Danish architect Jørn Utzon, the Opera House shells are covered in over one million ceramic tiles.",
+            logoKey = "sydney"
         )
     )
 

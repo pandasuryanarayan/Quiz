@@ -3,6 +3,7 @@ package com.example
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.example.data.PackCategory
 import com.example.data.QuizDatabase
 import com.example.data.QuizRepository
 import kotlinx.coroutines.runBlocking
@@ -26,7 +27,7 @@ class ExampleRobolectricTest {
   @Test
   fun `verify quiz packs catalog`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(40, levels.size)
+    assertEquals(60, levels.size)
   }
 
   @Test
@@ -161,6 +162,27 @@ class ExampleRobolectricTest {
     visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
     assertEquals(3, visible.size)
     assertEquals("brands_3", visible[2].id)
+
+    db.close()
+  }
+
+  @Test
+  fun `verify all categories have exactly 10 levels and are seeded properly`() = runBlocking {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val db = Room.inMemoryDatabaseBuilder(context, QuizDatabase::class.java).allowMainThreadQueries().build()
+    val repo = QuizRepository(db.quizDao())
+    repo.initializeDefaultsIfNeeded()
+
+    assertEquals(6, PackCategory.entries.size)
+
+    for (pack in PackCategory.entries) {
+      val packLevels = com.example.data.QuizPackData.getLevelsForPack(pack.id)
+      assertEquals("Pack ${pack.id} should have exactly 10 levels", 10, packLevels.size)
+      // Level 1 should be free & visible initially
+      val visible = com.example.data.QuizPackData.getVisibleLevelsForPack(pack.id, repo.allProgress.value)
+      assertEquals("Pack ${pack.id} should show only Level 1 initially", 1, visible.size)
+      assertEquals("${pack.id}_1", visible[0].id)
+    }
 
     db.close()
   }

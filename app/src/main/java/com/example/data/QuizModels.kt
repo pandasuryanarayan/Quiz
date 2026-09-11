@@ -13,7 +13,9 @@ enum class PackCategory(
     BRANDS("brands", "Famous Brands", "Iconic global logos & company trademarks", "tag", 0xFF3B82F6),
     ENTERTAINMENT("entertainment", "Entertainment", "Movies, TV, studios & streaming giants", "movie", 0xFF8B5CF6),
     GAMING("gaming", "Gaming & Tech", "Consoles, studios, retro games & tech titans", "gamepad", 0xFF10B981),
-    SPORTS("sports", "Sports & Autos", "Supercars, athletic gear & sports leagues", "trophy", 0xFFF59E0B)
+    SPORTS("sports", "Sports & Autos", "Supercars, athletic gear & sports leagues", "trophy", 0xFFF59E0B),
+    FOOD("food", "Food & Treats", "World-famous snacks, beverages & fast food chains", "restaurant", 0xFFEF4444),
+    WORLD("world", "World Wonders", "Iconic monuments, ancient ruins & landmarks", "globe", 0xFF06B6D4)
 }
 
 data class QuizLevel(

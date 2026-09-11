@@ -50,11 +50,34 @@ class QuizRepository(private val quizDao: QuizDao) {
             quizDao.insertInitialProgress(initialEntities)
             _allProgress.value = initialEntities
         } else {
+            // Check if any new levels or categories were added to QuizPackData that are missing in DB
+            val existingIds = existingProgress.map { it.id }.toSet()
+            val missingLevels = QuizPackData.allLevels.filter { it.id !in existingIds }
+            val newlyAddedEntities = if (missingLevels.isNotEmpty()) {
+                val newEntities = missingLevels.map { level ->
+                    LevelProgressEntity(
+                        id = level.id,
+                        packId = level.packId,
+                        levelNumber = level.levelNumber,
+                        isUnlocked = level.levelNumber == 1,
+                        isCompleted = false,
+                        stars = 0,
+                        hintsUsed = 0
+                    )
+                }
+                quizDao.insertInitialProgress(newEntities)
+                newEntities
+            } else {
+                emptyList()
+            }
+
+            val combined = existingProgress + newlyAddedEntities
+
             // Sanitize legacy or dirty database entries from earlier app versions:
             // Any level N > 1 where level N - 1 is NOT completed must be locked!
-            val sanitized = existingProgress.map { entity ->
+            val sanitized = combined.map { entity ->
                 if (entity.levelNumber > 1 && !entity.isCompleted) {
-                    val prev = existingProgress.find { it.packId == entity.packId && it.levelNumber == entity.levelNumber - 1 }
+                    val prev = combined.find { it.packId == entity.packId && it.levelNumber == entity.levelNumber - 1 }
                     if (prev?.isCompleted != true && entity.isUnlocked) {
                         quizDao.lockLevel(entity.id)
                         entity.copy(isUnlocked = false)

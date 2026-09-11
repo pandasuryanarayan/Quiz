@@ -25,6 +25,8 @@ import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.LocalOffer
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Movie
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Videocam
@@ -353,6 +355,8 @@ private fun PackCard(
         "tag" -> Icons.Rounded.LocalOffer
         "movie" -> Icons.Rounded.Movie
         "gamepad" -> Icons.Rounded.SportsEsports
+        "restaurant" -> Icons.Rounded.Restaurant
+        "globe" -> Icons.Rounded.Public
         else -> Icons.Rounded.EmojiEvents
     }
 
