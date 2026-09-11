@@ -49,4 +49,91 @@ class ExampleRobolectricTest {
 
     db.close()
   }
+
+  @Test
+  fun `verify sequential level unlock progression`() = runBlocking {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val db = Room.inMemoryDatabaseBuilder(context, QuizDatabase::class.java).allowMainThreadQueries().build()
+    val repo = QuizRepository(db.quizDao())
+    repo.initializeDefaultsIfNeeded()
+
+    val level1 = com.example.data.QuizPackData.getLevelById("brands_1")!!
+    val level2 = com.example.data.QuizPackData.getLevelById("brands_2")!!
+    val level5 = com.example.data.QuizPackData.getLevelById("brands_5")!!
+    val level6 = com.example.data.QuizPackData.getLevelById("brands_6")!!
+    val level7 = com.example.data.QuizPackData.getLevelById("brands_7")!!
+
+    var allProgress = db.quizDao().getAllLevelProgress()
+    // Helper to get sync list
+    fun getProgressList() = runBlocking {
+      com.example.data.QuizPackData.allLevels.mapNotNull { lvl ->
+        db.quizDao().getLevelProgressSync(lvl.id)
+      }
+    }
+
+    var progressList = getProgressList()
+
+    // 1. Level 1 must be unlocked initially
+    val statusL1 = com.example.data.QuizPackData.getLevelLockStatus(level1, progressList)
+    assertEquals(true, statusL1.isUnlocked)
+    assertEquals(false, statusL1.isStrictlyLocked)
+
+    // 2. Level 2 must be strictly locked initially because Level 1 is not completed
+    val statusL2 = com.example.data.QuizPackData.getLevelLockStatus(level2, progressList)
+    assertEquals(false, statusL2.isUnlocked)
+    assertEquals(true, statusL2.isStrictlyLocked)
+    assertEquals("brands_1", statusL2.requiredPreviousLevel?.id)
+
+    // 3. Level 6 (ad-gated) must be strictly locked because Level 5 is not completed
+    val statusL6Before = com.example.data.QuizPackData.getLevelLockStatus(level6, progressList)
+    assertEquals(false, statusL6Before.isUnlocked)
+    assertEquals(false, statusL6Before.isAdGated)
+    assertEquals(true, statusL6Before.isStrictlyLocked)
+
+    // 4. Complete Level 1 -> Level 2 should now be unlocked
+    repo.completeLevel(level1.id)
+    progressList = getProgressList()
+
+    val statusL2After = com.example.data.QuizPackData.getLevelLockStatus(level2, progressList)
+    assertEquals(true, statusL2After.isUnlocked)
+    assertEquals(false, statusL2After.isStrictlyLocked)
+
+    // 5. Complete levels 2, 3, 4, 5
+    repo.completeLevel("brands_2")
+    repo.completeLevel("brands_3")
+    repo.completeLevel("brands_4")
+    repo.completeLevel("brands_5")
+    progressList = getProgressList()
+
+    // Now Level 6 should be eligible for Ad-Unlock (isAdGated = true, but not unlocked yet)
+    val statusL6Eligible = com.example.data.QuizPackData.getLevelLockStatus(level6, progressList)
+    assertEquals(false, statusL6Eligible.isUnlocked)
+    assertEquals(true, statusL6Eligible.isAdGated)
+    assertEquals(false, statusL6Eligible.isStrictlyLocked)
+
+    // And Level 7 should still be strictly locked because Level 6 is not completed
+    val statusL7Locked = com.example.data.QuizPackData.getLevelLockStatus(level7, progressList)
+    assertEquals(false, statusL7Locked.isUnlocked)
+    assertEquals(false, statusL7Locked.isAdGated)
+    assertEquals(true, statusL7Locked.isStrictlyLocked)
+
+    // 6. Unlock Level 6 via ad
+    repo.unlockLevel(level6.id)
+    progressList = getProgressList()
+
+    val statusL6Unlocked = com.example.data.QuizPackData.getLevelLockStatus(level6, progressList)
+    assertEquals(true, statusL6Unlocked.isUnlocked)
+    assertEquals(false, statusL6Unlocked.isAdGated)
+
+    // 7. Complete Level 6 -> Level 7 becomes eligible for ad unlock
+    repo.completeLevel(level6.id)
+    progressList = getProgressList()
+
+    val statusL7Eligible = com.example.data.QuizPackData.getLevelLockStatus(level7, progressList)
+    assertEquals(false, statusL7Eligible.isUnlocked)
+    assertEquals(true, statusL7Eligible.isAdGated)
+    assertEquals(false, statusL7Eligible.isStrictlyLocked)
+
+    db.close()
+  }
 }

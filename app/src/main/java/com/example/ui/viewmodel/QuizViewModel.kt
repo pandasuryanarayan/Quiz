@@ -48,7 +48,9 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         PackCategory.entries.map { pack ->
             val packLevels = QuizPackData.getLevelsForPack(pack.id)
             val packProgress = progressList.filter { it.packId == pack.id }
-            val unlockedCount = packProgress.count { it.isUnlocked }
+            val unlockedCount = packLevels.count { level ->
+                QuizPackData.getLevelLockStatus(level, progressList).isUnlocked
+            }
             val completedCount = packProgress.count { it.isCompleted }
             val starsCount = packProgress.sumOf { it.stars }
             PackProgressSummary(
@@ -108,6 +110,24 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _advanceAfterAd = MutableStateFlow(false)
 
+    data class LockedLevelNotice(
+        val targetLevel: QuizLevel,
+        val requiredLevel: QuizLevel
+    )
+
+    private val _lockedLevelNotice = MutableStateFlow<LockedLevelNotice?>(null)
+    val lockedLevelNotice = _lockedLevelNotice.asStateFlow()
+
+    fun dismissLockedLevelNotice() {
+        _lockedLevelNotice.value = null
+    }
+
+    fun playRequiredLevelFromNotice() {
+        val notice = _lockedLevelNotice.value ?: return
+        _lockedLevelNotice.value = null
+        openLevel(notice.requiredLevel.id)
+    }
+
     fun promptEarnCoinsAd() {
         _pendingAdPurpose.value = AdPurpose.EARN_COINS
         _showAdPlayer.value = true
@@ -120,14 +140,21 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun openLevel(levelId: String) {
         val level = QuizPackData.getLevelById(levelId) ?: return
-        val progress = allProgress.value.find { it.id == levelId }
-        val isUnlocked = progress?.isUnlocked == true || level.levelNumber <= 5
+        val status = QuizPackData.getLevelLockStatus(level, allProgress.value)
 
-        if (isUnlocked) {
+        if (status.isStrictlyLocked) {
+            val req = status.requiredPreviousLevel
+            if (req != null) {
+                _lockedLevelNotice.value = LockedLevelNotice(targetLevel = level, requiredLevel = req)
+            }
+            return
+        }
+
+        if (status.isUnlocked) {
             setupLevel(level)
             _currentLevelId.value = levelId
-        } else {
-            // Trigger Rewarded Video Ad Gate
+        } else if (status.isAdGated) {
+            // Trigger Rewarded Video Ad Gate (only eligible if previous level was completed!)
             _pendingUnlockLevel.value = level
             _pendingAdPurpose.value = AdPurpose.UNLOCK_LEVEL
             _showAdPrompt.value = true

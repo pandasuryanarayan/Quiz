@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ads.LevelPlayAdsManager
 import com.example.ui.components.AdPromptDialog
 import com.example.ui.components.AdPurpose
+import com.example.ui.components.LockedLevelDialog
 import com.example.ui.components.RewardedAdPlayerModal
 import com.example.ui.components.LevelPlayAdErrorModal
 import com.example.ui.components.LevelPlayAdLoadingModal
@@ -83,6 +84,7 @@ fun LogoQuizApp(
     val showLevelComplete by viewModel.showLevelComplete.collectAsState()
     val pendingAdPurpose by viewModel.pendingAdPurpose.collectAsState()
     val pendingUnlockLevel by viewModel.pendingUnlockLevel.collectAsState()
+    val lockedLevelNotice by viewModel.lockedLevelNotice.collectAsState()
 
     // Navigation back handlers
     if (currentLevelId != null) {
@@ -168,6 +170,18 @@ fun LogoQuizApp(
             levelNumber = pendingUnlockLevel?.levelNumber ?: activeLevel?.levelNumber ?: 0,
             onConfirmWatch = viewModel::onConfirmWatchAd,
             onDismiss = viewModel::onDismissAdPrompt
+        )
+    }
+
+    // Locked Level Sequential Requirement Dialog
+    lockedLevelNotice?.let { notice ->
+        LockedLevelDialog(
+            targetLevel = notice.targetLevel,
+            requiredLevel = notice.requiredLevel,
+            onPlayRequiredLevel = {
+                viewModel.playRequiredLevelFromNotice()
+            },
+            onDismiss = viewModel::dismissLockedLevelNotice
         )
     }
 

@@ -194,14 +194,12 @@ fun LevelGridScreen(
             // Level Tiles (1 to 10)
             items(packLevels) { level ->
                 val progress = allProgress.find { it.id == level.id }
-                val isUnlocked = progress?.isUnlocked == true || level.levelNumber <= 5
-                val isCompleted = progress?.isCompleted == true
+                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress)
                 val stars = progress?.stars ?: 0
 
                 LevelGridTile(
                     level = level,
-                    isUnlocked = isUnlocked,
-                    isCompleted = isCompleted,
+                    lockStatus = lockStatus,
                     stars = stars,
                     onClick = { onLevelClick(level.id) },
                     modifier = Modifier.testTag("level_item_${level.id}")
@@ -214,30 +212,36 @@ fun LevelGridScreen(
 @Composable
 private fun LevelGridTile(
     level: QuizLevel,
-    isUnlocked: Boolean,
-    isCompleted: Boolean,
+    lockStatus: com.example.data.LevelLockStatus,
     stars: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isCompleted = lockStatus.isCompleted
+    val isUnlocked = lockStatus.isUnlocked
+    val isAdGated = lockStatus.isAdGated
+    val isStrictlyLocked = lockStatus.isStrictlyLocked
+
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = when {
             isCompleted -> Color(0xFFF0FDF4)
             isUnlocked -> Color.White
-            else -> Color(0xFFF8FAFC)
+            isAdGated -> Color(0xFFF8FAFC)
+            else -> Color(0xFFF1F5F9)
         },
         border = BorderStroke(
             width = if (isCompleted || isUnlocked) 1.5.dp else 1.dp,
             color = when {
                 isCompleted -> EmeraldSuccess
                 isUnlocked -> TailwindBlue.copy(alpha = 0.5f)
+                isAdGated -> Color(0xFFBFDBFE)
                 else -> Slate200
             }
         ),
         modifier = modifier
             .fillMaxWidth()
-            .height(115.dp)
+            .height(118.dp)
             .shadow(if (isUnlocked) 2.dp else 0.dp, RoundedCornerShape(18.dp))
             .clickable { onClick() }
     ) {
@@ -260,7 +264,12 @@ private fun LevelGridTile(
                         text = "LEVEL ${level.levelNumber}",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isUnlocked) Slate500 else Slate400,
+                        color = when {
+                            isCompleted -> EmeraldSuccess
+                            isUnlocked -> Slate700
+                            isAdGated -> TailwindBlue
+                            else -> Slate400
+                        },
                         letterSpacing = 0.5.sp
                     )
 
@@ -271,7 +280,7 @@ private fun LevelGridTile(
                             tint = EmeraldSuccess,
                             modifier = Modifier.size(18.dp)
                         )
-                    } else if (!isUnlocked) {
+                    } else if (isAdGated) {
                         Surface(
                             shape = CircleShape,
                             color = Color(0xFFEFF6FF),
@@ -279,81 +288,136 @@ private fun LevelGridTile(
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = Icons.Rounded.Lock,
-                                    contentDescription = "Locked",
+                                    imageVector = Icons.Rounded.Videocam,
+                                    contentDescription = "Watch Ad",
                                     tint = TailwindBlue,
                                     modifier = Modifier.size(13.dp)
+                                )
+                            }
+                        }
+                    } else if (isStrictlyLocked) {
+                        Surface(
+                            shape = CircleShape,
+                            color = Color(0xFFE2E8F0),
+                            modifier = Modifier.size(22.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Lock,
+                                    contentDescription = "Locked",
+                                    tint = Slate500,
+                                    modifier = Modifier.size(12.dp)
                                 )
                             }
                         }
                     }
                 }
 
-                // Center Content: Stars or Play Prompt or Ad Unlock Tag
+                // Center Content: Stars or Play Prompt or Ad Unlock Tag or Locked Icon
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isCompleted) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            repeat(stars) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Star,
-                                    contentDescription = null,
-                                    tint = AmberStar,
-                                    modifier = Modifier.size(20.dp)
+                    when {
+                        isCompleted -> {
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                repeat(stars) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Star,
+                                        contentDescription = null,
+                                        tint = AmberStar,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        }
+                        isUnlocked -> {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color(0xFFEFF6FF)
+                            ) {
+                                Text(
+                                    text = "PLAY",
+                                    color = TailwindBlue,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 13.sp,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp)
                                 )
                             }
                         }
-                    } else if (isUnlocked) {
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFEFF6FF)
-                        ) {
-                            Text(
-                                text = "PLAY",
-                                color = TailwindBlue,
-                                fontWeight = FontWeight.Black,
-                                fontSize = 13.sp,
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp)
-                            )
-                        }
-                    } else {
-                        // Ad Gated Badge
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFEFF6FF),
-                            border = BorderStroke(1.dp, Color(0xFFBFDBFE))
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                        isAdGated -> {
+                            // Ad Gated Badge (Previous level completed, ready to unlock via ad)
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color(0xFFEFF6FF),
+                                border = BorderStroke(1.dp, Color(0xFFBFDBFE))
                             ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Videocam,
-                                    contentDescription = null,
-                                    tint = TailwindBlue,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "WATCH AD",
-                                    color = TailwindBlue,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp
-                                )
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Videocam,
+                                        contentDescription = null,
+                                        tint = TailwindBlue,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "WATCH AD",
+                                        color = TailwindBlue,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        }
+                        else -> {
+                            // Strictly Locked (Previous level not completed yet)
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color(0xFFE2E8F0)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Lock,
+                                        contentDescription = null,
+                                        tint = Slate500,
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "LOCKED",
+                                        color = Slate500,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
-                // Bottom Subtitle (Letters count or status)
+                // Bottom Subtitle (Letters count or required level)
                 Text(
-                    text = "${level.answer.length} Letters",
-                    fontSize = 11.sp,
-                    color = if (isUnlocked) Slate500 else Slate400,
+                    text = when {
+                        isCompleted -> "${level.answer.length} Letters • Solved"
+                        isUnlocked -> "${level.answer.length} Letters"
+                        isAdGated -> "Unlock with Ad"
+                        else -> "Solve Level ${level.levelNumber - 1}"
+                    },
+                    fontSize = 10.sp,
+                    color = when {
+                        isCompleted -> EmeraldSuccess
+                        isUnlocked -> Slate500
+                        isAdGated -> TailwindBlue
+                        else -> Slate400
+                    },
                     fontWeight = FontWeight.Medium
                 )
             }

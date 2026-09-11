@@ -16,13 +16,13 @@ class QuizRepository(private val quizDao: QuizDao) {
             quizDao.insertInitialProfile(UserProfileEntity(id = 1, coins = 150, totalXp = 0))
         }
 
-        // Initialize level progresses
+        // Initialize level progresses (Level 1 of each pack unlocked initially)
         val initialEntities = QuizPackData.allLevels.map { level ->
             LevelProgressEntity(
                 id = level.id,
                 packId = level.packId,
                 levelNumber = level.levelNumber,
-                isUnlocked = level.levelNumber <= 5, // Stages 1..5 unlocked by default
+                isUnlocked = level.levelNumber == 1, // Only Level 1 of each pack is unlocked initially
                 isCompleted = false,
                 stars = 0,
                 hintsUsed = 0
@@ -50,6 +50,16 @@ class QuizRepository(private val quizDao: QuizDao) {
         quizDao.markLevelCompleted(levelId, stars, System.currentTimeMillis())
         if (!wasCompleted) {
             quizDao.addRewards(coinsDelta = coinsAwarded, xpDelta = xpAwarded, levelsDelta = 1)
+        }
+
+        // Sequential progression: when level N is completed, unlock level N+1 if it's a free level (<= 5)
+        val currentLevel = QuizPackData.getLevelById(levelId)
+        if (currentLevel != null) {
+            val nextLevelNumber = currentLevel.levelNumber + 1
+            val nextLevel = QuizPackData.getLevelsForPack(currentLevel.packId).find { it.levelNumber == nextLevelNumber }
+            if (nextLevel != null && nextLevel.levelNumber <= 5) {
+                quizDao.unlockLevel(nextLevel.id)
+            }
         }
     }
 

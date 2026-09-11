@@ -379,4 +379,87 @@ object QuizPackData {
     fun getLevelById(id: String): QuizLevel? = allLevels.find { it.id == id }
 
     fun getLevelsForPack(packId: String): List<QuizLevel> = allLevels.filter { it.packId == packId }
+
+    /**
+     * Determines whether a level is completed, unlocked, eligible for ad-unlock, or strictly locked.
+     * Rule: Every level (whether free or watch-ad) can ONLY be unlocked if the previous level is completed.
+     * Level 1 of any pack is always unlocked by default.
+     */
+    fun getLevelLockStatus(
+        level: QuizLevel,
+        allProgress: List<LevelProgressEntity>
+    ): LevelLockStatus {
+        val progress = allProgress.find { it.id == level.id }
+        val isCompleted = progress?.isCompleted == true
+
+        if (isCompleted) {
+            return LevelLockStatus(
+                isCompleted = true,
+                isUnlocked = true,
+                isAdGated = false,
+                isStrictlyLocked = false,
+                requiredPreviousLevel = null
+            )
+        }
+
+        // Level 1 is always unlocked
+        if (level.levelNumber == 1) {
+            return LevelLockStatus(
+                isCompleted = false,
+                isUnlocked = true,
+                isAdGated = false,
+                isStrictlyLocked = false,
+                requiredPreviousLevel = null
+            )
+        }
+
+        // For level N > 1, level N - 1 in the same pack must be completed
+        val packLevels = getLevelsForPack(level.packId)
+        val prevLevel = packLevels.find { it.levelNumber == level.levelNumber - 1 }
+        val prevProgress = prevLevel?.let { p -> allProgress.find { it.id == p.id } }
+        val isPrevCompleted = prevProgress?.isCompleted == true
+
+        if (!isPrevCompleted) {
+            // Previous level has not been completed yet -> strictly locked
+            return LevelLockStatus(
+                isCompleted = false,
+                isUnlocked = false,
+                isAdGated = false,
+                isStrictlyLocked = true,
+                requiredPreviousLevel = prevLevel
+            )
+        }
+
+        // Previous level IS completed:
+        // Free levels (stages 1..5) are automatically unlocked once previous level is completed
+        val isFreeLevel = level.levelNumber <= 5
+        val hasWatchedAd = progress?.isUnlocked == true
+
+        return if (isFreeLevel || hasWatchedAd) {
+            LevelLockStatus(
+                isCompleted = false,
+                isUnlocked = true,
+                isAdGated = false,
+                isStrictlyLocked = false,
+                requiredPreviousLevel = null
+            )
+        } else {
+            // Ad-gated level (stages 6..10) whose previous level IS completed, ready for ad unlock
+            LevelLockStatus(
+                isCompleted = false,
+                isUnlocked = false,
+                isAdGated = true,
+                isStrictlyLocked = false,
+                requiredPreviousLevel = null
+            )
+        }
+    }
 }
+
+data class LevelLockStatus(
+    val isCompleted: Boolean,
+    val isUnlocked: Boolean,
+    val isAdGated: Boolean,
+    val isStrictlyLocked: Boolean,
+    val requiredPreviousLevel: QuizLevel?
+)
