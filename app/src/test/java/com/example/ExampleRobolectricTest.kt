@@ -136,4 +136,32 @@ class ExampleRobolectricTest {
 
     db.close()
   }
+
+  @Test
+  fun `verify only level 1 is shown until passed, then level 2 shown`() = runBlocking {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val db = Room.inMemoryDatabaseBuilder(context, QuizDatabase::class.java).allowMainThreadQueries().build()
+    val repo = QuizRepository(db.quizDao())
+    repo.initializeDefaultsIfNeeded()
+
+    // 1. Initially, only Level 1 must be visible in the pack
+    var visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    assertEquals(1, visible.size)
+    assertEquals("brands_1", visible[0].id)
+
+    // 2. User completes Level 1 -> now Level 1 and Level 2 are visible
+    repo.completeLevel("brands_1")
+    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    assertEquals(2, visible.size)
+    assertEquals("brands_1", visible[0].id)
+    assertEquals("brands_2", visible[1].id)
+
+    // 3. User completes Level 2 -> now Level 1, 2, and 3 are visible
+    repo.completeLevel("brands_2")
+    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    assertEquals(3, visible.size)
+    assertEquals("brands_3", visible[2].id)
+
+    db.close()
+  }
 }

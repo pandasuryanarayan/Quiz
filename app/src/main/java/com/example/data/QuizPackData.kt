@@ -454,6 +454,38 @@ object QuizPackData {
             )
         }
     }
+
+    /**
+     * Returns only the levels that should be shown to the user for a pack.
+     * Rule:
+     * - Level 1 is always shown.
+     * - Level N (where N > 1) is ONLY shown when Level N-1 has been passed (completed).
+     */
+    fun getVisibleLevelsForPack(
+        packId: String,
+        allProgress: List<LevelProgressEntity>
+    ): List<QuizLevel> {
+        val packLevels = getLevelsForPack(packId).sortedBy { it.levelNumber }
+        val visibleList = mutableListOf<QuizLevel>()
+
+        for (level in packLevels) {
+            if (level.levelNumber == 1) {
+                visibleList.add(level)
+            } else {
+                val prevLevel = packLevels.find { it.levelNumber == level.levelNumber - 1 }
+                val prevProgress = prevLevel?.let { p -> allProgress.find { it.id == p.id } }
+                val isPrevCompleted = prevProgress?.isCompleted == true
+
+                if (isPrevCompleted) {
+                    visibleList.add(level)
+                } else {
+                    // Do not show this or any subsequent levels until previous level is passed
+                    break
+                }
+            }
+        }
+        return visibleList
+    }
 }
 
 data class LevelLockStatus(

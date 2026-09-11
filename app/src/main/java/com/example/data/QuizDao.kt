@@ -13,6 +13,9 @@ interface QuizDao {
     @Query("SELECT * FROM level_progress")
     fun getAllLevelProgress(): Flow<List<LevelProgressEntity>>
 
+    @Query("SELECT * FROM level_progress")
+    suspend fun getAllLevelProgressSync(): List<LevelProgressEntity>
+
     @Query("SELECT * FROM level_progress WHERE packId = :packId ORDER BY levelNumber ASC")
     fun getProgressForPack(packId: String): Flow<List<LevelProgressEntity>>
 
@@ -30,6 +33,9 @@ interface QuizDao {
 
     @Query("UPDATE level_progress SET isUnlocked = 1 WHERE id = :levelId")
     suspend fun unlockLevel(levelId: String)
+
+    @Query("UPDATE level_progress SET isUnlocked = 0 WHERE id = :levelId")
+    suspend fun lockLevel(levelId: String)
 
     @Query("UPDATE level_progress SET isCompleted = 1, stars = :stars, solvedTimestamp = :timestamp WHERE id = :levelId")
     suspend fun markLevelCompleted(levelId: String, stars: Int, timestamp: Long)

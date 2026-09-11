@@ -191,8 +191,11 @@ fun LevelGridScreen(
                 }
             }
 
-            // Level Tiles (1 to 10)
-            items(packLevels) { level ->
+            // Only show levels that have been unlocked sequentially
+            // Level 1 is always shown. Level N (N > 1) is ONLY shown once Level N-1 has been passed.
+            val visibleLevels = QuizPackData.getVisibleLevelsForPack(pack.id, allProgress)
+
+            items(visibleLevels) { level ->
                 val progress = allProgress.find { it.id == level.id }
                 val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress)
                 val stars = progress?.stars ?: 0
@@ -204,6 +207,54 @@ fun LevelGridScreen(
                     onClick = { onLevelClick(level.id) },
                     modifier = Modifier.testTag("level_item_${level.id}")
                 )
+            }
+
+            // Progression indicator card if more levels are locked
+            if (visibleLevels.size < packLevels.size) {
+                item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(2) }) {
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = Color(0xFFF1F5F9),
+                        border = BorderStroke(1.dp, Slate200),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = Color.White,
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Lock,
+                                        contentDescription = null,
+                                        tint = Slate500,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = "Level ${visibleLevels.size + 1} Locked",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Slate700
+                                )
+                                Text(
+                                    text = "Pass Level ${visibleLevels.size} to unlock Level ${visibleLevels.size + 1}",
+                                    fontSize = 11.sp,
+                                    color = Slate500
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

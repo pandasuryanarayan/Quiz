@@ -1,13 +1,30 @@
 package com.example.data
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class QuizRepository(private val quizDao: QuizDao) {
 
-    val allProgress: Flow<List<LevelProgressEntity>> = quizDao.getAllLevelProgress()
+    private val _allProgress = MutableStateFlow<List<LevelProgressEntity>>(emptyList())
+    val allProgress: StateFlow<List<LevelProgressEntity>> = _allProgress.asStateFlow()
+
     val userProfile: Flow<UserProfileEntity?> = quizDao.getUserProfile()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            quizDao.getAllLevelProgress().collect { dbList ->
+                if (dbList.isNotEmpty()) {
+                    _allProgress.value = dbList
+                }
+            }
+        }
+    }
 
     suspend fun initializeDefaultsIfNeeded() = withContext(Dispatchers.IO) {
         // Initialize user profile if not exists
@@ -17,18 +34,39 @@ class QuizRepository(private val quizDao: QuizDao) {
         }
 
         // Initialize level progresses (Level 1 of each pack unlocked initially)
-        val initialEntities = QuizPackData.allLevels.map { level ->
-            LevelProgressEntity(
-                id = level.id,
-                packId = level.packId,
-                levelNumber = level.levelNumber,
-                isUnlocked = level.levelNumber == 1, // Only Level 1 of each pack is unlocked initially
-                isCompleted = false,
-                stars = 0,
-                hintsUsed = 0
-            )
+        val existingProgress = quizDao.getAllLevelProgressSync()
+        if (existingProgress.isEmpty()) {
+            val initialEntities = QuizPackData.allLevels.map { level ->
+                LevelProgressEntity(
+                    id = level.id,
+                    packId = level.packId,
+                    levelNumber = level.levelNumber,
+                    isUnlocked = level.levelNumber == 1, // Only Level 1 of each pack is unlocked initially
+                    isCompleted = false,
+                    stars = 0,
+                    hintsUsed = 0
+                )
+            }
+            quizDao.insertInitialProgress(initialEntities)
+            _allProgress.value = initialEntities
+        } else {
+            // Sanitize legacy or dirty database entries from earlier app versions:
+            // Any level N > 1 where level N - 1 is NOT completed must be locked!
+            val sanitized = existingProgress.map { entity ->
+                if (entity.levelNumber > 1 && !entity.isCompleted) {
+                    val prev = existingProgress.find { it.packId == entity.packId && it.levelNumber == entity.levelNumber - 1 }
+                    if (prev?.isCompleted != true && entity.isUnlocked) {
+                        quizDao.lockLevel(entity.id)
+                        entity.copy(isUnlocked = false)
+                    } else {
+                        entity
+                    }
+                } else {
+                    entity
+                }
+            }
+            _allProgress.value = sanitized
         }
-        quizDao.insertInitialProgress(initialEntities)
     }
 
     fun getProgressForPack(packId: String): Flow<List<LevelProgressEntity>> {
@@ -40,6 +78,12 @@ class QuizRepository(private val quizDao: QuizDao) {
     }
 
     suspend fun unlockLevel(levelId: String) = withContext(Dispatchers.IO) {
+        // Synchronously update in-memory state
+        val updated = _allProgress.value.map { entity ->
+            if (entity.id == levelId) entity.copy(isUnlocked = true) else entity
+        }
+        _allProgress.value = updated
+
         quizDao.unlockLevel(levelId)
         quizDao.incrementAdsWatched()
     }
@@ -54,13 +98,26 @@ class QuizRepository(private val quizDao: QuizDao) {
 
         // Sequential progression: when level N is completed, unlock level N+1 if it's a free level (<= 5)
         val currentLevel = QuizPackData.getLevelById(levelId)
-        if (currentLevel != null) {
+        val nextLevelId = if (currentLevel != null) {
             val nextLevelNumber = currentLevel.levelNumber + 1
             val nextLevel = QuizPackData.getLevelsForPack(currentLevel.packId).find { it.levelNumber == nextLevelNumber }
             if (nextLevel != null && nextLevel.levelNumber <= 5) {
                 quizDao.unlockLevel(nextLevel.id)
+                nextLevel.id
+            } else {
+                null
+            }
+        } else null
+
+        // Immediately update in-memory state so UI and next-level flows react with zero lag
+        val updated = _allProgress.value.map { entity ->
+            when (entity.id) {
+                levelId -> entity.copy(isCompleted = true, stars = stars)
+                nextLevelId -> entity.copy(isUnlocked = true)
+                else -> entity
             }
         }
+        _allProgress.value = updated
     }
 
     suspend fun spendCoins(amount: Int): Boolean = withContext(Dispatchers.IO) {
