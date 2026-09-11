@@ -20,6 +20,12 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# kotlinx-coroutines (required service-loader entries under R8 full mode)
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidExceptionPreHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
+
 # Unity Ads (legacy waterfall SDK, kept for bidder demand)
 -keep class com.unity3d.ads.** { *; }
 -keep interface com.unity3d.ads.** { *; }

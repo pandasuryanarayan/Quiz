@@ -21,6 +21,12 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    // Keep only English strings: ad/network SDKs bundle 100+ locales we don't need.
+    resourceConfigurations += listOf("en")
+
+    // Drop x86/x86_64 (emulator-only ABIs). Real phones are arm64-v8a/armeabi-v7a.
+    ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
   }
 
   signingConfigs {
@@ -41,12 +47,38 @@ android {
 
   buildTypes {
     release {
-      isCrunchPngs = false
-      isMinifyEnabled = false
+      isCrunchPngs = true
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
     debug { signingConfig = signingConfigs.getByName("debugConfig") }
+  }
+  // Per-ABI APKs: phones download/install only their own native libs.
+  splits {
+    abi {
+      isEnable = true
+      reset()
+      include("armeabi-v7a", "arm64-v8a")
+      isUniversalApk = true
+    }
+  }
+  packaging {
+    resources {
+      excludes += setOf(
+        "META-INF/DEPENDENCIES",
+        "META-INF/LICENSE",
+        "META-INF/LICENSE.txt",
+        "META-INF/LICENSE.md",
+        "META-INF/NOTICE",
+        "META-INF/NOTICE.txt",
+        "META-INF/NOTICE.md",
+        "META-INF/*.version",
+        "META-INF/*.properties",
+        "DebugProbesKt.bin"
+      )
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -77,7 +109,6 @@ googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.W
 // This makes it easy to add them back in the future if needed.
 dependencies {
   implementation(platform(libs.androidx.compose.bom))
-  implementation(platform(libs.firebase.bom))
   // implementation(libs.accompanist.permissions)
   implementation(libs.androidx.activity.compose)
   // implementation(libs.androidx.camera.camera2)
@@ -89,7 +120,6 @@ dependencies {
   implementation(libs.androidx.compose.material3)
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.graphics)
-  implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.core.ktx)
   // implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.runtime.compose)
@@ -105,26 +135,9 @@ dependencies {
   implementation(libs.play.services.appset)
   implementation(libs.play.services.basement)
   // implementation(libs.coil.compose)
-  implementation(libs.converter.moshi)
-  implementation(libs.firebase.ai)
-  // Uncomment to use Firestore:
-  // implementation(libs.firebase.firestore)
-
-  // Uncomment ALL FOUR of the following dependencies together to use Firebase Auth and Google
-  // Sign-In via Credential Manager:
-  // implementation(libs.firebase.auth)
-  // implementation(libs.androidx.credentials)
-  // implementation(libs.androidx.credentials.play.services)
-  // implementation(libs.googleid)
-  implementation(libs.firebase.appcheck.recaptcha)
-  implementation(libs.firebase.appcheck.debug)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.logging.interceptor)
-  implementation(libs.moshi.kotlin)
-  implementation(libs.okhttp)
   // implementation(libs.play.services.location)
-  implementation(libs.retrofit)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)
   testImplementation(libs.androidx.junit)
@@ -142,5 +155,4 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
   "ksp"(libs.androidx.room.compiler)
-  "ksp"(libs.moshi.kotlin.codegen)
 }
