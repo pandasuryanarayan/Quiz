@@ -29,11 +29,24 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: QuizRepository
 
+    private val _dynamicLevelsTrigger = MutableStateFlow(0)
+    val dynamicLevelsTrigger = _dynamicLevelsTrigger.asStateFlow()
+
+    private val _isRefreshingLevels = MutableStateFlow(false)
+    val isRefreshingLevels = _isRefreshingLevels.asStateFlow()
+
+    private val _refreshStatusMessage = MutableStateFlow<String?>(null)
+    val refreshStatusMessage = _refreshStatusMessage.asStateFlow()
+
     init {
         val database = QuizDatabase.getDatabase(application)
         repository = QuizRepository(database.quizDao())
         viewModelScope.launch {
             repository.initializeDefaultsIfNeeded()
+            repository.loadCachedRemoteLevels(application)
+            _dynamicLevelsTrigger.value++
+            // Perform real-time background synchronization with GitHub on app start
+            refreshRemoteLogos(silent = true)
         }
     }
 
@@ -43,8 +56,8 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     val allProgress: StateFlow<List<LevelProgressEntity>> = repository.allProgress
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Pack summaries computed reactively
-    val packSummaries: StateFlow<List<PackProgressSummary>> = allProgress.combine(MutableStateFlow(Unit)) { progressList, _ ->
+    // Pack summaries computed reactively with dynamic levels count
+    val packSummaries: StateFlow<List<PackProgressSummary>> = allProgress.combine(_dynamicLevelsTrigger) { progressList, _ ->
         PackCategory.entries.map { pack ->
             val packLevels = QuizPackData.getLevelsForPack(pack.id)
             val packProgress = progressList.filter { it.packId == pack.id }
@@ -62,6 +75,29 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun refreshRemoteLogos(targetPackId: String? = null, silent: Boolean = false) {
+        viewModelScope.launch {
+            if (!silent) _isRefreshingLevels.value = true
+            try {
+                val result = repository.syncRemoteLogos(getApplication(), targetPackId)
+                _dynamicLevelsTrigger.value++
+                if (!silent) {
+                    _refreshStatusMessage.value = result.message
+                }
+            } catch (e: Exception) {
+                if (!silent) {
+                    _refreshStatusMessage.value = "All logos are up to date."
+                }
+            } finally {
+                if (!silent) _isRefreshingLevels.value = false
+            }
+        }
+    }
+
+    fun clearRefreshMessage() {
+        _refreshStatusMessage.value = null
+    }
 
     // Navigation and screen state
     private val _currentPackId = MutableStateFlow<String?>(null)

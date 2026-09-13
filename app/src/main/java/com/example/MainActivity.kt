@@ -85,6 +85,8 @@ fun LogoQuizApp(
     val pendingAdPurpose by viewModel.pendingAdPurpose.collectAsState()
     val pendingUnlockLevel by viewModel.pendingUnlockLevel.collectAsState()
     val lockedLevelNotice by viewModel.lockedLevelNotice.collectAsState()
+    val isRefreshingLevels by viewModel.isRefreshingLevels.collectAsState()
+    val refreshStatusMessage by viewModel.refreshStatusMessage.collectAsState()
 
     // Navigation back handlers
     if (currentLevelId != null) {
@@ -145,6 +147,10 @@ fun LogoQuizApp(
                         packId = packId,
                         allProgress = allProgress,
                         coins = userProfile?.coins ?: 150,
+                        isRefreshing = isRefreshingLevels,
+                        refreshMessage = refreshStatusMessage,
+                        onRefreshClick = { viewModel.refreshRemoteLogos(packId) },
+                        onClearRefreshMessage = viewModel::clearRefreshMessage,
                         onLevelClick = viewModel::openLevel,
                         onBack = { viewModel.selectPack(null) },
                         onEarnCoinsClick = viewModel::promptEarnCoinsAd

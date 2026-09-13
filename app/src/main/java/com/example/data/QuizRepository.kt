@@ -160,4 +160,41 @@ class QuizRepository(private val quizDao: QuizDao) {
         quizDao.addRewards(coinsDelta = bonusCoins, xpDelta = 10, levelsDelta = 0)
         quizDao.incrementAdsWatched()
     }
+
+    suspend fun loadCachedRemoteLevels(context: android.content.Context) = withContext(Dispatchers.IO) {
+        val cached = RemoteLogoSyncManager.loadCachedLevels(context)
+        if (cached.isNotEmpty()) {
+            QuizPackData.addLevels(cached)
+            reconcileMissingLevelsInDb()
+        }
+    }
+
+    suspend fun syncRemoteLogos(context: android.content.Context, targetPackId: String? = null): RemoteLogoSyncManager.SyncResult {
+        val result = RemoteLogoSyncManager.syncRemoteLogos(context, targetPackId)
+        if (result.newLevelsCount > 0) {
+            reconcileMissingLevelsInDb()
+        }
+        return result
+    }
+
+    private suspend fun reconcileMissingLevelsInDb() = withContext(Dispatchers.IO) {
+        val existingProgress = quizDao.getAllLevelProgressSync()
+        val existingIds = existingProgress.map { it.id }.toSet()
+        val missingLevels = QuizPackData.allLevels.filter { it.id !in existingIds }
+        if (missingLevels.isNotEmpty()) {
+            val newEntities = missingLevels.map { level ->
+                LevelProgressEntity(
+                    id = level.id,
+                    packId = level.packId,
+                    levelNumber = level.levelNumber,
+                    isUnlocked = level.levelNumber == 1,
+                    isCompleted = false,
+                    stars = 0,
+                    hintsUsed = 0
+                )
+            }
+            quizDao.insertInitialProgress(newEntities)
+            _allProgress.value = existingProgress + newEntities
+        }
+    }
 }

@@ -4,8 +4,8 @@ object QuizPackData {
 
     private const val CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz"
 
-    val allLevels: List<QuizLevel> = listOf(
-        // FAMOUS BRANDS PACK (User sequence: amazon, apple, google, macdonald, nike, spotify, target, tesla, zoho)
+    val bundledLevels: List<QuizLevel> = listOf(
+        // FAMOUS BRANDS PACK (User sequence: amazon, apple, google, macdonald, nike, spotify, target, tesla, zoho, microsoft)
         QuizLevel(
             id = "brands_1",
             packId = "brands",
@@ -95,6 +95,16 @@ object QuizPackData {
             triviaFact = "Founded in 1996 as AdventNet, Zoho now runs entirely on private cloud infrastructure serving over 100 million users.",
             logoKey = "zoho",
             imageUrl = "$CDN_BASE_URL/Famous%20Brands/Zoho_Corporation-Logo.wine.webp"
+        ),
+        QuizLevel(
+            id = "brands_10",
+            packId = "brands",
+            levelNumber = 10,
+            answer = "MICROSOFT",
+            hintSentence = "Global software giant famous for Windows, Office, and Xbox",
+            triviaFact = "Founded in 1975 by Bill Gates and Paul Allen, Microsoft's name is a portmanteau of 'microcomputer' and 'software'.",
+            logoKey = "microsoft",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/Microsoft.webp"
         ),
 
         // ENTERTAINMENT PACK (User sequence: disney, netflix, twitch, warner-bros, youtube)
@@ -480,9 +490,28 @@ object QuizPackData {
         )
     )
 
-    fun getLevelById(id: String): QuizLevel? = allLevels.find { it.id == id }
+    private val dynamicLevelsList = java.util.concurrent.CopyOnWriteArrayList<QuizLevel>(bundledLevels)
 
-    fun getLevelsForPack(packId: String): List<QuizLevel> = allLevels.filter { it.packId == packId }
+    val allLevels: List<QuizLevel>
+        get() = dynamicLevelsList.toList()
+
+    fun updateLevels(newLevels: List<QuizLevel>) {
+        dynamicLevelsList.clear()
+        dynamicLevelsList.addAll(newLevels)
+    }
+
+    fun addLevels(newLevels: List<QuizLevel>) {
+        val currentIds = dynamicLevelsList.map { it.id }.toSet()
+        val toAdd = newLevels.filter { it.id !in currentIds }
+        if (toAdd.isNotEmpty()) {
+            dynamicLevelsList.addAll(toAdd)
+        }
+    }
+
+    fun getLevelById(id: String): QuizLevel? = dynamicLevelsList.find { it.id == id }
+
+    fun getLevelsForPack(packId: String): List<QuizLevel> =
+        dynamicLevelsList.filter { it.packId == packId }.sortedBy { it.levelNumber }
 
     /**
      * Determines whether a level is completed, unlocked, eligible for ad-unlock, or strictly locked.

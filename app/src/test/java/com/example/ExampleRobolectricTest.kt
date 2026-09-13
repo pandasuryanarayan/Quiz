@@ -27,11 +27,11 @@ class ExampleRobolectricTest {
   @Test
   fun `verify quiz packs catalog and CDN mappings`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(48, levels.size)
+    assertEquals(49, levels.size)
 
-    // Verify Famous Brands sequence
+    // Verify Famous Brands sequence (now 10 levels with Microsoft)
     val brands = com.example.data.QuizPackData.getLevelsForPack("brands")
-    assertEquals(9, brands.size)
+    assertEquals(10, brands.size)
     assertEquals("AMAZON", brands[0].answer)
     assertEquals("APPLE", brands[1].answer)
     assertEquals("GOOGLE", brands[2].answer)
@@ -41,6 +41,7 @@ class ExampleRobolectricTest {
     assertEquals("TARGET", brands[6].answer)
     assertEquals("TESLA", brands[7].answer)
     assertEquals("ZOHO", brands[8].answer)
+    assertEquals("MICROSOFT", brands[9].answer)
     brands.forEach { lvl ->
       org.junit.Assert.assertNotNull(lvl.imageUrl)
       org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Famous%20Brands/"))
@@ -236,7 +237,7 @@ class ExampleRobolectricTest {
     assertEquals(6, PackCategory.entries.size)
 
     val expectedCounts = mapOf(
-      "brands" to 9,
+      "brands" to 10,
       "entertainment" to 5,
       "gaming" to 10,
       "sports" to 9,

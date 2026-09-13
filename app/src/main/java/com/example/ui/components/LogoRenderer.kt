@@ -101,6 +101,7 @@ private fun DrawScope.drawLogoCanvas(logoKey: String, w: Float, h: Float) {
         "google" -> drawGoogleLogo(cx, cy, w, h)
         "mcdonalds" -> drawMcdonaldsLogo(cx, cy, w, h)
         "zoho" -> drawZohoLogo(cx, cy, w, h)
+        "microsoft" -> drawMicrosoftLogo(cx, cy, w, h)
         "netflix" -> drawNetflixLogo(cx, cy, w, h)
         "disney" -> drawDisneyLogo(cx, cy, w, h)
         "marvel" -> drawMarvelLogo(cx, cy, w, h)
@@ -449,6 +450,36 @@ private fun DrawScope.drawZohoLogo(cx: Float, cy: Float, w: Float, h: Float) {
         topLeft = Offset(cx + gap / 2f, cy + gap / 2f),
         size = Size(boxSize, boxSize),
         cornerRadius = cornerRadius
+    )
+}
+
+private fun DrawScope.drawMicrosoftLogo(cx: Float, cy: Float, w: Float, h: Float) {
+    val boxSize = w * 0.28f
+    val gap = w * 0.04f
+
+    // Red (top-left) #F25022
+    drawRect(
+        color = Color(0xFFF25022),
+        topLeft = Offset(cx - boxSize - gap / 2f, cy - boxSize - gap / 2f),
+        size = Size(boxSize, boxSize)
+    )
+    // Green (top-right) #7FBA00
+    drawRect(
+        color = Color(0xFF7FBA00),
+        topLeft = Offset(cx + gap / 2f, cy - boxSize - gap / 2f),
+        size = Size(boxSize, boxSize)
+    )
+    // Blue (bottom-left) #00A4EF
+    drawRect(
+        color = Color(0xFF00A4EF),
+        topLeft = Offset(cx - boxSize - gap / 2f, cy + gap / 2f),
+        size = Size(boxSize, boxSize)
+    )
+    // Yellow (bottom-right) #FFB900
+    drawRect(
+        color = Color(0xFFFFB900),
+        topLeft = Offset(cx + gap / 2f, cy + gap / 2f),
+        size = Size(boxSize, boxSize)
     )
 }
 

@@ -17,6 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +30,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MonetizationOn
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,14 +38,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -66,6 +78,10 @@ fun LevelGridScreen(
     packId: String,
     allProgress: List<LevelProgressEntity>,
     coins: Int,
+    isRefreshing: Boolean = false,
+    refreshMessage: String? = null,
+    onRefreshClick: () -> Unit = {},
+    onClearRefreshMessage: () -> Unit = {},
     onLevelClick: (String) -> Unit,
     onBack: () -> Unit,
     onEarnCoinsClick: () -> Unit,
@@ -79,7 +95,16 @@ fun LevelGridScreen(
         allProgress.find { it.id == level.id }?.isCompleted == true
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(refreshMessage) {
+        refreshMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onClearRefreshMessage()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -107,6 +132,27 @@ fun LevelGridScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = onRefreshClick,
+                        enabled = !isRefreshing,
+                        modifier = Modifier.testTag("refresh_category_levels_button")
+                    ) {
+                        val rotation by animateFloatAsState(
+                            targetValue = if (isRefreshing) 360f else 0f,
+                            animationSpec = if (isRefreshing) infiniteRepeatable(
+                                animation = tween(800, easing = LinearEasing),
+                                repeatMode = RepeatMode.Restart
+                            ) else tween(300),
+                            label = "refresh_rotation"
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Refresh category levels",
+                            tint = if (isRefreshing) TailwindBlue else Slate700,
+                            modifier = Modifier.rotate(rotation)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = Color(0xFFFEF3C7),
