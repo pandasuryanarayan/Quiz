@@ -2,191 +2,151 @@ package com.example.data
 
 object QuizPackData {
 
+    private const val CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz"
+
     val allLevels: List<QuizLevel> = listOf(
-        // BRANDS PACK (1..10)
+        // FAMOUS BRANDS PACK (User sequence: amazon, apple, google, macdonald, nike, spotify, target, tesla, zoho)
         QuizLevel(
             id = "brands_1",
             packId = "brands",
             levelNumber = 1,
-            answer = "APPLE",
-            hintSentence = "Bitten fruit tech titan from Cupertino",
-            triviaFact = "Apple's first logo featured Sir Isaac Newton sitting under an apple tree before the rainbow bite was created.",
-            logoKey = "apple"
+            answer = "AMAZON",
+            hintSentence = "E-commerce giant with an orange smile arrow linking A to Z",
+            triviaFact = "Originally started in Jeff Bezos's garage in 1994 as an online bookstore before expanding to 'the everything store'.",
+            logoKey = "amazon",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/amazon.webp"
         ),
         QuizLevel(
             id = "brands_2",
             packId = "brands",
             levelNumber = 2,
-            answer = "NIKE",
-            hintSentence = "Athletic giant famous for the iconic Swoosh and 'Just Do It'",
-            triviaFact = "The famous Nike Swoosh was created in 1971 by graphic design student Carolyn Davidson for just \$35.",
-            logoKey = "nike"
+            answer = "APPLE",
+            hintSentence = "Bitten fruit tech titan from Cupertino creating iPhone and Mac",
+            triviaFact = "Apple's first logo featured Sir Isaac Newton sitting under an apple tree before the rainbow bite was created.",
+            logoKey = "apple",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/apple-logo.webp"
         ),
         QuizLevel(
             id = "brands_3",
             packId = "brands",
             levelNumber = 3,
-            answer = "TESLA",
-            hintSentence = "Electric vehicle and clean energy pioneer with a stylized T",
-            triviaFact = "Tesla's logo isn't just a 'T'—it represents a cross-section of an electric induction motor.",
-            logoKey = "tesla"
+            answer = "GOOGLE",
+            hintSentence = "Search titan known for primary colors and a distinctive capital G",
+            triviaFact = "Google's name originated from a misspelling of 'googol', which represents the number 1 followed by 100 zeros.",
+            logoKey = "google",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/google.webp"
         ),
         QuizLevel(
             id = "brands_4",
             packId = "brands",
             levelNumber = 4,
-            answer = "SPOTIFY",
-            hintSentence = "Audio streaming king with three curved acoustic wave lines",
-            triviaFact = "Spotify was founded in Stockholm, Sweden in 2006 by Daniel Ek and Martin Lorentzon.",
-            logoKey = "spotify"
+            answer = "MCDONALDS",
+            hintSentence = "Fast-food empire celebrated worldwide for its Golden Arches",
+            triviaFact = "The Golden Arches were originally architectural features of early walk-up franchise stands in the 1950s.",
+            logoKey = "mcdonalds",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/McDonald%27s-Logo.wine.webp"
         ),
         QuizLevel(
             id = "brands_5",
             packId = "brands",
             levelNumber = 5,
-            answer = "TARGET",
-            hintSentence = "Retail giant with distinctive red and white concentric circles",
-            triviaFact = "Target's classic bullseye logo has over 96% brand recognition across the United States.",
-            logoKey = "target"
+            answer = "NIKE",
+            hintSentence = "Athletic giant famous for the iconic Swoosh and 'Just Do It'",
+            triviaFact = "The famous Nike Swoosh was created in 1971 by graphic design student Carolyn Davidson for just $35.",
+            logoKey = "nike",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/nike.webp"
         ),
-        // Ad Gated Levels (6..10)
         QuizLevel(
             id = "brands_6",
             packId = "brands",
             levelNumber = 6,
-            answer = "STARBUCKS",
-            hintSentence = "Global coffeehouse chain with a twin-tailed siren emblem",
-            triviaFact = "The Starbucks siren is named after the legendary twin-tailed creature from 16th-century Norse mythology.",
-            logoKey = "starbucks"
+            answer = "SPOTIFY",
+            hintSentence = "Audio streaming king with three curved acoustic wave lines",
+            triviaFact = "Spotify was founded in Stockholm, Sweden in 2006 by Daniel Ek and Martin Lorentzon.",
+            logoKey = "spotify",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/spotify.webp"
         ),
         QuizLevel(
             id = "brands_7",
             packId = "brands",
             levelNumber = 7,
-            answer = "TWITTER",
-            hintSentence = "Social microblogging platform recognized by a soaring blue bird",
-            triviaFact = "Twitter's original bird logo was named 'Larry' in honor of NBA Hall of Famer Larry Bird.",
-            logoKey = "twitter"
+            answer = "TARGET",
+            hintSentence = "Retail giant with distinctive red and white concentric circles",
+            triviaFact = "Target's classic bullseye logo has over 96% brand recognition across the United States.",
+            logoKey = "target",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/Target_Bullseye-Logo_Red.webp"
         ),
         QuizLevel(
             id = "brands_8",
             packId = "brands",
             levelNumber = 8,
-            answer = "AMAZON",
-            hintSentence = "E-commerce titan with an orange arrow smiling from A to Z",
-            triviaFact = "The curved arrow signifies that Amazon sells everything from A to Z, while also forming a smile.",
-            logoKey = "amazon"
+            answer = "TESLA",
+            hintSentence = "Electric vehicle and clean energy pioneer with a stylized T",
+            triviaFact = "Tesla's logo isn't just a 'T'—it represents a cross-section of an electric induction motor.",
+            logoKey = "tesla",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/Tesla%2C_Inc.-Logomark-Black-Logo.wine.webp"
         ),
         QuizLevel(
             id = "brands_9",
             packId = "brands",
             levelNumber = 9,
-            answer = "GOOGLE",
-            hintSentence = "Search titan known for primary colors and a distinctive capital G",
-            triviaFact = "Google's name originated from a misspelling of 'googol', which represents the number 1 followed by 100 zeros.",
-            logoKey = "google"
-        ),
-        QuizLevel(
-            id = "brands_10",
-            packId = "brands",
-            levelNumber = 10,
-            answer = "MCDONALDS",
-            hintSentence = "Fast-food empire celebrated worldwide for its Golden Arches",
-            triviaFact = "The Golden Arches were originally architectural features of early walk-up franchise stands in the 1950s.",
-            logoKey = "mcdonalds"
+            answer = "ZOHO",
+            hintSentence = "Global cloud software suite provider with colorful toy building blocks",
+            triviaFact = "Founded in 1996 as AdventNet, Zoho now runs entirely on private cloud infrastructure serving over 100 million users.",
+            logoKey = "zoho",
+            imageUrl = "$CDN_BASE_URL/Famous%20Brands/Zoho_Corporation-Logo.wine.webp"
         ),
 
-        // ENTERTAINMENT PACK (1..10)
+        // ENTERTAINMENT PACK (User sequence: disney, netflix, twitch, warner-bros, youtube)
         QuizLevel(
             id = "entertainment_1",
             packId = "entertainment",
             levelNumber = 1,
-            answer = "NETFLIX",
-            hintSentence = "Streaming giant famous for its vivid red ribbon 'N' and chime",
-            triviaFact = "Netflix began in 1997 shipping DVD rentals by mail before introducing online streaming in 2007.",
-            logoKey = "netflix"
+            answer = "DISNEY",
+            hintSentence = "The house of magic and fairy tales with an iconic castle spire",
+            triviaFact = "Walt Disney holds the individual record for the most Academy Awards won in history, totaling 22 Oscars.",
+            logoKey = "disney",
+            imageUrl = "$CDN_BASE_URL/Entertainment/Disney%2B-Logo.wine.webp"
         ),
         QuizLevel(
             id = "entertainment_2",
             packId = "entertainment",
             levelNumber = 2,
-            answer = "DISNEY",
-            hintSentence = "The house of magic and fairy tales with an iconic castle spire",
-            triviaFact = "Cinderella's Castle in the logo was inspired by Bavaria's Neuschwanstein Castle.",
-            logoKey = "disney"
+            answer = "NETFLIX",
+            hintSentence = "Streaming giant famous for its vivid red ribbon 'N' and chime",
+            triviaFact = "Netflix began in 1997 shipping DVD rentals by mail before introducing online streaming in 2007.",
+            logoKey = "netflix",
+            imageUrl = "$CDN_BASE_URL/Entertainment/netflix.webp"
         ),
         QuizLevel(
             id = "entertainment_3",
             packId = "entertainment",
             levelNumber = 3,
-            answer = "MARVEL",
-            hintSentence = "Superhero comic powerhouse with a bold red badge",
-            triviaFact = "Marvel was originally launched in 1939 as Timely Publications, debuting the Human Torch and Sub-Mariner.",
-            logoKey = "marvel"
+            answer = "TWITCH",
+            hintSentence = "World's leading interactive live streaming service for gaming & esports",
+            triviaFact = "Twitch's chat mascot is named 'Glitch', represented by the retro robotic speech bubble with two square eyes.",
+            logoKey = "twitch",
+            imageUrl = "$CDN_BASE_URL/Entertainment/twitch.webp"
         ),
         QuizLevel(
             id = "entertainment_4",
             packId = "entertainment",
             levelNumber = 4,
-            answer = "YOUTUBE",
-            hintSentence = "Video platform featuring a bright red rectangle and white play button",
-            triviaFact = "The first video ever uploaded was 'Me at the zoo' by co-founder Jawed Karim in April 2005.",
-            logoKey = "youtube"
+            answer = "WARNERBROS",
+            hintSentence = "Century-old movie studio with a famous blue and gold shield",
+            triviaFact = "Warner Bros. produced 'The Jazz Singer' in 1927, the very first full-length talking motion picture.",
+            logoKey = "warner",
+            imageUrl = "$CDN_BASE_URL/Entertainment/warner-bros.webp"
         ),
         QuizLevel(
             id = "entertainment_5",
             packId = "entertainment",
             levelNumber = 5,
-            answer = "PIXAR",
-            hintSentence = "Pioneering CGI animation studio featuring a hopping desk lamp",
-            triviaFact = "The playful desk lamp is named Luxo Jr., starring in Pixar's groundbreaking 1986 computer animated short.",
-            logoKey = "pixar"
-        ),
-        // Ad Gated Levels (6..10)
-        QuizLevel(
-            id = "entertainment_6",
-            packId = "entertainment",
-            levelNumber = 6,
-            answer = "BATMAN",
-            hintSentence = "Gotham's vigilante hero recognized by a sharp black bat silhouette",
-            triviaFact = "The iconic Bat-Signal first beamed into the skies of Gotham in Detective Comics #60 in 1942.",
-            logoKey = "batman"
-        ),
-        QuizLevel(
-            id = "entertainment_7",
-            packId = "entertainment",
-            levelNumber = 7,
-            answer = "POTTER",
-            hintSentence = "Boy wizard recognized by round spectacles and a lightning bolt",
-            triviaFact = "The lightning bolt scar became one of the most recognizable pop culture silhouettes in modern literature.",
-            logoKey = "potter"
-        ),
-        QuizLevel(
-            id = "entertainment_8",
-            packId = "entertainment",
-            levelNumber = 8,
-            answer = "WARNER",
-            hintSentence = "Century-old movie studio with a famous blue and gold shield",
-            triviaFact = "Warner Bros. produced 'The Jazz Singer' in 1927, the very first full-length talking motion picture.",
-            logoKey = "warner"
-        ),
-        QuizLevel(
-            id = "entertainment_9",
-            packId = "entertainment",
-            levelNumber = 9,
-            answer = "HBO",
-            hintSentence = "Prestige cable & streaming pioneer with a static circle in its 'O'",
-            triviaFact = "Home Box Office launched in November 1972, broadcasting an NHL hockey game to 365 subscribers.",
-            logoKey = "hbo"
-        ),
-        QuizLevel(
-            id = "entertainment_10",
-            packId = "entertainment",
-            levelNumber = 10,
-            answer = "TWITCH",
-            hintSentence = "Gaming live-stream platform represented by a chat mascot robot",
-            triviaFact = "Twitch's friendly purple robot logo with two eye slits is officially named 'Glitch'.",
-            logoKey = "twitch"
+            answer = "YOUTUBE",
+            hintSentence = "Video platform featuring a bright red rectangle and white play button",
+            triviaFact = "The first video ever uploaded was 'Me at the zoo' by co-founder Jawed Karim in April 2005.",
+            logoKey = "youtube",
+            imageUrl = "$CDN_BASE_URL/Entertainment/youtube.webp"
         ),
 
         // GAMING & TECH PACK (1..10)
@@ -282,190 +242,148 @@ object QuizPackData {
             logoKey = "linux"
         ),
 
-        // SPORTS & AUTOS PACK (1..10)
+        // SPORTS & AUTOS PACK (User sequence: adidas, audi, bmw, ferrari, mercedes, nba, olumpic, puma, redbull)
         QuizLevel(
             id = "sports_1",
             packId = "sports",
             levelNumber = 1,
-            answer = "FERRARI",
-            hintSentence = "Italian supercar icon with a canary yellow shield and prancing stallion",
-            triviaFact = "The prancing horse was gifted to Enzo Ferrari by Countess Paolina, whose son was an Italian aviation ace.",
-            logoKey = "ferrari"
+            answer = "ADIDAS",
+            hintSentence = "Sportswear titan recognized worldwide by the Three Stripes",
+            triviaFact = "The three stripes were originally placed on running shoes in 1949 for lateral stability, not decoration.",
+            logoKey = "adidas",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Adidas--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_2",
             packId = "sports",
             levelNumber = 2,
-            answer = "ADIDAS",
-            hintSentence = "Sportswear titan recognized worldwide by the Three Stripes",
-            triviaFact = "The three stripes were originally placed on running shoes in 1949 for lateral stability, not decoration.",
-            logoKey = "adidas"
+            answer = "AUDI",
+            hintSentence = "German luxury auto marque with four interlocking silver rings",
+            triviaFact = "The four rings represent the historic 1932 alliance of four independent automakers: Audi, DKW, Horch, and Wanderer.",
+            logoKey = "audi",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Audi--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_3",
             packId = "sports",
             levelNumber = 3,
-            answer = "PUMA",
-            hintSentence = "Speed and athletic brand with a leaping wild cat silhouette",
-            triviaFact = "Puma was founded by Rudolf Dassler in 1948 across the river from his brother's company Adidas.",
-            logoKey = "puma"
+            answer = "BMW",
+            hintSentence = "Bavarian automotive maker with blue and white quadrant roundel",
+            triviaFact = "While often mistaken for an airplane propeller, the blue and white segments represent Bavaria's state flag.",
+            logoKey = "bmw",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Bmw--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_4",
             packId = "sports",
             levelNumber = 4,
-            answer = "OLYMPIC",
-            hintSentence = "World athletic games uniting five continents with interlocking rings",
-            triviaFact = "The five rings' colors plus the white background ensured every nation had at least one flag color represented.",
-            logoKey = "olympic"
+            answer = "FERRARI",
+            hintSentence = "Italian supercar icon with a canary yellow shield and prancing stallion",
+            triviaFact = "The prancing horse was gifted to Enzo Ferrari by Countess Paolina, whose son was an Italian aviation ace.",
+            logoKey = "ferrari",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Ferrari--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_5",
             packId = "sports",
             levelNumber = 5,
-            answer = "NBA",
-            hintSentence = "Premier basketball league with a dynamic player dribbling silhouette",
-            triviaFact = "The silhouette on the red and blue badge was modeled directly after Lakers legend Jerry West.",
-            logoKey = "nba"
+            answer = "MERCEDES",
+            hintSentence = "Pioneering luxury automaker with a gleaming three-pointed star",
+            triviaFact = "The three-pointed star symbolizes founder Gottlieb Daimler's vision of motorized transport on land, water, and air.",
+            logoKey = "mercedes",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Mercedes--Streamline-Simple-Icons.webp"
         ),
-        // Ad Gated Levels (6..10)
         QuizLevel(
             id = "sports_6",
             packId = "sports",
             levelNumber = 6,
-            answer = "REDBULL",
-            hintSentence = "Extreme sports & F1 champion with two charging red bulls and a golden sun",
-            triviaFact = "Red Bull sponsors hundreds of extreme sports athletes and owns two Formula 1 racing teams.",
-            logoKey = "redbull"
+            answer = "NBA",
+            hintSentence = "Premier basketball league with a dynamic player dribbling silhouette",
+            triviaFact = "The silhouette on the red and blue badge was modeled directly after Lakers legend Jerry West.",
+            logoKey = "nba",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Nba--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_7",
             packId = "sports",
             levelNumber = 7,
-            answer = "BMW",
-            hintSentence = "Bavarian automotive maker with blue and white quadrant roundel",
-            triviaFact = "While often mistaken for an airplane propeller, the blue and white segments represent Bavaria's state flag.",
-            logoKey = "bmw"
+            answer = "OLYMPIC",
+            hintSentence = "World athletic games uniting five continents with interlocking rings",
+            triviaFact = "The five rings' colors plus the white background ensured every nation had at least one flag color represented.",
+            logoKey = "olympic",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Olympic_rings_without_rims.svg.webp"
         ),
         QuizLevel(
             id = "sports_8",
             packId = "sports",
             levelNumber = 8,
-            answer = "AUDI",
-            hintSentence = "German luxury auto marque with four interlocking silver rings",
-            triviaFact = "The four rings represent the historic 1932 alliance of four independent automakers: Audi, DKW, Horch, and Wanderer.",
-            logoKey = "audi"
+            answer = "PUMA",
+            hintSentence = "Speed and athletic brand with a leaping wild cat silhouette",
+            triviaFact = "Puma was founded by Rudolf Dassler in 1948 across the river from his brother's company Adidas.",
+            logoKey = "puma",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/Puma--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "sports_9",
             packId = "sports",
             levelNumber = 9,
-            answer = "MERCEDES",
-            hintSentence = "Pioneering luxury automaker with a gleaming three-pointed star",
-            triviaFact = "The three-pointed star symbolizes founder Gottlieb Daimler's vision of motorized transport on land, water, and air.",
-            logoKey = "mercedes"
-        ),
-        QuizLevel(
-            id = "sports_10",
-            packId = "sports",
-            levelNumber = 10,
-            answer = "FIFA",
-            hintSentence = "World football governing body and organizer of the World Cup",
-            triviaFact = "FIFA was founded in Paris in 1904 and today has 211 national member associations—more than the United Nations.",
-            logoKey = "fifa"
+            answer = "REDBULL",
+            hintSentence = "Extreme sports & F1 champion with two charging red bulls and a golden sun",
+            triviaFact = "Red Bull sponsors hundreds of extreme sports athletes and owns two Formula 1 racing teams.",
+            logoKey = "redbull",
+            imageUrl = "$CDN_BASE_URL/Sports%20%26%20Autos/redbull.webp"
         ),
 
-        // FOOD & TREATS PACK (1..10)
+        // FOOD & TREATS PACK (User sequence: burger king, dominos, kfc, pepsi, taco bell)
         QuizLevel(
             id = "food_1",
             packId = "food",
             levelNumber = 1,
-            answer = "PEPSI",
-            hintSentence = "Carbonated cola giant with a red, white and blue globe logo",
-            triviaFact = "Originally called 'Brad's Drink' in 1893, Pepsi was invented by pharmacist Caleb Bradham in North Carolina.",
-            logoKey = "pepsi"
+            answer = "BURGERKING",
+            hintSentence = "Home of the Whopper with two golden bun halves framing its name",
+            triviaFact = "Burger King operates in Australia under the trademark name 'Hungry Jack's' due to a pre-existing trademark.",
+            logoKey = "burgerking",
+            imageUrl = "$CDN_BASE_URL/Food%20%26%20Treats/Burgerking--Streamline-Simple-Icons.webp"
         ),
         QuizLevel(
             id = "food_2",
             packId = "food",
             levelNumber = 2,
-            answer = "BURGERKING",
-            hintSentence = "Home of the Whopper with two golden bun halves framing its name",
-            triviaFact = "Burger King operates in Australia under the trademark name 'Hungry Jack's' due to a pre-existing trademark.",
-            logoKey = "burgerking"
+            answer = "DOMINOS",
+            hintSentence = "Pizza delivery empire with a tilted red and blue domino tile",
+            triviaFact = "The three dots on the domino represented the original three franchise stores opened in the 1960s.",
+            logoKey = "dominos",
+            imageUrl = "$CDN_BASE_URL/Food%20%26%20Treats/dominos.webp"
         ),
         QuizLevel(
             id = "food_3",
             packId = "food",
             levelNumber = 3,
-            answer = "SUBWAY",
-            hintSentence = "Fresh sub sandwich chain with green and yellow directional arrows",
-            triviaFact = "Subway serves more than 5,300 sandwiches every single minute across more than 37,000 global restaurants.",
-            logoKey = "subway"
+            answer = "KFC",
+            hintSentence = "Fried chicken legend founded in Corbin, Kentucky by the Colonel",
+            triviaFact = "Colonel Harland Sanders was made an honorary Kentucky Colonel by the state governor in 1935.",
+            logoKey = "kfc",
+            imageUrl = "$CDN_BASE_URL/Food%20%26%20Treats/kfc.webp"
         ),
         QuizLevel(
             id = "food_4",
             packId = "food",
             levelNumber = 4,
-            answer = "PRINGLES",
-            hintSentence = "Stackable potato crisp can featuring a mustachioed mascot",
-            triviaFact = "The shape of a Pringle is mathematically known as a hyperbolic paraboloid, engineered to resist breakage.",
-            logoKey = "pringles"
+            answer = "PEPSI",
+            hintSentence = "Carbonated cola giant with a red, white and blue globe logo",
+            triviaFact = "Originally called 'Brad's Drink' in 1893, Pepsi was invented by pharmacist Caleb Bradham in North Carolina.",
+            logoKey = "pepsi",
+            imageUrl = "$CDN_BASE_URL/Food%20%26%20Treats/pepsi_logo_icon_168910.webp"
         ),
         QuizLevel(
             id = "food_5",
             packId = "food",
             levelNumber = 5,
-            answer = "DOMINOS",
-            hintSentence = "Pizza delivery empire with a tilted red and blue domino tile",
-            triviaFact = "The three dots on the domino represented the original three franchise stores opened in the 1960s.",
-            logoKey = "dominos"
-        ),
-        // Ad Gated Levels (6..10)
-        QuizLevel(
-            id = "food_6",
-            packId = "food",
-            levelNumber = 6,
-            answer = "OREO",
-            hintSentence = "World's favorite sandwich cookie with embossed chocolate wafers",
-            triviaFact = "Over 500 billion Oreo cookies have been produced since their introduction in 1912 in New York City.",
-            logoKey = "oreo"
-        ),
-        QuizLevel(
-            id = "food_7",
-            packId = "food",
-            levelNumber = 7,
-            answer = "KFC",
-            hintSentence = "Fried chicken legend founded in Corbin, Kentucky by the Colonel",
-            triviaFact = "Colonel Harland Sanders was made an honorary Kentucky Colonel by the state governor in 1935.",
-            logoKey = "kfc"
-        ),
-        QuizLevel(
-            id = "food_8",
-            packId = "food",
-            levelNumber = 8,
-            answer = "NUTELLA",
-            hintSentence = "Famous cocoa and hazelnut breakfast spread in a distinctive jar",
-            triviaFact = "One jar of Nutella is sold somewhere in the world every 2.5 seconds, using 25% of global hazelnuts.",
-            logoKey = "nutella"
-        ),
-        QuizLevel(
-            id = "food_9",
-            packId = "food",
-            levelNumber = 9,
-            answer = "FANTA",
-            hintSentence = "Bubbly fruit-flavored soda with an orange slice and leaf motif",
-            triviaFact = "Fanta originated in 1940 during WWII when trade embargos made importing Coca-Cola syrup impossible.",
-            logoKey = "fanta"
-        ),
-        QuizLevel(
-            id = "food_10",
-            packId = "food",
-            levelNumber = 10,
             answer = "TACOBELL",
             hintSentence = "Mexican-inspired fast food famous for a magenta bell and crunchy tacos",
             triviaFact = "Glen Bell opened the first Taco Bell in Downey, California in 1962, inspiring a nationwide Mexican craze.",
-            logoKey = "tacobell"
+            logoKey = "tacobell",
+            imageUrl = "$CDN_BASE_URL/Food%20%26%20Treats/taco%20bell.webp"
         ),
 
         // WORLD WONDERS PACK (1..10)

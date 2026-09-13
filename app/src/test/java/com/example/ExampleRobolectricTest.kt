@@ -25,9 +25,69 @@ class ExampleRobolectricTest {
   }
 
   @Test
-  fun `verify quiz packs catalog`() {
+  fun `verify quiz packs catalog and CDN mappings`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(60, levels.size)
+    assertEquals(48, levels.size)
+
+    // Verify Famous Brands sequence
+    val brands = com.example.data.QuizPackData.getLevelsForPack("brands")
+    assertEquals(9, brands.size)
+    assertEquals("AMAZON", brands[0].answer)
+    assertEquals("APPLE", brands[1].answer)
+    assertEquals("GOOGLE", brands[2].answer)
+    assertEquals("MCDONALDS", brands[3].answer)
+    assertEquals("NIKE", brands[4].answer)
+    assertEquals("SPOTIFY", brands[5].answer)
+    assertEquals("TARGET", brands[6].answer)
+    assertEquals("TESLA", brands[7].answer)
+    assertEquals("ZOHO", brands[8].answer)
+    brands.forEach { lvl ->
+      org.junit.Assert.assertNotNull(lvl.imageUrl)
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Famous%20Brands/"))
+    }
+
+    // Verify Entertainment sequence
+    val entertainment = com.example.data.QuizPackData.getLevelsForPack("entertainment")
+    assertEquals(5, entertainment.size)
+    assertEquals("DISNEY", entertainment[0].answer)
+    assertEquals("NETFLIX", entertainment[1].answer)
+    assertEquals("TWITCH", entertainment[2].answer)
+    assertEquals("WARNERBROS", entertainment[3].answer)
+    assertEquals("YOUTUBE", entertainment[4].answer)
+    entertainment.forEach { lvl ->
+      org.junit.Assert.assertNotNull(lvl.imageUrl)
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Entertainment/"))
+    }
+
+    // Verify Food sequence
+    val food = com.example.data.QuizPackData.getLevelsForPack("food")
+    assertEquals(5, food.size)
+    assertEquals("BURGERKING", food[0].answer)
+    assertEquals("DOMINOS", food[1].answer)
+    assertEquals("KFC", food[2].answer)
+    assertEquals("PEPSI", food[3].answer)
+    assertEquals("TACOBELL", food[4].answer)
+    food.forEach { lvl ->
+      org.junit.Assert.assertNotNull(lvl.imageUrl)
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Treats/"))
+    }
+
+    // Verify Sports sequence
+    val sports = com.example.data.QuizPackData.getLevelsForPack("sports")
+    assertEquals(9, sports.size)
+    assertEquals("ADIDAS", sports[0].answer)
+    assertEquals("AUDI", sports[1].answer)
+    assertEquals("BMW", sports[2].answer)
+    assertEquals("FERRARI", sports[3].answer)
+    assertEquals("MERCEDES", sports[4].answer)
+    assertEquals("NBA", sports[5].answer)
+    assertEquals("OLYMPIC", sports[6].answer)
+    assertEquals("PUMA", sports[7].answer)
+    assertEquals("REDBULL", sports[8].answer)
+    sports.forEach { lvl ->
+      org.junit.Assert.assertNotNull(lvl.imageUrl)
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Sports%20%26%20Autos/"))
+    }
   }
 
   @Test
@@ -167,7 +227,7 @@ class ExampleRobolectricTest {
   }
 
   @Test
-  fun `verify all categories have exactly 10 levels and are seeded properly`() = runBlocking {
+  fun `verify all categories have levels seeded properly and level 1 visible`() = runBlocking {
     val context = ApplicationProvider.getApplicationContext<Context>()
     val db = Room.inMemoryDatabaseBuilder(context, QuizDatabase::class.java).allowMainThreadQueries().build()
     val repo = QuizRepository(db.quizDao())
@@ -175,9 +235,18 @@ class ExampleRobolectricTest {
 
     assertEquals(6, PackCategory.entries.size)
 
+    val expectedCounts = mapOf(
+      "brands" to 9,
+      "entertainment" to 5,
+      "gaming" to 10,
+      "sports" to 9,
+      "food" to 5,
+      "world" to 10
+    )
+
     for (pack in PackCategory.entries) {
       val packLevels = com.example.data.QuizPackData.getLevelsForPack(pack.id)
-      assertEquals("Pack ${pack.id} should have exactly 10 levels", 10, packLevels.size)
+      assertEquals("Pack ${pack.id} size mismatch", expectedCounts[pack.id], packLevels.size)
       // Level 1 should be free & visible initially
       val visible = com.example.data.QuizPackData.getVisibleLevelsForPack(pack.id, repo.allProgress.value)
       assertEquals("Pack ${pack.id} should show only Level 1 initially", 1, visible.size)

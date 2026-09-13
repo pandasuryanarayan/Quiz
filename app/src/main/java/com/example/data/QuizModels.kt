@@ -25,7 +25,8 @@ data class QuizLevel(
     val answer: String, // Clean uppercase alphabetical (e.g. "APPLE")
     val hintSentence: String,
     val triviaFact: String,
-    val logoKey: String
+    val logoKey: String,
+    val imageUrl: String? = null
 )
 
 @Entity(tableName = "level_progress")

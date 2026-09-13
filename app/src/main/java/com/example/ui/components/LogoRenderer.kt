@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,12 +25,17 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun LogoCard(
     logoKey: String,
+    imageUrl: String? = null,
     modifier: Modifier = Modifier,
     cardSize: Dp = 200.dp
 ) {
@@ -43,82 +49,111 @@ fun LogoCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val w = size.width
-                val h = size.height
-                val cx = w / 2f
-                val cy = h / 2f
-
-                when (logoKey) {
-                    "apple" -> drawAppleLogo(cx, cy, w, h)
-                    "nike" -> drawNikeLogo(cx, cy, w, h)
-                    "tesla" -> drawTeslaLogo(cx, cy, w, h)
-                    "spotify" -> drawSpotifyLogo(cx, cy, w, h)
-                    "target" -> drawTargetLogo(cx, cy, w, h)
-                    "starbucks" -> drawStarbucksLogo(cx, cy, w, h)
-                    "twitter" -> drawTwitterLogo(cx, cy, w, h)
-                    "amazon" -> drawAmazonLogo(cx, cy, w, h)
-                    "google" -> drawGoogleLogo(cx, cy, w, h)
-                    "mcdonalds" -> drawMcdonaldsLogo(cx, cy, w, h)
-                    "netflix" -> drawNetflixLogo(cx, cy, w, h)
-                    "disney" -> drawDisneyLogo(cx, cy, w, h)
-                    "marvel" -> drawMarvelLogo(cx, cy, w, h)
-                    "youtube" -> drawYoutubeLogo(cx, cy, w, h)
-                    "pixar" -> drawPixarLogo(cx, cy, w, h)
-                    "batman" -> drawBatmanLogo(cx, cy, w, h)
-                    "potter" -> drawPotterLogo(cx, cy, w, h)
-                    "warner" -> drawWarnerLogo(cx, cy, w, h)
-                    "hbo" -> drawHboLogo(cx, cy, w, h)
-                    "twitch" -> drawTwitchLogo(cx, cy, w, h)
-                    "nintendo" -> drawNintendoLogo(cx, cy, w, h)
-                    "playstation" -> drawPlaystationLogo(cx, cy, w, h)
-                    "xbox" -> drawXboxLogo(cx, cy, w, h)
-                    "steam" -> drawSteamLogo(cx, cy, w, h)
-                    "discord" -> drawDiscordLogo(cx, cy, w, h)
-                    "android" -> drawAndroidLogo(cx, cy, w, h)
-                    "atari" -> drawAtariLogo(cx, cy, w, h)
-                    "sega" -> drawSegaLogo(cx, cy, w, h)
-                    "roblox" -> drawRobloxLogo(cx, cy, w, h)
-                    "linux" -> drawLinuxLogo(cx, cy, w, h)
-                    "ferrari" -> drawFerrariLogo(cx, cy, w, h)
-                    "adidas" -> drawAdidasLogo(cx, cy, w, h)
-                    "puma" -> drawPumaLogo(cx, cy, w, h)
-                    "olympic" -> drawOlympicLogo(cx, cy, w, h)
-                    "nba" -> drawNbaLogo(cx, cy, w, h)
-                    "redbull" -> drawRedbullLogo(cx, cy, w, h)
-                    "bmw" -> drawBmwLogo(cx, cy, w, h)
-                    "audi" -> drawAudiLogo(cx, cy, w, h)
-                    "mercedes" -> drawMercedesLogo(cx, cy, w, h)
-                    "fifa" -> drawFifaLogo(cx, cy, w, h)
-                    // FOOD & TREATS
-                    "pepsi" -> drawPepsiLogo(cx, cy, w, h)
-                    "burgerking" -> drawBurgerKingLogo(cx, cy, w, h)
-                    "subway" -> drawSubwayLogo(cx, cy, w, h)
-                    "pringles" -> drawPringlesLogo(cx, cy, w, h)
-                    "dominos" -> drawDominosLogo(cx, cy, w, h)
-                    "oreo" -> drawOreoLogo(cx, cy, w, h)
-                    "kfc" -> drawKfcLogo(cx, cy, w, h)
-                    "nutella" -> drawNutellaLogo(cx, cy, w, h)
-                    "fanta" -> drawFantaLogo(cx, cy, w, h)
-                    "tacobell" -> drawTacobellLogo(cx, cy, w, h)
-                    // WORLD WONDERS
-                    "eiffel" -> drawEiffelLogo(cx, cy, w, h)
-                    "pyramids" -> drawPyramidsLogo(cx, cy, w, h)
-                    "liberty" -> drawLibertyLogo(cx, cy, w, h)
-                    "colosseum" -> drawColosseumLogo(cx, cy, w, h)
-                    "tajmahal" -> drawTajMahalLogo(cx, cy, w, h)
-                    "bigben" -> drawBigBenLogo(cx, cy, w, h)
-                    "fuji" -> drawFujiLogo(cx, cy, w, h)
-                    "pisa" -> drawPisaLogo(cx, cy, w, h)
-                    "sphinx" -> drawSphinxLogo(cx, cy, w, h)
-                    "sydney" -> drawSydneyLogo(cx, cy, w, h)
-                    else -> drawGenericQuizLogo(cx, cy, w, h)
+            if (!imageUrl.isNullOrBlank()) {
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Quiz Logo",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                    loading = {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(32.dp),
+                                strokeWidth = 3.dp,
+                                color = Color(0xFF3B82F6)
+                            )
+                        }
+                    },
+                    error = {
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            drawLogoCanvas(logoKey, size.width, size.height)
+                        }
+                    }
+                )
+            } else {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawLogoCanvas(logoKey, size.width, size.height)
                 }
             }
         }
+    }
+}
+
+private fun DrawScope.drawLogoCanvas(logoKey: String, w: Float, h: Float) {
+    val cx = w / 2f
+    val cy = h / 2f
+
+    when (logoKey) {
+        "apple" -> drawAppleLogo(cx, cy, w, h)
+        "nike" -> drawNikeLogo(cx, cy, w, h)
+        "tesla" -> drawTeslaLogo(cx, cy, w, h)
+        "spotify" -> drawSpotifyLogo(cx, cy, w, h)
+        "target" -> drawTargetLogo(cx, cy, w, h)
+        "starbucks" -> drawStarbucksLogo(cx, cy, w, h)
+        "twitter" -> drawTwitterLogo(cx, cy, w, h)
+        "amazon" -> drawAmazonLogo(cx, cy, w, h)
+        "google" -> drawGoogleLogo(cx, cy, w, h)
+        "mcdonalds" -> drawMcdonaldsLogo(cx, cy, w, h)
+        "zoho" -> drawZohoLogo(cx, cy, w, h)
+        "netflix" -> drawNetflixLogo(cx, cy, w, h)
+        "disney" -> drawDisneyLogo(cx, cy, w, h)
+        "marvel" -> drawMarvelLogo(cx, cy, w, h)
+        "youtube" -> drawYoutubeLogo(cx, cy, w, h)
+        "pixar" -> drawPixarLogo(cx, cy, w, h)
+        "batman" -> drawBatmanLogo(cx, cy, w, h)
+        "potter" -> drawPotterLogo(cx, cy, w, h)
+        "warner" -> drawWarnerLogo(cx, cy, w, h)
+        "hbo" -> drawHboLogo(cx, cy, w, h)
+        "twitch" -> drawTwitchLogo(cx, cy, w, h)
+        "nintendo" -> drawNintendoLogo(cx, cy, w, h)
+        "playstation" -> drawPlaystationLogo(cx, cy, w, h)
+        "xbox" -> drawXboxLogo(cx, cy, w, h)
+        "steam" -> drawSteamLogo(cx, cy, w, h)
+        "discord" -> drawDiscordLogo(cx, cy, w, h)
+        "android" -> drawAndroidLogo(cx, cy, w, h)
+        "atari" -> drawAtariLogo(cx, cy, w, h)
+        "sega" -> drawSegaLogo(cx, cy, w, h)
+        "roblox" -> drawRobloxLogo(cx, cy, w, h)
+        "linux" -> drawLinuxLogo(cx, cy, w, h)
+        "ferrari" -> drawFerrariLogo(cx, cy, w, h)
+        "adidas" -> drawAdidasLogo(cx, cy, w, h)
+        "puma" -> drawPumaLogo(cx, cy, w, h)
+        "olympic" -> drawOlympicLogo(cx, cy, w, h)
+        "nba" -> drawNbaLogo(cx, cy, w, h)
+        "redbull" -> drawRedbullLogo(cx, cy, w, h)
+        "bmw" -> drawBmwLogo(cx, cy, w, h)
+        "audi" -> drawAudiLogo(cx, cy, w, h)
+        "mercedes" -> drawMercedesLogo(cx, cy, w, h)
+        "fifa" -> drawFifaLogo(cx, cy, w, h)
+        // FOOD & TREATS
+        "pepsi" -> drawPepsiLogo(cx, cy, w, h)
+        "burgerking" -> drawBurgerKingLogo(cx, cy, w, h)
+        "subway" -> drawSubwayLogo(cx, cy, w, h)
+        "pringles" -> drawPringlesLogo(cx, cy, w, h)
+        "dominos" -> drawDominosLogo(cx, cy, w, h)
+        "oreo" -> drawOreoLogo(cx, cy, w, h)
+        "kfc" -> drawKfcLogo(cx, cy, w, h)
+        "nutella" -> drawNutellaLogo(cx, cy, w, h)
+        "fanta" -> drawFantaLogo(cx, cy, w, h)
+        "tacobell" -> drawTacobellLogo(cx, cy, w, h)
+        // WORLD WONDERS
+        "eiffel" -> drawEiffelLogo(cx, cy, w, h)
+        "pyramids" -> drawPyramidsLogo(cx, cy, w, h)
+        "liberty" -> drawLibertyLogo(cx, cy, w, h)
+        "colosseum" -> drawColosseumLogo(cx, cy, w, h)
+        "tajmahal" -> drawTajMahalLogo(cx, cy, w, h)
+        "bigben" -> drawBigBenLogo(cx, cy, w, h)
+        "fuji" -> drawFujiLogo(cx, cy, w, h)
+        "pisa" -> drawPisaLogo(cx, cy, w, h)
+        "sphinx" -> drawSphinxLogo(cx, cy, w, h)
+        "sydney" -> drawSydneyLogo(cx, cy, w, h)
+        else -> drawGenericQuizLogo(cx, cy, w, h)
     }
 }
 
@@ -380,6 +415,41 @@ private fun DrawScope.drawMcdonaldsLogo(cx: Float, cy: Float, w: Float, h: Float
         )
     }
     drawPath(rightArch, yellow, style = Stroke(width = strokeWidth, cap = StrokeCap.Round))
+}
+
+private fun DrawScope.drawZohoLogo(cx: Float, cy: Float, w: Float, h: Float) {
+    val boxSize = w * 0.28f
+    val gap = w * 0.04f
+    val cornerRadius = CornerRadius(boxSize * 0.2f, boxSize * 0.2f)
+
+    // Red (top-left)
+    drawRoundRect(
+        color = Color(0xFFE32726),
+        topLeft = Offset(cx - boxSize - gap / 2f, cy - boxSize - gap / 2f),
+        size = Size(boxSize, boxSize),
+        cornerRadius = cornerRadius
+    )
+    // Green (top-right)
+    drawRoundRect(
+        color = Color(0xFF319842),
+        topLeft = Offset(cx + gap / 2f, cy - boxSize - gap / 2f),
+        size = Size(boxSize, boxSize),
+        cornerRadius = cornerRadius
+    )
+    // Blue (bottom-left)
+    drawRoundRect(
+        color = Color(0xFF006BB4),
+        topLeft = Offset(cx - boxSize - gap / 2f, cy + gap / 2f),
+        size = Size(boxSize, boxSize),
+        cornerRadius = cornerRadius
+    )
+    // Yellow (bottom-right)
+    drawRoundRect(
+        color = Color(0xFFECA824),
+        topLeft = Offset(cx + gap / 2f, cy + gap / 2f),
+        size = Size(boxSize, boxSize),
+        cornerRadius = cornerRadius
+    )
 }
 
 // ----------------- ENTERTAINMENT -----------------

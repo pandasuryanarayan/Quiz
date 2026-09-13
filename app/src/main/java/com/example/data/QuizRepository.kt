@@ -50,8 +50,16 @@ class QuizRepository(private val quizDao: QuizDao) {
             quizDao.insertInitialProgress(initialEntities)
             _allProgress.value = initialEntities
         } else {
+            // Remove obsolete level progress entries that no longer exist in QuizPackData
+            val currentValidIds = QuizPackData.allLevels.map { it.id }.toSet()
+            val obsolete = existingProgress.filter { it.id !in currentValidIds }
+            for (obs in obsolete) {
+                quizDao.deleteLevelProgress(obs.id)
+            }
+            val validExisting = existingProgress.filter { it.id in currentValidIds }
+
             // Check if any new levels or categories were added to QuizPackData that are missing in DB
-            val existingIds = existingProgress.map { it.id }.toSet()
+            val existingIds = validExisting.map { it.id }.toSet()
             val missingLevels = QuizPackData.allLevels.filter { it.id !in existingIds }
             val newlyAddedEntities = if (missingLevels.isNotEmpty()) {
                 val newEntities = missingLevels.map { level ->
@@ -71,7 +79,7 @@ class QuizRepository(private val quizDao: QuizDao) {
                 emptyList()
             }
 
-            val combined = existingProgress + newlyAddedEntities
+            val combined = validExisting + newlyAddedEntities
 
             // Sanitize legacy or dirty database entries from earlier app versions:
             // Any level N > 1 where level N - 1 is NOT completed must be locked!

@@ -40,6 +40,9 @@ interface QuizDao {
     @Query("UPDATE level_progress SET isCompleted = 1, stars = :stars, solvedTimestamp = :timestamp WHERE id = :levelId")
     suspend fun markLevelCompleted(levelId: String, stars: Int, timestamp: Long)
 
+    @Query("DELETE FROM level_progress WHERE id = :levelId")
+    suspend fun deleteLevelProgress(levelId: String)
+
     @Query("SELECT * FROM user_profile WHERE id = 1 LIMIT 1")
     fun getUserProfile(): Flow<UserProfileEntity?>
 

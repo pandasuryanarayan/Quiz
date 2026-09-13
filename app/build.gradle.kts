@@ -134,7 +134,7 @@ dependencies {
   implementation(libs.play.services.ads.identifier)
   implementation(libs.play.services.appset)
   implementation(libs.play.services.basement)
-  // implementation(libs.coil.compose)
+  implementation(libs.coil.compose)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   // implementation(libs.play.services.location)

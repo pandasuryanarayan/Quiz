@@ -202,6 +202,7 @@ fun QuizPlayScreen(
                 // Centered Visual Logo Prompt Card
                 LogoCard(
                     logoKey = level.logoKey,
+                    imageUrl = level.imageUrl,
                     cardSize = 180.dp,
                     modifier = Modifier.testTag("logo_display_card")
                 )
