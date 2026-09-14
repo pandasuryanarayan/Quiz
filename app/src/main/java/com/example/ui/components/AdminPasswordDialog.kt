@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -117,6 +118,7 @@ fun AdminPasswordDialog(
         Surface(
             shape = RoundedCornerShape(26.dp),
             color = Color.White,
+            contentColor = Slate900,
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(scale)
@@ -184,8 +186,13 @@ fun AdminPasswordDialog(
                             errorMessage = ""
                         }
                     },
-                    label = { Text("Password") },
-                    placeholder = { Text("Enter admin password") },
+                    textStyle = TextStyle(
+                        color = Slate900,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    label = { Text("Password", color = if (isError) Color(0xFFDC2626) else Slate700) },
+                    placeholder = { Text("Enter admin password", color = Slate400) },
                     singleLine = true,
                     isError = isError,
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -212,16 +219,25 @@ fun AdminPasswordDialog(
                             Icon(
                                 imageVector = if (isPasswordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
                                 contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
-                                tint = Slate400,
+                                tint = if (isPasswordVisible) TailwindBlue else Slate400,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                     },
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Slate900,
+                        unfocusedTextColor = Slate900,
+                        focusedContainerColor = Color(0xFFF8FAFC),
+                        unfocusedContainerColor = Color(0xFFF8FAFC),
                         focusedBorderColor = TailwindBlue,
                         unfocusedBorderColor = Slate200,
-                        errorBorderColor = Color(0xFFDC2626)
+                        focusedLabelColor = TailwindBlue,
+                        unfocusedLabelColor = Slate500,
+                        cursorColor = TailwindBlue,
+                        errorTextColor = Slate900,
+                        errorBorderColor = Color(0xFFDC2626),
+                        errorCursorColor = Color(0xFFDC2626)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
