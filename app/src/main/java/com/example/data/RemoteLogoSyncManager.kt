@@ -31,12 +31,9 @@ object RemoteLogoSyncManager {
         val packId: String
     )
 
-    private val FOLDERS = listOf(
-        FolderMapping("Famous Brands", "brands"),
-        FolderMapping("Entertainment", "entertainment"),
-        FolderMapping("Food & Treats", "food"),
-        FolderMapping("Sports & Autos", "sports")
-    )
+    private val FOLDERS = PackCategory.entries.map {
+        FolderMapping(folderName = it.folderName, packId = it.id)
+    }
 
     // Curated catalog for famous brands so any newly uploaded logo gets high-quality answers & trivia
     private val BRAND_KNOWLEDGE = mapOf(

@@ -43,10 +43,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.PackProgressSummary
 import com.example.data.UserProfileEntity
+import com.example.ui.components.CategoryHeroImage
 import com.example.ui.theme.AmberStar
 import com.example.ui.theme.WarmBg
 import com.example.ui.theme.WarmBorder
@@ -264,15 +266,19 @@ fun PackSelectionScreen(
 
             // Categories 2-Column Grid
             val chunkedPacks = packSummaries.chunked(2)
+            var currentPackIndex = 1
             chunkedPacks.forEach { rowPacks ->
+                val startIndex = currentPackIndex
+                currentPackIndex += rowPacks.size
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        rowPacks.forEach { summary ->
+                        rowPacks.forEachIndexed { colIdx, summary ->
                             CategoryWireCard(
                                 summary = summary,
+                                packIndex = startIndex + colIdx,
                                 onClick = { onSelectPack(summary.pack.id) },
                                 modifier = Modifier
                                     .weight(1f)
@@ -379,72 +385,123 @@ private fun QuickPlayHeroCard(
 @Composable
 private fun CategoryWireCard(
     summary: PackProgressSummary,
+    packIndex: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pack = summary.pack
     val primaryColor = Color(pack.primaryColorHex)
-    val dimColor = Color(pack.dimColorHex)
     val progress = if (summary.totalLevels > 0) {
         summary.completedLevels.toFloat() / summary.totalLevels
     } else 0f
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = dimColor,
-        border = BorderStroke(1.dp, primaryColor),
+        shape = RoundedCornerShape(16.dp),
+        color = WarmSurface,
+        border = BorderStroke(1.dp, WarmBorderBright),
+        shadowElevation = 2.dp,
         modifier = modifier
             .clickable { onClick() }
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Category Icon Emoji
-            Text(
-                text = pack.emoji,
-                fontSize = 28.sp,
-                textAlign = TextAlign.Center
+            // Premium Category Hero Image Header (attempts CDN cover or renders rich gradient visual)
+            CategoryHeroImage(
+                pack = pack,
+                height = 86.dp,
+                packIndex = packIndex,
+                totalLogos = summary.totalLevels,
+                shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // Category Title
-            Text(
-                text = pack.title,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = WarmText,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Category Progress Bar
-            LinearProgressIndicator(
-                progress = { progress },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-                color = primaryColor,
-                trackColor = WarmBorder
-            )
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+            ) {
+                // Category Title
+                Text(
+                    text = pack.title,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = WarmText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-            // Solved Count
-            Text(
-                text = "${summary.completedLevels} / ${summary.totalLevels}",
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-                color = WarmTextDim,
-                textAlign = TextAlign.Center
-            )
+                // Subtitle
+                Text(
+                    text = pack.subtitle,
+                    fontSize = 10.sp,
+                    color = WarmTextDim,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Category Progress Bar
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp)),
+                    color = primaryColor,
+                    trackColor = WarmBorder
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Solved Count & Status Pill
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${summary.completedLevels} / ${summary.totalLevels}",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = WarmTextDim
+                    )
+
+                    if (summary.completedLevels == summary.totalLevels && summary.totalLevels > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = Color(0xFFDCFCE7),
+                            border = BorderStroke(0.5.dp, Color(0xFF22C55E))
+                        ) {
+                            Text(
+                                text = "DONE ✓",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF15803D),
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                    } else if (progress > 0f) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = primaryColor.copy(alpha = 0.12f),
+                            border = BorderStroke(0.5.dp, primaryColor.copy(alpha = 0.35f))
+                        ) {
+                            Text(
+                                text = "${(progress * 100).toInt()}%",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = primaryColor,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

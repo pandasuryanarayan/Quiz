@@ -30,6 +30,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -54,6 +55,7 @@ import com.example.data.LevelProgressEntity
 import com.example.data.PackCategory
 import com.example.data.QuizLevel
 import com.example.data.QuizPackData
+import com.example.ui.components.CategoryHeroImage
 import com.example.ui.theme.AmberStar
 import com.example.ui.theme.WarmBg
 import com.example.ui.theme.WarmBorder
@@ -83,7 +85,7 @@ fun LevelGridScreen(
     onEarnCoinsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pack = PackCategory.entries.find { it.id == packId } ?: PackCategory.FOOD
+    val pack = PackCategory.entries.find { it.id == packId } ?: PackCategory.AUTOMOTIVE
     val packLevels = QuizPackData.getLevelsForPack(packId)
     val packColor = Color(pack.primaryColorHex)
     val packDimColor = Color(pack.dimColorHex)
@@ -222,41 +224,72 @@ fun LevelGridScreen(
                 }
             }
 
-            // Category Hero Banner (Wireframe Screen 2 Header)
+            // Category Hero Banner
             item {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = packDimColor,
-                    border = BorderStroke(1.dp, packColor),
+                    color = WarmSurface,
+                    border = BorderStroke(1.dp, WarmBorderBright),
+                    shadowElevation = 2.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 18.dp, horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = pack.emoji,
-                            fontSize = 38.sp,
-                            textAlign = TextAlign.Center
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        CategoryHeroImage(
+                            pack = pack,
+                            height = 110.dp,
+                            totalLogos = packLevels.size,
+                            shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = pack.title,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = WarmText,
-                            letterSpacing = (-0.5).sp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "$completedCount / ${packLevels.size} identified • $percentage%",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = WarmTextDim
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                        ) {
+                            Text(
+                                text = pack.title,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = WarmText,
+                                letterSpacing = (-0.3).sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = pack.subtitle,
+                                fontSize = 12.sp,
+                                color = WarmTextDim
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            LinearProgressIndicator(
+                                progress = { if (packLevels.isNotEmpty()) completedCount.toFloat() / packLevels.size else 0f },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(5.dp)
+                                    .clip(RoundedCornerShape(2.5.dp)),
+                                color = packColor,
+                                trackColor = WarmBorder
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "$completedCount / ${packLevels.size} identified",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = WarmTextDim
+                                )
+                                Text(
+                                    text = "$percentage%",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = packColor
+                                )
+                            }
+                        }
                     }
                 }
             }

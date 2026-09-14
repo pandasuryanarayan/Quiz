@@ -27,67 +27,39 @@ class ExampleRobolectricTest {
   @Test
   fun `verify quiz packs catalog and CDN mappings`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(49, levels.size)
+    assertEquals(130, levels.size)
 
-    // Verify Famous Brands sequence (now 10 levels with Microsoft)
-    val brands = com.example.data.QuizPackData.getLevelsForPack("brands")
-    assertEquals(10, brands.size)
-    assertEquals("AMAZON", brands[0].answer)
-    assertEquals("APPLE", brands[1].answer)
-    assertEquals("GOOGLE", brands[2].answer)
-    assertEquals("MCDONALDS", brands[3].answer)
-    assertEquals("NIKE", brands[4].answer)
-    assertEquals("SPOTIFY", brands[5].answer)
-    assertEquals("TARGET", brands[6].answer)
-    assertEquals("TESLA", brands[7].answer)
-    assertEquals("ZOHO", brands[8].answer)
-    assertEquals("MICROSOFT", brands[9].answer)
-    brands.forEach { lvl ->
+    // Verify Automotive sequence
+    val automotive = com.example.data.QuizPackData.getLevelsForPack("automotive")
+    assertEquals(10, automotive.size)
+    assertEquals("TOYOTA", automotive[0].answer)
+    assertEquals("BMW", automotive[1].answer)
+    assertEquals("FERRARI", automotive[2].answer)
+    automotive.forEach { lvl ->
       org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Famous%20Brands/"))
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Automotive/"))
     }
 
-    // Verify Entertainment sequence
-    val entertainment = com.example.data.QuizPackData.getLevelsForPack("entertainment")
-    assertEquals(5, entertainment.size)
-    assertEquals("DISNEY", entertainment[0].answer)
-    assertEquals("NETFLIX", entertainment[1].answer)
-    assertEquals("TWITCH", entertainment[2].answer)
-    assertEquals("WARNERBROS", entertainment[3].answer)
-    assertEquals("YOUTUBE", entertainment[4].answer)
-    entertainment.forEach { lvl ->
-      org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Entertainment/"))
-    }
-
-    // Verify Food sequence
-    val food = com.example.data.QuizPackData.getLevelsForPack("food")
-    assertEquals(5, food.size)
-    assertEquals("BURGERKING", food[0].answer)
-    assertEquals("DOMINOS", food[1].answer)
-    assertEquals("KFC", food[2].answer)
-    assertEquals("PEPSI", food[3].answer)
-    assertEquals("TACOBELL", food[4].answer)
+    // Verify Food & Beverage sequence
+    val food = com.example.data.QuizPackData.getLevelsForPack("food_beverage")
+    assertEquals(10, food.size)
+    assertEquals("MCDONALDS", food[0].answer)
+    assertEquals("KFC", food[1].answer)
+    assertEquals("COCACOLA", food[2].answer)
     food.forEach { lvl ->
       org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Treats/"))
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Beverage/"))
     }
 
-    // Verify Sports sequence
-    val sports = com.example.data.QuizPackData.getLevelsForPack("sports")
-    assertEquals(9, sports.size)
-    assertEquals("ADIDAS", sports[0].answer)
-    assertEquals("AUDI", sports[1].answer)
-    assertEquals("BMW", sports[2].answer)
-    assertEquals("FERRARI", sports[3].answer)
-    assertEquals("MERCEDES", sports[4].answer)
-    assertEquals("NBA", sports[5].answer)
-    assertEquals("OLYMPIC", sports[6].answer)
-    assertEquals("PUMA", sports[7].answer)
-    assertEquals("REDBULL", sports[8].answer)
-    sports.forEach { lvl ->
+    // Verify Energy & Telecom sequence
+    val energy = com.example.data.QuizPackData.getLevelsForPack("energy_telecom")
+    assertEquals(10, energy.size)
+    assertEquals("SHELL", energy[0].answer)
+    assertEquals("VODAFONE", energy[1].answer)
+    assertEquals("VERIZON", energy[2].answer)
+    energy.forEach { lvl ->
       org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Sports%20%26%20Autos/"))
+      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Energy%20%26%20Telecom/"))
     }
   }
 
@@ -119,11 +91,11 @@ class ExampleRobolectricTest {
     val repo = QuizRepository(db.quizDao())
     repo.initializeDefaultsIfNeeded()
 
-    val level1 = com.example.data.QuizPackData.getLevelById("brands_1")!!
-    val level2 = com.example.data.QuizPackData.getLevelById("brands_2")!!
-    val level5 = com.example.data.QuizPackData.getLevelById("brands_5")!!
-    val level6 = com.example.data.QuizPackData.getLevelById("brands_6")!!
-    val level7 = com.example.data.QuizPackData.getLevelById("brands_7")!!
+    val level1 = com.example.data.QuizPackData.getLevelById("automotive_1")!!
+    val level2 = com.example.data.QuizPackData.getLevelById("automotive_2")!!
+    val level5 = com.example.data.QuizPackData.getLevelById("automotive_5")!!
+    val level6 = com.example.data.QuizPackData.getLevelById("automotive_6")!!
+    val level7 = com.example.data.QuizPackData.getLevelById("automotive_7")!!
 
     var allProgress = db.quizDao().getAllLevelProgress()
     // Helper to get sync list
@@ -144,7 +116,7 @@ class ExampleRobolectricTest {
     val statusL2 = com.example.data.QuizPackData.getLevelLockStatus(level2, progressList)
     assertEquals(false, statusL2.isUnlocked)
     assertEquals(true, statusL2.isStrictlyLocked)
-    assertEquals("brands_1", statusL2.requiredPreviousLevel?.id)
+    assertEquals("automotive_1", statusL2.requiredPreviousLevel?.id)
 
     // 3. Level 6 (ad-gated) must be strictly locked because Level 5 is not completed
     val statusL6Before = com.example.data.QuizPackData.getLevelLockStatus(level6, progressList)
@@ -161,10 +133,10 @@ class ExampleRobolectricTest {
     assertEquals(false, statusL2After.isStrictlyLocked)
 
     // 5. Complete levels 2, 3, 4, 5
-    repo.completeLevel("brands_2")
-    repo.completeLevel("brands_3")
-    repo.completeLevel("brands_4")
-    repo.completeLevel("brands_5")
+    repo.completeLevel("automotive_2")
+    repo.completeLevel("automotive_3")
+    repo.completeLevel("automotive_4")
+    repo.completeLevel("automotive_5")
     progressList = getProgressList()
 
     // Now Level 6 should be eligible for Ad-Unlock (isAdGated = true, but not unlocked yet)
@@ -207,22 +179,22 @@ class ExampleRobolectricTest {
     repo.initializeDefaultsIfNeeded()
 
     // 1. Initially, only Level 1 must be visible in the pack
-    var visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    var visible = com.example.data.QuizPackData.getVisibleLevelsForPack("automotive", repo.allProgress.value)
     assertEquals(1, visible.size)
-    assertEquals("brands_1", visible[0].id)
+    assertEquals("automotive_1", visible[0].id)
 
     // 2. User completes Level 1 -> now Level 1 and Level 2 are visible
-    repo.completeLevel("brands_1")
-    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    repo.completeLevel("automotive_1")
+    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("automotive", repo.allProgress.value)
     assertEquals(2, visible.size)
-    assertEquals("brands_1", visible[0].id)
-    assertEquals("brands_2", visible[1].id)
+    assertEquals("automotive_1", visible[0].id)
+    assertEquals("automotive_2", visible[1].id)
 
     // 3. User completes Level 2 -> now Level 1, 2, and 3 are visible
-    repo.completeLevel("brands_2")
-    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("brands", repo.allProgress.value)
+    repo.completeLevel("automotive_2")
+    visible = com.example.data.QuizPackData.getVisibleLevelsForPack("automotive", repo.allProgress.value)
     assertEquals(3, visible.size)
-    assertEquals("brands_3", visible[2].id)
+    assertEquals("automotive_3", visible[2].id)
 
     db.close()
   }
@@ -234,20 +206,11 @@ class ExampleRobolectricTest {
     val repo = QuizRepository(db.quizDao())
     repo.initializeDefaultsIfNeeded()
 
-    assertEquals(6, PackCategory.entries.size)
-
-    val expectedCounts = mapOf(
-      "brands" to 10,
-      "entertainment" to 5,
-      "gaming" to 10,
-      "sports" to 9,
-      "food" to 5,
-      "world" to 10
-    )
+    assertEquals(13, PackCategory.entries.size)
 
     for (pack in PackCategory.entries) {
       val packLevels = com.example.data.QuizPackData.getLevelsForPack(pack.id)
-      assertEquals("Pack ${pack.id} size mismatch", expectedCounts[pack.id], packLevels.size)
+      assertEquals("Pack ${pack.id} size mismatch", 10, packLevels.size)
       // Level 1 should be free & visible initially
       val visible = com.example.data.QuizPackData.getVisibleLevelsForPack(pack.id, repo.allProgress.value)
       assertEquals("Pack ${pack.id} should show only Level 1 initially", 1, visible.size)
