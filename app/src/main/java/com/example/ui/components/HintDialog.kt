@@ -109,7 +109,7 @@ fun HintDialog(
                 // Option 1: Free Hint (reveals first letter)
                 HintOptionCard(
                     title = "Free First Letter",
-                    subtitle = if (freeHintAvailable) "Reveals the first letter of the logo" else "Already used on this level",
+                    subtitle = if (freeHintAvailable) "Reveals the first letter of the logo" else "Already used on this logo",
                     icon = Icons.Rounded.AutoFixHigh,
                     badgeText = if (freeHintAvailable) "FREE" else "USED",
                     badgeColor = if (freeHintAvailable) EmeraldSuccess else Slate400,

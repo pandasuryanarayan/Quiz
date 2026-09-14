@@ -149,7 +149,7 @@ fun LevelGridScreen(
                         )
                         Icon(
                             imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Refresh category levels",
+                            contentDescription = "Refresh category logos",
                             tint = if (isRefreshing) TailwindBlue else Slate700,
                             modifier = Modifier.rotate(rotation)
                         )
@@ -260,7 +260,7 @@ fun LevelGridScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Admin Mode • All ${packLevels.size} levels unlocked for testing",
+                                text = "Admin Mode • All ${packLevels.size} logos unlocked for testing",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color(0xFF1E40AF)
@@ -319,13 +319,13 @@ fun LevelGridScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Level ${visibleLevels.size + 1} Locked",
+                                    text = "Logo ${visibleLevels.size + 1} Locked",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Slate700
                                 )
                                 Text(
-                                    text = "Pass Level ${visibleLevels.size} to unlock Level ${visibleLevels.size + 1}",
+                                    text = "Pass Logo ${visibleLevels.size} to unlock Logo ${visibleLevels.size + 1}",
                                     fontSize = 11.sp,
                                     color = Slate500
                                 )
@@ -383,14 +383,14 @@ private fun LevelGridTile(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Top row: Level tag and status icon
+                // Top row: Logo tag and status icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "LEVEL ${level.levelNumber}",
+                        text = "LOGO ${level.levelNumber}",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = when {
@@ -532,13 +532,13 @@ private fun LevelGridTile(
                     }
                 }
 
-                // Bottom Subtitle (Letters count or required level)
+                // Bottom Subtitle (Letters count or required logo)
                 Text(
                     text = when {
                         isCompleted -> "${level.answer.length} Letters • Solved"
                         isUnlocked -> "${level.answer.length} Letters"
                         isAdGated -> "Unlock with Ad"
-                        else -> "Solve Level ${level.levelNumber - 1}"
+                        else -> "Solve Logo ${level.levelNumber - 1}"
                     },
                     fontSize = 10.sp,
                     color = when {

@@ -264,7 +264,7 @@ fun LevelCompleteDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Next Level Button
+                // Next Logo Button
                 if (hasNextLevel) {
                     Button(
                         onClick = onNextLevel,
@@ -276,7 +276,7 @@ fun LevelCompleteDialog(
                             .testTag("next_level_button")
                     ) {
                         Text(
-                            text = "Next Level",
+                            text = "Next Logo",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
@@ -308,7 +308,7 @@ fun LevelCompleteDialog(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Level Selection",
+                        text = "All Logos",
                         color = Slate700,
                         fontSize = 14.sp
                     )

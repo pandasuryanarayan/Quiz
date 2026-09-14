@@ -96,7 +96,7 @@ fun QuizPlayScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Level ${level.levelNumber}",
+                            text = "Logo ${level.levelNumber}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Slate900
@@ -113,7 +113,7 @@ fun QuizPlayScreen(
                     IconButton(onClick = onBack, modifier = Modifier.testTag("back_button")) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back to Level Grid",
+                            contentDescription = "Back to Logos",
                             tint = Slate700
                         )
                     }

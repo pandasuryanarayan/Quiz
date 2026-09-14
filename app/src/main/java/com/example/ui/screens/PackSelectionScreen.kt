@@ -253,7 +253,7 @@ fun PackSelectionScreen(
                                         color = Color(0xFF1E3A8A)
                                     )
                                     Text(
-                                        text = "All levels unlocked for instant testing",
+                                        text = "All logos unlocked for instant testing",
                                         fontSize = 12.sp,
                                         color = Color(0xFF2563EB)
                                     )

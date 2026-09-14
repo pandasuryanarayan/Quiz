@@ -107,7 +107,7 @@ fun LockedLevelDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Level ${targetLevel.levelNumber} is Locked",
+                    text = "Logo ${targetLevel.levelNumber} is Locked",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Slate900,
@@ -117,7 +117,7 @@ fun LockedLevelDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Complete Level ${requiredLevel.levelNumber} first to unlock this level!\nAll levels unlock in sequence as you solve them.",
+                    text = "Complete Logo ${requiredLevel.levelNumber} first to unlock this logo!\nAll logos unlock in sequence as you solve them.",
                     fontSize = 14.sp,
                     color = Slate700,
                     textAlign = TextAlign.Center,
@@ -145,7 +145,7 @@ fun LockedLevelDialog(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Play Level ${requiredLevel.levelNumber}",
+                        text = "Play Logo ${requiredLevel.levelNumber}",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )

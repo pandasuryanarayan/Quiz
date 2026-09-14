@@ -105,14 +105,14 @@ fun AdPromptDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 val title = when (purpose) {
-                    AdPurpose.UNLOCK_LEVEL -> "Unlock Level $levelNumber"
+                    AdPurpose.UNLOCK_LEVEL -> "Unlock Logo $levelNumber"
                     AdPurpose.REMOVE_WRONG_LETTERS -> "Remove 3 Wrong Letters"
                     AdPurpose.REVEAL_LETTER -> "Reveal Next Letter"
                     AdPurpose.EARN_COINS -> "Earn +50 Free Coins"
                 }
 
                 val subtitle = when (purpose) {
-                    AdPurpose.UNLOCK_LEVEL -> "Stages 6 and above are locked. Watch a quick 5-second sponsor video to permanently unlock this stage!"
+                    AdPurpose.UNLOCK_LEVEL -> "Logos 6 and above are locked. Watch a quick 5-second sponsor video to permanently unlock this logo!"
                     AdPurpose.REMOVE_WRONG_LETTERS -> "Watch a quick sponsor video to eliminate 3 distracting letter tiles from the scrambled bank."
                     AdPurpose.REVEAL_LETTER -> "Watch a short video to place the next correct letter in your answer slots."
                     AdPurpose.EARN_COINS -> "Watch a short sponsor video to instantly claim 50 free game coins!"
@@ -350,7 +350,7 @@ fun RewardedAdPlayerModal(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 val rewardLabel = when (purpose) {
                                     AdPurpose.EARN_COINS -> "+50 Coins Granted!"
-                                    AdPurpose.UNLOCK_LEVEL -> "Level Unlocked!"
+                                    AdPurpose.UNLOCK_LEVEL -> "Logo Unlocked!"
                                     AdPurpose.REMOVE_WRONG_LETTERS -> "3 Letters Removed!"
                                     AdPurpose.REVEAL_LETTER -> "Letter Revealed!"
                                 }

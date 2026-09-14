@@ -34,6 +34,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.AppMode
+import com.example.ui.components.AdminPasswordDialog
 import com.example.ui.theme.EmeraldSuccess
 import com.example.ui.theme.Slate200
 import com.example.ui.theme.Slate400
@@ -61,6 +66,19 @@ fun ModeSelectionScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    var showAdminPasswordDialog by remember { mutableStateOf(false) }
+
+    if (showAdminPasswordDialog) {
+        AdminPasswordDialog(
+            onSuccess = {
+                showAdminPasswordDialog = false
+                onSelectMode(AppMode.ADMIN)
+            },
+            onDismiss = {
+                showAdminPasswordDialog = false
+            }
+        )
+    }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -189,7 +207,7 @@ fun ModeSelectionScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "Authentic player journey with progressive stage unlocking, coins, hints, and rewarded challenges.",
+                        text = "Authentic player journey with progressive logo unlocking, coins, hints, and rewarded challenges.",
                         fontSize = 13.sp,
                         color = Slate700,
                         lineHeight = 18.sp
@@ -199,7 +217,7 @@ fun ModeSelectionScreen(
 
                     // Feature highlights
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        ModeFeatureItem(text = "Sequential stage progression")
+                        ModeFeatureItem(text = "Sequential logo progression")
                         ModeFeatureItem(text = "Coin balance & hint management")
                         ModeFeatureItem(text = "Standard gameplay rules")
                     }
@@ -236,7 +254,7 @@ fun ModeSelectionScreen(
 
             // ADMIN MODE CARD
             Card(
-                onClick = { onSelectMode(AppMode.ADMIN) },
+                onClick = { showAdminPasswordDialog = true },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 border = BorderStroke(1.5.dp, Color(0xFFBFDBFE)),
@@ -305,7 +323,7 @@ fun ModeSelectionScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "Full unrestricted testing mode where all levels across all categories are unlocked for instant testing.",
+                        text = "Full unrestricted testing mode where all logos across all categories are unlocked for instant testing.",
                         fontSize = 13.sp,
                         color = Slate700,
                         lineHeight = 18.sp
@@ -315,7 +333,7 @@ fun ModeSelectionScreen(
 
                     // Feature highlights
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        ModeFeatureItem(text = "All 49+ levels unlocked immediately", iconTint = Color(0xFF2563EB))
+                        ModeFeatureItem(text = "All 49+ logos unlocked immediately", iconTint = Color(0xFF2563EB))
                         ModeFeatureItem(text = "Jump to any logo to test graphics & answers", iconTint = Color(0xFF2563EB))
                         ModeFeatureItem(text = "No lock dialogs or sequential restrictions", iconTint = Color(0xFF2563EB))
                     }
@@ -323,7 +341,7 @@ fun ModeSelectionScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { onSelectMode(AppMode.ADMIN) },
+                        onClick = { showAdminPasswordDialog = true },
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
                         modifier = Modifier
