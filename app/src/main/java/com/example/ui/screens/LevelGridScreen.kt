@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,30 +15,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AdminPanelSettings
-import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,16 +39,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.LevelProgressEntity
@@ -64,14 +55,17 @@ import com.example.data.PackCategory
 import com.example.data.QuizLevel
 import com.example.data.QuizPackData
 import com.example.ui.theme.AmberStar
-import com.example.ui.theme.CleanWhite
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate500
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.WarmBg
+import com.example.ui.theme.WarmBorder
+import com.example.ui.theme.WarmBorderBright
+import com.example.ui.theme.WarmSurface
+import com.example.ui.theme.WarmSurface2
+import com.example.ui.theme.WarmText
+import com.example.ui.theme.WarmTextDim
+import com.example.ui.theme.WireAmber
+import com.example.ui.theme.WireSage
+import com.example.ui.theme.WireSageDim
+import com.example.ui.theme.WireTeal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,13 +83,15 @@ fun LevelGridScreen(
     onEarnCoinsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pack = PackCategory.entries.find { it.id == packId } ?: PackCategory.BRANDS
+    val pack = PackCategory.entries.find { it.id == packId } ?: PackCategory.FOOD
     val packLevels = QuizPackData.getLevelsForPack(packId)
     val packColor = Color(pack.primaryColorHex)
+    val packDimColor = Color(pack.dimColorHex)
 
     val completedCount = packLevels.count { level ->
         allProgress.find { it.id == level.id }?.isCompleted == true
     }
+    val percentage = if (packLevels.isNotEmpty()) (completedCount * 100 / packLevels.size) else 0
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(refreshMessage) {
@@ -110,51 +106,43 @@ fun LevelGridScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = pack.title,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Slate900
-                        )
-                        Text(
-                            text = "$completedCount of ${packLevels.size} Solved",
-                            fontSize = 11.sp,
-                            color = Slate500
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.testTag("back_to_packs_button")) {
+                    Row(
+                        modifier = Modifier.clickable { onBack() },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back to packs",
-                            tint = Slate700
+                            contentDescription = "Back",
+                            tint = WarmTextDim,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Back",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = WarmTextDim
                         )
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = onRefreshClick,
-                        enabled = !isRefreshing,
-                        modifier = Modifier.testTag("refresh_category_levels_button")
-                    ) {
-                        val rotation by animateFloatAsState(
-                            targetValue = if (isRefreshing) 360f else 0f,
-                            animationSpec = if (isRefreshing) infiniteRepeatable(
-                                animation = tween(800, easing = LinearEasing),
-                                repeatMode = RepeatMode.Restart
-                            ) else tween(300),
-                            label = "refresh_rotation"
-                        )
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Refresh category logos",
-                            tint = if (isRefreshing) TailwindBlue else Slate700,
-                            modifier = Modifier.rotate(rotation)
-                        )
+                    // Admin Sync Button if Admin Mode
+                    if (isAdminMode) {
+                        IconButton(
+                            onClick = onRefreshClick,
+                            enabled = !isRefreshing,
+                            modifier = Modifier.testTag("admin_refresh_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Refresh,
+                                contentDescription = "Sync logos",
+                                tint = WireTeal,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+
+                    // Coins Pill
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = Color(0xFFFEF3C7),
@@ -164,391 +152,315 @@ fun LevelGridScreen(
                             .testTag("grid_earn_coins_button")
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.MonetizationOn,
                                 contentDescription = "Coins",
                                 tint = AmberStar,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "$coins",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
+                                fontSize = 13.sp,
                                 color = Color(0xFFB45309)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = "+",
+                                fontWeight = FontWeight.Black,
+                                fontSize = 13.sp,
+                                color = AmberStar
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(14.dp))
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = CleanWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBg)
             )
         },
-        containerColor = Color(0xFFF8FAFC)
+        containerColor = WarmBg
     ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Header information banner
-            item(span = { GridItemSpan(2) }) {
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, Slate200),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Pack Progression",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Slate900
-                            )
-                            Text(
-                                text = "${(completedCount * 100) / packLevels.size}%",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = packColor
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        LinearProgressIndicator(
-                            progress = { completedCount.toFloat() / packLevels.size },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp)),
-                            color = packColor,
-                            trackColor = Color(0xFFF1F5F9)
-                        )
-                    }
-                }
-            }
-
-            // Admin Mode info banner
+            // Admin Mode Active Banner
             if (isAdminMode) {
-                item(span = { GridItemSpan(2) }) {
+                item {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
                         color = Color(0xFFEFF6FF),
-                        border = BorderStroke(1.dp, Color(0xFFBFDBFE)),
+                        border = BorderStroke(1.dp, Color(0xFF93C5FD)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.AdminPanelSettings,
                                 contentDescription = null,
-                                tint = Color(0xFF2563EB),
-                                modifier = Modifier.size(18.dp)
+                                tint = Color(0xFF1D4ED8),
+                                modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Admin Mode • All ${packLevels.size} logos unlocked for testing",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF1E40AF)
+                                text = "Admin Mode • All logos unlocked for testing",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1D4ED8)
                             )
                         }
                     }
                 }
             }
 
-            // Visible levels: in admin mode all levels are visible; in user mode only unlocked levels
-            val visibleLevels = QuizPackData.getVisibleLevelsForPack(pack.id, allProgress, isAdminMode = isAdminMode)
+            // Category Hero Banner (Wireframe Screen 2 Header)
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = packDimColor,
+                    border = BorderStroke(1.dp, packColor),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 18.dp, horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = pack.emoji,
+                            fontSize = 38.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = pack.title,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = WarmText,
+                            letterSpacing = (-0.5).sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "$completedCount / ${packLevels.size} identified • $percentage%",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = WarmTextDim
+                        )
+                    }
+                }
+            }
 
-            items(visibleLevels) { level ->
+            // Section Heading: LOGOS
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, bottom = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "LOGOS",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp,
+                        color = WarmTextDim
+                    )
+                    Text(
+                        text = "$completedCount of ${packLevels.size} Solved",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        color = WarmTextDim
+                    )
+                }
+            }
+
+            // Logo Rows (Wireframe level-list style)
+            items(packLevels) { level ->
                 val progress = allProgress.find { it.id == level.id }
-                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode = isAdminMode)
-                val stars = progress?.stars ?: 0
+                val isCompleted = progress?.isCompleted == true
+                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode)
 
-                LevelGridTile(
+                LogoWireRow(
                     level = level,
-                    lockStatus = lockStatus,
-                    stars = stars,
+                    isCompleted = isCompleted,
+                    isUnlocked = lockStatus.isUnlocked,
+                    isAdGated = lockStatus.isAdGated,
+                    stars = progress?.stars ?: 0,
+                    packColor = packColor,
                     onClick = { onLevelClick(level.id) },
-                    modifier = Modifier.testTag("level_item_${level.id}")
+                    modifier = Modifier.testTag("logo_row_${level.id}")
                 )
             }
 
-            // Progression indicator card if more levels are locked (only in user mode)
-            if (!isAdminMode && visibleLevels.size < packLevels.size) {
-                item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(2) }) {
-                    Surface(
-                        shape = RoundedCornerShape(14.dp),
-                        color = Color(0xFFF1F5F9),
-                        border = BorderStroke(1.dp, Slate200),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Surface(
-                                shape = CircleShape,
-                                color = Color.White,
-                                modifier = Modifier.size(28.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Lock,
-                                        contentDescription = null,
-                                        tint = Slate500,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Logo ${visibleLevels.size + 1} Locked",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Slate700
-                                )
-                                Text(
-                                    text = "Pass Logo ${visibleLevels.size} to unlock Logo ${visibleLevels.size + 1}",
-                                    fontSize = 11.sp,
-                                    color = Slate500
-                                )
-                            }
-                        }
-                    }
-                }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
 }
 
 @Composable
-private fun LevelGridTile(
+private fun LogoWireRow(
     level: QuizLevel,
-    lockStatus: com.example.data.LevelLockStatus,
+    isCompleted: Boolean,
+    isUnlocked: Boolean,
+    isAdGated: Boolean,
     stars: Int,
+    packColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isCompleted = lockStatus.isCompleted
-    val isUnlocked = lockStatus.isUnlocked
-    val isAdGated = lockStatus.isAdGated
-    val isStrictlyLocked = lockStatus.isStrictlyLocked
+    val rowBg = when {
+        isCompleted -> WireSageDim
+        isUnlocked -> WarmSurface
+        else -> WarmSurface.copy(alpha = 0.55f)
+    }
+
+    val rowBorder = when {
+        isCompleted -> WireSage
+        isUnlocked -> WarmBorder
+        else -> WarmBorder.copy(alpha = 0.6f)
+    }
 
     Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = when {
-            isCompleted -> Color(0xFFF0FDF4)
-            isUnlocked -> Color.White
-            isAdGated -> Color(0xFFF8FAFC)
-            else -> Color(0xFFF1F5F9)
-        },
-        border = BorderStroke(
-            width = if (isCompleted || isUnlocked) 1.5.dp else 1.dp,
-            color = when {
-                isCompleted -> EmeraldSuccess
-                isUnlocked -> TailwindBlue.copy(alpha = 0.5f)
-                isAdGated -> Color(0xFFBFDBFE)
-                else -> Slate200
-            }
-        ),
+        shape = RoundedCornerShape(12.dp),
+        color = rowBg,
+        border = BorderStroke(1.dp, rowBorder),
         modifier = modifier
             .fillMaxWidth()
-            .height(118.dp)
-            .shadow(if (isUnlocked) 2.dp else 0.dp, RoundedCornerShape(18.dp))
             .clickable { onClick() }
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Top row: Logo tag and status icon
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "LOGO ${level.levelNumber}",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = when {
-                            isCompleted -> EmeraldSuccess
-                            isUnlocked -> Slate700
-                            isAdGated -> TailwindBlue
-                            else -> Slate400
-                        },
-                        letterSpacing = 0.5.sp
+            // Circle Status Indicator
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(
+                        when {
+                            isCompleted -> WireSage
+                            isUnlocked -> WarmSurface2
+                            else -> WarmSurface2.copy(alpha = 0.6f)
+                        }
                     )
-
-                    if (isCompleted) {
+                    .then(
+                        if (!isCompleted && isUnlocked) {
+                            Modifier.background(WarmSurface2)
+                        } else Modifier
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    isCompleted -> {
                         Icon(
-                            imageVector = Icons.Rounded.CheckCircle,
-                            contentDescription = "Completed",
-                            tint = EmeraldSuccess,
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = "Solved",
+                            tint = Color.White,
                             modifier = Modifier.size(18.dp)
                         )
-                    } else if (isAdGated) {
-                        Surface(
-                            shape = CircleShape,
-                            color = Color(0xFFEFF6FF),
-                            modifier = Modifier.size(22.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Videocam,
-                                    contentDescription = "Watch Ad",
-                                    tint = TailwindBlue,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                            }
-                        }
-                    } else if (isStrictlyLocked) {
-                        Surface(
-                            shape = CircleShape,
-                            color = Color(0xFFE2E8F0),
-                            modifier = Modifier.size(22.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Lock,
-                                    contentDescription = "Locked",
-                                    tint = Slate500,
-                                    modifier = Modifier.size(12.dp)
-                                )
-                            }
-                        }
+                    }
+                    isUnlocked -> {
+                        Text(
+                            text = "${level.levelNumber}",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = WireAmber
+                        )
+                    }
+                    else -> {
+                        Icon(
+                            imageVector = Icons.Rounded.Lock,
+                            contentDescription = "Locked",
+                            tint = WarmTextDim,
+                            modifier = Modifier.size(14.dp)
+                        )
                     }
                 }
+            }
 
-                // Center Content: Stars or Play Prompt or Ad Unlock Tag or Locked Icon
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    when {
-                        isCompleted -> {
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                repeat(stars) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Star,
-                                        contentDescription = null,
-                                        tint = AmberStar,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-                        }
-                        isUnlocked -> {
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = Color(0xFFEFF6FF)
-                            ) {
-                                Text(
-                                    text = "PLAY",
-                                    color = TailwindBlue,
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp)
-                                )
-                            }
-                        }
-                        isAdGated -> {
-                            // Ad Gated Badge (Previous level completed, ready to unlock via ad)
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = Color(0xFFEFF6FF),
-                                border = BorderStroke(1.dp, Color(0xFFBFDBFE))
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Videocam,
-                                        contentDescription = null,
-                                        tint = TailwindBlue,
-                                        modifier = Modifier.size(14.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "WATCH AD",
-                                        color = TailwindBlue,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
-                        else -> {
-                            // Strictly Locked (Previous level not completed yet)
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = Color(0xFFE2E8F0)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Lock,
-                                        contentDescription = null,
-                                        tint = Slate500,
-                                        modifier = Modifier.size(12.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "LOCKED",
-                                        color = Slate500,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+            Spacer(modifier = Modifier.width(12.dp))
 
-                // Bottom Subtitle (Letters count or required logo)
+            // Logo Name & Subtitle
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Logo ${level.levelNumber}",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isUnlocked || isCompleted) WarmText else WarmTextDim
+                )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = when {
-                        isCompleted -> "${level.answer.length} Letters • Solved"
-                        isUnlocked -> "${level.answer.length} Letters"
-                        isAdGated -> "Unlock with Ad"
-                        else -> "Solve Logo ${level.levelNumber - 1}"
+                        isCompleted -> "${level.answer.length} letters • Solved"
+                        isUnlocked -> "${level.answer.length} letters"
+                        isAdGated -> "Watch Ad to unlock"
+                        else -> "Complete Logo ${level.levelNumber - 1} to unlock"
                     },
+                    fontFamily = FontFamily.Monospace,
                     fontSize = 10.sp,
                     color = when {
-                        isCompleted -> EmeraldSuccess
-                        isUnlocked -> Slate500
-                        isAdGated -> TailwindBlue
-                        else -> Slate400
-                    },
-                    fontWeight = FontWeight.Medium
+                        isCompleted -> WireSage
+                        isUnlocked -> WarmTextDim
+                        isAdGated -> WireAmber
+                        else -> WarmTextDim.copy(alpha = 0.7f)
+                    }
                 )
+            }
+
+            // Right side stars or lock indicator
+            if (isCompleted) {
+                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    val filledStars = if (stars > 0) stars else 3
+                    repeat(filledStars) {
+                        Icon(
+                            imageVector = Icons.Rounded.Star,
+                            contentDescription = null,
+                            tint = WireAmber,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+            } else if (isUnlocked) {
+                Text(
+                    text = "Play ›",
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = WireTeal
+                )
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isAdGated) WireAmber.copy(alpha = 0.12f) else Color.Transparent
+                ) {
+                    Text(
+                        text = if (isAdGated) "Ad Unlock" else "Locked",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (isAdGated) WireAmber else WarmTextDim,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
             }
         }
     }

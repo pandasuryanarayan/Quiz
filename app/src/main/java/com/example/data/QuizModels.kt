@@ -8,14 +8,16 @@ enum class PackCategory(
     val title: String,
     val subtitle: String,
     val iconKey: String,
-    val primaryColorHex: Long
+    val emoji: String,
+    val primaryColorHex: Long,
+    val dimColorHex: Long
 ) {
-    BRANDS("brands", "Famous Brands", "Iconic global logos & company trademarks", "tag", 0xFF3B82F6),
-    ENTERTAINMENT("entertainment", "Entertainment", "Movies, TV, studios & streaming giants", "movie", 0xFF8B5CF6),
-    GAMING("gaming", "Gaming & Tech", "Consoles, studios, retro games & tech titans", "gamepad", 0xFF10B981),
-    SPORTS("sports", "Sports & Autos", "Supercars, athletic gear & sports leagues", "trophy", 0xFFF59E0B),
-    FOOD("food", "Food & Treats", "World-famous snacks, beverages & fast food chains", "restaurant", 0xFFEF4444),
-    WORLD("world", "World Wonders", "Iconic monuments, ancient ruins & landmarks", "globe", 0xFF06B6D4)
+    FOOD("food", "Foods", "Snacks, drinks & food chains", "restaurant", "🥐", 0xFFD97706, 0xFFFDF4E7),
+    GAMING("gaming", "Games", "Gaming consoles & studios", "gamepad", "🎮", 0xFF0D9488, 0xFFE6F5F4),
+    ENTERTAINMENT("entertainment", "Entertainment", "Movies, TV & streaming", "movie", "🎬", 0xFFBE123C, 0xFFFDF0F3),
+    BRANDS("brands", "Famous Brands", "Global brands & trademarks", "tag", "💼", 0xFF2563EB, 0xFFEFF4FE),
+    SPORTS("sports", "Sports", "Athletic gear & leagues", "trophy", "⚽", 0xFF65A30D, 0xFFF4F9E9),
+    WORLD("world", "Tech", "Apps, gadgets & tech titans", "globe", "📱", 0xFF9333EA, 0xFFF8EFFF)
 }
 
 enum class AppMode {

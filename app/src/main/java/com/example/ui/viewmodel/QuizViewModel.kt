@@ -198,6 +198,24 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         _currentLevelId.value = null
     }
 
+    fun startQuickPlay() {
+        val progress = allProgress.value
+        val isAdmin = _appMode.value == AppMode.ADMIN
+        val allLevels = QuizPackData.bundledLevels
+        // Pick first uncompleted unlocked level across categories, or fallback to first level
+        val target = allLevels.find { lvl ->
+            val p = progress.find { it.id == lvl.id }
+            val isCompleted = p?.isCompleted == true
+            val isUnlocked = isAdmin || QuizPackData.getLevelLockStatus(lvl, progress, isAdminMode = false).isUnlocked
+            !isCompleted && isUnlocked
+        } ?: allLevels.firstOrNull()
+
+        if (target != null) {
+            _currentPackId.value = target.packId
+            openLevel(target.id)
+        }
+    }
+
     fun openLevel(levelId: String) {
         val level = QuizPackData.getLevelById(levelId) ?: return
         val isAdmin = _appMode.value == AppMode.ADMIN

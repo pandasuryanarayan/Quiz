@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.GridView
-import androidx.compose.material.icons.rounded.MonetizationOn
-import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,6 +38,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,12 +47,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.data.QuizLevel
 import com.example.ui.theme.AmberStar
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.WarmBg
+import com.example.ui.theme.WarmBorder
+import com.example.ui.theme.WarmBorderBright
+import com.example.ui.theme.WarmSurface
+import com.example.ui.theme.WarmSurface2
+import com.example.ui.theme.WarmText
+import com.example.ui.theme.WarmTextDim
+import com.example.ui.theme.WireAmber
+import com.example.ui.theme.WireSage
+import com.example.ui.theme.WireSageDim
+import com.example.ui.theme.WireTeal
 
 @Composable
 fun LevelCompleteDialog(
@@ -70,7 +73,7 @@ fun LevelCompleteDialog(
     }
 
     val scale by animateFloatAsState(
-        targetValue = if (animateIn) 1f else 0.8f,
+        targetValue = if (animateIn) 1f else 0.85f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -83,237 +86,241 @@ fun LevelCompleteDialog(
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
     ) {
         Surface(
-            shape = RoundedCornerShape(28.dp),
-            color = Color.White,
+            shape = RoundedCornerShape(24.dp),
+            color = WarmSurface,
+            border = BorderStroke(1.dp, WarmBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(scale)
-                .shadow(12.dp, RoundedCornerShape(28.dp))
-                .padding(16.dp)
+                .shadow(12.dp, RoundedCornerShape(24.dp))
+                .padding(8.dp)
                 .testTag("level_complete_dialog")
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Success Badge
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFD1FAE5),
-                    modifier = Modifier.size(68.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Rounded.CheckCircle,
-                            contentDescription = null,
-                            tint = EmeraldSuccess,
-                            modifier = Modifier.size(44.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
+                // Trophy & Title
                 Text(
-                    text = "BRILLIANT!",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Slate900,
-                    letterSpacing = 1.sp
+                    text = "🏆",
+                    fontSize = 44.sp,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = level.answer,
+                    text = "Logo Complete!",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = TailwindBlue,
-                    letterSpacing = 2.sp
+                    color = WarmText,
+                    letterSpacing = (-0.5).sp
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Logo ${level.levelNumber} Solved",
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 11.sp,
+                    color = WarmTextDim
+                )
 
-                // 3 Stars Row
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Wireframe 3 Stat Cards (stat-card)
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    repeat(3) {
-                        Icon(
-                            imageVector = Icons.Rounded.Star,
-                            contentDescription = null,
-                            tint = AmberStar,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
+                    StatCard(
+                        value = "+50",
+                        label = "COINS",
+                        valueColor = WireTeal,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        value = "★★★",
+                        label = "STARS",
+                        valueColor = WireAmber,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        value = "100%",
+                        label = "SCORE",
+                        valueColor = WireSage,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Rewards Chips (+50 Coins, +100 XP)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFFFEF3C7),
-                        border = BorderStroke(1.dp, Color(0xFFFDE68A))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.MonetizationOn,
-                                contentDescription = null,
-                                tint = AmberStar,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "+50 Coins",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = Color(0xFFB45309)
-                            )
-                        }
-                    }
-
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFFEFF6FF),
-                        border = BorderStroke(1.dp, Color(0xFFBFDBFE))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Star,
-                                contentDescription = null,
-                                tint = TailwindBlue,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "+100 XP",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = TailwindBlue
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Trivia card
+                // Review Section (from Wireframe Screen 4)
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFF8FAFC),
-                    border = BorderStroke(1.dp, Slate200),
+                    shape = RoundedCornerShape(12.dp),
+                    color = WireSageDim,
+                    border = BorderStroke(1.dp, WireSage.copy(alpha = 0.5f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Text(
-                            text = "DID YOU KNOW?",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Slate400,
-                            letterSpacing = 0.5.sp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = level.triviaFact,
-                            fontSize = 13.sp,
-                            color = Slate700,
-                            lineHeight = 18.sp
-                        )
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .background(WireSage, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = level.answer,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = WarmText
+                                )
+                            }
+
+                            Text(
+                                text = "+50 coins",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = WireSage
+                            )
+                        }
+
+                        if (level.triviaFact.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = level.triviaFact,
+                                fontSize = 11.sp,
+                                color = WarmTextDim,
+                                lineHeight = 15.sp
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Double Coins Ad Button
+                // Double Coins Ad Bonus Button
                 OutlinedButton(
                     onClick = onDoubleCoinsAd,
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.5.dp, AmberStar),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFFFFBEB)),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color(0xFFFEF3C7),
+                        contentColor = Color(0xFFB45309)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFFFDE68A)),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(46.dp)
-                        .testTag("double_coins_button")
+                        .testTag("double_coins_ad_button")
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Videocam,
                         contentDescription = null,
-                        tint = AmberStar,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Watch Ad: 2X Coins (+50 Extra)",
-                        color = Color(0xFFB45309),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
+                        text = "Double Reward (+100 Coins)",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Next Logo Button
-                if (hasNextLevel) {
-                    Button(
-                        onClick = onNextLevel,
-                        colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
-                        shape = RoundedCornerShape(14.dp),
+                // Result Action Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onBackToGrid,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = WarmSurface2,
+                            contentColor = WarmText
+                        ),
+                        border = BorderStroke(1.dp, WarmBorder),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .testTag("next_level_button")
+                            .weight(1f)
+                            .testTag("back_to_grid_button")
                     ) {
                         Text(
-                            text = "Next Logo",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowForward,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            text = "Logos",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
 
-                // Back to Grid Button
-                OutlinedButton(
-                    onClick = onBackToGrid,
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Slate200),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                        .testTag("back_to_grid_button")
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.GridView,
-                        contentDescription = null,
-                        tint = Slate700,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "All Logos",
-                        color = Slate700,
-                        fontSize = 14.sp
-                    )
+                    if (hasNextLevel) {
+                        Button(
+                            onClick = onNextLevel,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = WireTeal,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .weight(1.3f)
+                                .testTag("next_level_button")
+                        ) {
+                            Text(
+                                text = "Next Logo ›",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    value: String,
+    label: String,
+    valueColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = WarmSurface2,
+        border = BorderStroke(1.dp, WarmBorder),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = valueColor
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = label,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 1.sp,
+                color = WarmTextDim
+            )
         }
     }
 }

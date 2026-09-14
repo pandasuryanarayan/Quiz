@@ -2,7 +2,6 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,8 +23,6 @@ import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.SportsEsports
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -40,25 +37,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.AppMode
 import com.example.ui.components.AdminPasswordDialog
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate500
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
-import com.example.ui.theme.TailwindBlueDark
+import com.example.ui.theme.WarmBg
+import com.example.ui.theme.WarmBorder
+import com.example.ui.theme.WarmBorderBright
+import com.example.ui.theme.WarmSurface
+import com.example.ui.theme.WarmSurface2
+import com.example.ui.theme.WarmText
+import com.example.ui.theme.WarmTextDim
+import com.example.ui.theme.WireAmber
+import com.example.ui.theme.WireSage
+import com.example.ui.theme.WireTeal
 
 @Composable
 fun ModeSelectionScreen(
@@ -82,7 +80,7 @@ fun ModeSelectionScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color(0xFFF8FAFC)
+        color = WarmBg
     ) {
         Column(
             modifier = Modifier
@@ -94,20 +92,17 @@ fun ModeSelectionScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // App Emblem & Header
+            // App Emblem
             Surface(
-                shape = RoundedCornerShape(24.dp),
-                color = TailwindBlue,
-                shadowElevation = 8.dp,
-                modifier = Modifier
-                    .size(80.dp)
-                    .shadow(12.dp, RoundedCornerShape(24.dp), spotColor = TailwindBlue.copy(alpha = 0.5f))
+                shape = RoundedCornerShape(22.dp),
+                color = WireTeal,
+                modifier = Modifier.size(76.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.background(
                         Brush.linearGradient(
-                            listOf(Color(0xFF3B82F6), Color(0xFF1D4ED8))
+                            listOf(WireTeal, WireAmber)
                         )
                     )
                 ) {
@@ -115,7 +110,7 @@ fun ModeSelectionScreen(
                         text = "Q",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 44.sp
+                        fontSize = 40.sp
                     )
                 }
             }
@@ -124,36 +119,35 @@ fun ModeSelectionScreen(
 
             Text(
                 text = "Logo Quiz",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Black,
-                color = Slate900,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = WarmText,
                 letterSpacing = (-0.5).sp
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = "Select your experience mode to get started",
-                fontSize = 14.sp,
-                color = Slate500,
+                fontSize = 13.sp,
+                color = WarmTextDim,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // USER MODE CARD
             Card(
                 onClick = { onSelectMode(AppMode.USER) },
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.5.dp, Color(0xFFE2E8F0)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = WarmSurface),
+                border = BorderStroke(1.5.dp, WarmBorderBright),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("mode_user_card")
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -162,60 +156,60 @@ fun ModeSelectionScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(46.dp)
-                                    .background(Color(0xFFEFF6FF), CircleShape),
+                                    .size(42.dp)
+                                    .background(WireTeal.copy(alpha = 0.12f), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Person,
                                     contentDescription = null,
-                                    tint = TailwindBlue,
-                                    modifier = Modifier.size(26.dp)
+                                    tint = WireTeal,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
                                     text = "User Mode",
-                                    fontSize = 18.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Slate900
+                                    color = WarmText
                                 )
                                 Text(
                                     text = "Standard Player Experience",
-                                    fontSize = 12.sp,
-                                    color = Slate500
+                                    fontSize = 11.sp,
+                                    color = WarmTextDim
                                 )
                             }
                         }
 
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFFEFF6FF),
-                            border = BorderStroke(1.dp, Color(0xFFBFDBFE))
+                            shape = RoundedCornerShape(10.dp),
+                            color = WireTeal.copy(alpha = 0.1f),
+                            border = BorderStroke(1.dp, WireTeal.copy(alpha = 0.3f))
                         ) {
                             Text(
                                 text = "Standard",
-                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TailwindBlue,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                color = WireTeal,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
                         text = "Authentic player journey with progressive logo unlocking, coins, hints, and rewarded challenges.",
-                        fontSize = 13.sp,
-                        color = Slate700,
-                        lineHeight = 18.sp
+                        fontSize = 12.sp,
+                        color = WarmTextDim,
+                        lineHeight = 17.sp
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Feature highlights
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         ModeFeatureItem(text = "Sequential logo progression")
                         ModeFeatureItem(text = "Coin balance & hint management")
@@ -226,16 +220,16 @@ fun ModeSelectionScreen(
 
                     Button(
                         onClick = { onSelectMode(AppMode.USER) },
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = WireTeal),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .height(46.dp)
                             .testTag("mode_user_button")
                     ) {
                         Text(
                             text = "Start User Mode",
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -244,26 +238,25 @@ fun ModeSelectionScreen(
                             imageVector = Icons.Rounded.ArrowForward,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // ADMIN MODE CARD
             Card(
                 onClick = { showAdminPasswordDialog = true },
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.5.dp, Color(0xFFBFDBFE)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = WarmSurface),
+                border = BorderStroke(1.5.dp, Color(0xFF93C5FD)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("mode_admin_card")
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -272,33 +265,28 @@ fun ModeSelectionScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(46.dp)
-                                    .background(
-                                        Brush.linearGradient(
-                                            listOf(Color(0xFF2563EB), Color(0xFF1D4ED8))
-                                        ),
-                                        CircleShape
-                                    ),
+                                    .size(42.dp)
+                                    .background(Color(0xFF2563EB), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.AdminPanelSettings,
                                     contentDescription = null,
                                     tint = Color.White,
-                                    modifier = Modifier.size(26.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
                                     text = "Admin Mode",
-                                    fontSize = 18.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Slate900
+                                    color = WarmText
                                 )
                                 Text(
                                     text = "Tester & QA Mode",
-                                    fontSize = 12.sp,
+                                    fontSize = 11.sp,
                                     color = Color(0xFF2563EB),
                                     fontWeight = FontWeight.Medium
                                 )
@@ -306,34 +294,34 @@ fun ModeSelectionScreen(
                         }
 
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),
                             color = Color(0xFFFEF3C7),
                             border = BorderStroke(1.dp, Color(0xFFFDE68A))
                         ) {
                             Text(
                                 text = "All Unlocked",
-                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFB45309),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
                         text = "Full unrestricted testing mode where all logos across all categories are unlocked for instant testing.",
-                        fontSize = 13.sp,
-                        color = Slate700,
-                        lineHeight = 18.sp
+                        fontSize = 12.sp,
+                        color = WarmTextDim,
+                        lineHeight = 17.sp
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Feature highlights
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        ModeFeatureItem(text = "All 49+ logos unlocked immediately", iconTint = Color(0xFF2563EB))
+                        ModeFeatureItem(text = "All logos unlocked immediately", iconTint = Color(0xFF2563EB))
                         ModeFeatureItem(text = "Jump to any logo to test graphics & answers", iconTint = Color(0xFF2563EB))
                         ModeFeatureItem(text = "No lock dialogs or sequential restrictions", iconTint = Color(0xFF2563EB))
                     }
@@ -342,16 +330,16 @@ fun ModeSelectionScreen(
 
                     Button(
                         onClick = { showAdminPasswordDialog = true },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .height(46.dp)
                             .testTag("mode_admin_button")
                     ) {
                         Text(
                             text = "Launch Admin Mode",
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -360,19 +348,18 @@ fun ModeSelectionScreen(
                             imageVector = Icons.Rounded.LockOpen,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Footer note
             Text(
                 text = "Tip: You can switch modes anytime from the main screen",
-                fontSize = 12.sp,
-                color = Slate400,
+                fontSize = 11.sp,
+                color = WarmTextDim,
                 textAlign = TextAlign.Center
             )
 
@@ -384,20 +371,20 @@ fun ModeSelectionScreen(
 @Composable
 private fun ModeFeatureItem(
     text: String,
-    iconTint: Color = EmeraldSuccess
+    iconTint: Color = WireSage
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = Icons.Rounded.CheckCircle,
             contentDescription = null,
             tint = iconTint,
-            modifier = Modifier.size(15.dp)
+            modifier = Modifier.size(14.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            fontSize = 12.sp,
-            color = Slate700,
+            fontSize = 11.sp,
+            color = WarmText,
             fontWeight = FontWeight.Medium
         )
     }

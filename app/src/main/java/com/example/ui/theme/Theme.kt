@@ -8,36 +8,37 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme =
   darkColorScheme(
-    primary = TailwindBlueLight,
-    onPrimary = Slate900,
-    primaryContainer = TailwindBlueDark,
-    onPrimaryContainer = CleanWhite,
-    secondary = CyanAccent,
-    onSecondary = Slate900,
-    background = Slate900,
-    surface = Slate700,
-    onBackground = CleanWhite,
-    onSurface = CleanWhite,
+    primary = WireTeal,
+    onPrimary = CleanWhite,
+    primaryContainer = Color(0xFF2B2622),
+    onPrimaryContainer = Color(0xFFEDE5DD),
+    secondary = WireAmber,
+    onSecondary = CleanWhite,
+    background = Color(0xFF161311),
+    surface = Color(0xFF221E1B),
+    onBackground = Color(0xFFEDE5DD),
+    onSurface = Color(0xFFEDE5DD),
   )
 
 private val LightColorScheme =
   lightColorScheme(
-    primary = TailwindBlue,
+    primary = WireTeal,
     onPrimary = CleanWhite,
-    primaryContainer = TailwindBlueSurface,
-    onPrimaryContainer = TailwindBlueDark,
-    secondary = IndigoPrimary,
+    primaryContainer = WireTealDim,
+    onPrimaryContainer = WireTeal,
+    secondary = WireAmber,
     onSecondary = CleanWhite,
-    background = Slate50,
-    surface = CleanWhite,
-    onBackground = CharcoalDark,
-    onSurface = CharcoalDark,
-    surfaceVariant = Slate100,
-    onSurfaceVariant = Slate700,
+    background = WarmBg,
+    surface = WarmSurface,
+    onBackground = WarmText,
+    onSurface = WarmText,
+    surfaceVariant = WarmSurface2,
+    onSurfaceVariant = WarmTextDim,
   )
 
 @Composable

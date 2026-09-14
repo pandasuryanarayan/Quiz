@@ -40,6 +40,9 @@ import com.example.ui.theme.Slate200
 import com.example.ui.theme.Slate400
 import com.example.ui.theme.Slate700
 import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.WarmBorder
+import com.example.ui.theme.WarmSurface2
+import com.example.ui.theme.WarmText
 
 data class BankTile(
     val id: Int,
@@ -178,12 +181,12 @@ private fun BankTileItem(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
+                    .shadow(elevation = 1.dp, shape = RoundedCornerShape(8.dp))
                     .clickable { onClick() }
                     .testTag("bank_tile_${tile.id}"),
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                border = BorderStroke(1.5.dp, Slate200)
+                shape = RoundedCornerShape(8.dp),
+                color = WarmSurface2,
+                border = BorderStroke(1.dp, WarmBorder)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -191,9 +194,9 @@ private fun BankTileItem(
                 ) {
                     Text(
                         text = tile.char.toString(),
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Slate700
+                        color = WarmText
                     )
                 }
             }

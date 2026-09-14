@@ -179,6 +179,7 @@ fun LogoQuizApp(
                     userProfile = userProfile,
                     isAdminMode = (appMode == AppMode.ADMIN),
                     onSelectPack = viewModel::selectPack,
+                    onQuickPlayClick = viewModel::startQuickPlay,
                     onEarnCoinsClick = viewModel::promptEarnCoinsAd,
                     onSwitchMode = { viewModel.setAppMode(null) }
                 )

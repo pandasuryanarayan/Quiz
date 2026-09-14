@@ -39,6 +39,13 @@ import com.example.ui.theme.Slate200
 import com.example.ui.theme.Slate400
 import com.example.ui.theme.Slate700
 import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.WarmBorderBright
+import com.example.ui.theme.WarmSurface2
+import com.example.ui.theme.WarmTextDim
+import com.example.ui.theme.WireAmber
+import com.example.ui.theme.WireRose
+import com.example.ui.theme.WireSage
+import com.example.ui.theme.WireTeal
 import kotlin.math.roundToInt
 
 enum class SlotState {
@@ -130,11 +137,11 @@ private fun LetterSlotTile(
 
     val borderColor by animateColorAsState(
         targetValue = when {
-            slotState == SlotState.CORRECT -> EmeraldSuccess
-            slotState == SlotState.ERROR -> CoralRed
-            slot.isRevealedByHint -> Color(0xFFF59E0B)
-            isFilled -> TailwindBlue
-            else -> Slate200
+            slotState == SlotState.CORRECT -> WireSage
+            slotState == SlotState.ERROR -> WireRose
+            slot.isRevealedByHint -> WireAmber
+            isFilled -> WireTeal
+            else -> WarmBorderBright
         },
         animationSpec = tween(durationMillis = 200),
         label = "slotBorderColor"
@@ -142,32 +149,33 @@ private fun LetterSlotTile(
 
     val bgColor by animateColorAsState(
         targetValue = when {
-            slotState == SlotState.CORRECT -> Color(0xFFD1FAE5)
-            slotState == SlotState.ERROR -> Color(0xFFFEE2E2)
-            slot.isRevealedByHint -> Color(0xFFFEF3C7)
-            isFilled -> Color(0xFFEFF6FF)
-            else -> Color.White
+            slotState == SlotState.CORRECT -> WireSage
+            slotState == SlotState.ERROR -> WireRose
+            slot.isRevealedByHint -> WireAmber
+            isFilled -> WireTeal
+            else -> WarmSurface2
         },
         animationSpec = tween(durationMillis = 200),
         label = "slotBgColor"
     )
 
     val textColor = when {
-        slotState == SlotState.CORRECT -> Color(0xFF065F46)
-        slotState == SlotState.ERROR -> Color(0xFF991B1B)
-        slot.isRevealedByHint -> Color(0xFFB45309)
-        else -> Slate700
+        slotState == SlotState.CORRECT -> Color.White
+        slotState == SlotState.ERROR -> Color.White
+        slot.isRevealedByHint -> Color.White
+        isFilled -> Color.White
+        else -> WarmTextDim
     }
 
     Surface(
         modifier = modifier
             .size(size)
             .shadow(
-                elevation = if (isFilled) 3.dp else 1.dp,
-                shape = RoundedCornerShape(10.dp)
+                elevation = if (isFilled) 2.dp else 0.dp,
+                shape = RoundedCornerShape(8.dp)
             )
             .clickable(enabled = isFilled && !slot.isRevealedByHint) { onClick() },
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(8.dp),
         color = bgColor,
         border = BorderStroke(if (isFilled) 2.dp else 1.5.dp, borderColor)
     ) {
