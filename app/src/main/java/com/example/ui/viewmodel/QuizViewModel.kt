@@ -3,6 +3,7 @@ package com.example.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.AppMode
 import com.example.data.LevelProgressEntity
 import com.example.data.PackCategory
 import com.example.data.PackProgressSummary
@@ -38,6 +39,20 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     private val _refreshStatusMessage = MutableStateFlow<String?>(null)
     val refreshStatusMessage = _refreshStatusMessage.asStateFlow()
 
+    private val _appMode = MutableStateFlow<AppMode?>(null)
+    val appMode = _appMode.asStateFlow()
+
+    val isAdminMode: Boolean
+        get() = _appMode.value == AppMode.ADMIN
+
+    fun setAppMode(mode: AppMode?) {
+        _appMode.value = mode
+        if (mode == null) {
+            _currentPackId.value = null
+            _currentLevelId.value = null
+        }
+    }
+
     init {
         val database = QuizDatabase.getDatabase(application)
         repository = QuizRepository(database.quizDao())
@@ -56,13 +71,22 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     val allProgress: StateFlow<List<LevelProgressEntity>> = repository.allProgress
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Pack summaries computed reactively with dynamic levels count
-    val packSummaries: StateFlow<List<PackProgressSummary>> = allProgress.combine(_dynamicLevelsTrigger) { progressList, _ ->
+    // Pack summaries computed reactively with dynamic levels count and current mode
+    val packSummaries: StateFlow<List<PackProgressSummary>> = combine(
+        allProgress,
+        _dynamicLevelsTrigger,
+        _appMode
+    ) { progressList, _, mode ->
+        val isAdmin = (mode == AppMode.ADMIN)
         PackCategory.entries.map { pack ->
             val packLevels = QuizPackData.getLevelsForPack(pack.id)
             val packProgress = progressList.filter { it.packId == pack.id }
-            val unlockedCount = packLevels.count { level ->
-                QuizPackData.getLevelLockStatus(level, progressList).isUnlocked
+            val unlockedCount = if (isAdmin) {
+                packLevels.size
+            } else {
+                packLevels.count { level ->
+                    QuizPackData.getLevelLockStatus(level, progressList, isAdminMode = false).isUnlocked
+                }
             }
             val completedCount = packProgress.count { it.isCompleted }
             val starsCount = packProgress.sumOf { it.stars }
@@ -176,7 +200,14 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun openLevel(levelId: String) {
         val level = QuizPackData.getLevelById(levelId) ?: return
-        val status = QuizPackData.getLevelLockStatus(level, allProgress.value)
+        val isAdmin = _appMode.value == AppMode.ADMIN
+        val status = QuizPackData.getLevelLockStatus(level, allProgress.value, isAdminMode = isAdmin)
+
+        if (isAdmin || status.isUnlocked) {
+            setupLevel(level)
+            _currentLevelId.value = levelId
+            return
+        }
 
         if (status.isStrictlyLocked) {
             val req = status.requiredPreviousLevel
@@ -186,10 +217,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if (status.isUnlocked) {
-            setupLevel(level)
-            _currentLevelId.value = levelId
-        } else if (status.isAdGated) {
+        if (status.isAdGated) {
             // Trigger Rewarded Video Ad Gate (only eligible if previous level was completed!)
             _pendingUnlockLevel.value = level
             _pendingAdPurpose.value = AdPurpose.UNLOCK_LEVEL

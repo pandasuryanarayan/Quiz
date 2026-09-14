@@ -18,6 +18,11 @@ enum class PackCategory(
     WORLD("world", "World Wonders", "Iconic monuments, ancient ruins & landmarks", "globe", 0xFF06B6D4)
 }
 
+enum class AppMode {
+    USER,
+    ADMIN
+}
+
 data class QuizLevel(
     val id: String,
     val packId: String,

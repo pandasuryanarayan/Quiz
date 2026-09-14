@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ads.LevelPlayAdsManager
+import com.example.data.AppMode
 import com.example.ui.components.AdPromptDialog
 import com.example.ui.components.AdPurpose
 import com.example.ui.components.LockedLevelDialog
@@ -30,6 +31,7 @@ import com.example.ui.components.RewardedAdPlayerModal
 import com.example.ui.components.LevelPlayAdErrorModal
 import com.example.ui.components.LevelPlayAdLoadingModal
 import com.example.ui.screens.LevelGridScreen
+import com.example.ui.screens.ModeSelectionScreen
 import com.example.ui.screens.PackSelectionScreen
 import com.example.ui.screens.QuizPlayScreen
 import com.example.ui.theme.MyApplicationTheme
@@ -71,6 +73,7 @@ fun LogoQuizApp(
     val currentPackId by viewModel.currentPackId.collectAsState()
     val currentLevelId by viewModel.currentLevelId.collectAsState()
     val activeLevel by viewModel.activeLevel.collectAsState()
+    val appMode by viewModel.appMode.collectAsState()
 
     val slots by viewModel.slots.collectAsState()
     val bankTiles by viewModel.bankTiles.collectAsState()
@@ -97,9 +100,14 @@ fun LogoQuizApp(
         BackHandler {
             viewModel.selectPack(null)
         }
+    } else if (appMode != null) {
+        BackHandler {
+            viewModel.setAppMode(null)
+        }
     }
 
     val screenState = when {
+        appMode == null -> "MODE_SELECTION"
         currentLevelId != null && activeLevel != null -> "PLAY"
         currentPackId != null -> "GRID"
         else -> "PACKS"
@@ -111,6 +119,12 @@ fun LogoQuizApp(
         label = "ScreenTransition"
     ) { state ->
         when (state) {
+            "MODE_SELECTION" -> {
+                ModeSelectionScreen(
+                    onSelectMode = viewModel::setAppMode
+                )
+            }
+
             "PLAY" -> {
                 activeLevel?.let { level ->
                     QuizPlayScreen(
@@ -147,6 +161,7 @@ fun LogoQuizApp(
                         packId = packId,
                         allProgress = allProgress,
                         coins = userProfile?.coins ?: 150,
+                        isAdminMode = (appMode == AppMode.ADMIN),
                         isRefreshing = isRefreshingLevels,
                         refreshMessage = refreshStatusMessage,
                         onRefreshClick = { viewModel.refreshRemoteLogos(packId) },
@@ -162,8 +177,10 @@ fun LogoQuizApp(
                 PackSelectionScreen(
                     packSummaries = packSummaries,
                     userProfile = userProfile,
+                    isAdminMode = (appMode == AppMode.ADMIN),
                     onSelectPack = viewModel::selectPack,
-                    onEarnCoinsClick = viewModel::promptEarnCoinsAd
+                    onEarnCoinsClick = viewModel::promptEarnCoinsAd,
+                    onSwitchMode = { viewModel.setAppMode(null) }
                 )
             }
         }

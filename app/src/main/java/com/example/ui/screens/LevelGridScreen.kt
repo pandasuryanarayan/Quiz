@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MonetizationOn
@@ -78,6 +79,7 @@ fun LevelGridScreen(
     packId: String,
     allProgress: List<LevelProgressEntity>,
     coins: Int,
+    isAdminMode: Boolean = false,
     isRefreshing: Boolean = false,
     refreshMessage: String? = null,
     onRefreshClick: () -> Unit = {},
@@ -237,13 +239,43 @@ fun LevelGridScreen(
                 }
             }
 
-            // Only show levels that have been unlocked sequentially
-            // Level 1 is always shown. Level N (N > 1) is ONLY shown once Level N-1 has been passed.
-            val visibleLevels = QuizPackData.getVisibleLevelsForPack(pack.id, allProgress)
+            // Admin Mode info banner
+            if (isAdminMode) {
+                item(span = { GridItemSpan(2) }) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFEFF6FF),
+                        border = BorderStroke(1.dp, Color(0xFFBFDBFE)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.AdminPanelSettings,
+                                contentDescription = null,
+                                tint = Color(0xFF2563EB),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Admin Mode • All ${packLevels.size} levels unlocked for testing",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF1E40AF)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Visible levels: in admin mode all levels are visible; in user mode only unlocked levels
+            val visibleLevels = QuizPackData.getVisibleLevelsForPack(pack.id, allProgress, isAdminMode = isAdminMode)
 
             items(visibleLevels) { level ->
                 val progress = allProgress.find { it.id == level.id }
-                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress)
+                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode = isAdminMode)
                 val stars = progress?.stars ?: 0
 
                 LevelGridTile(
@@ -255,8 +287,8 @@ fun LevelGridScreen(
                 )
             }
 
-            // Progression indicator card if more levels are locked
-            if (visibleLevels.size < packLevels.size) {
+            // Progression indicator card if more levels are locked (only in user mode)
+            if (!isAdminMode && visibleLevels.size < packLevels.size) {
                 item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(2) }) {
                     Surface(
                         shape = RoundedCornerShape(14.dp),

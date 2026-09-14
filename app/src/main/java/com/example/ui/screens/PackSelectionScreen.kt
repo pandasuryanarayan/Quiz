@@ -20,22 +20,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.LocalOffer
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Movie
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -72,8 +77,10 @@ import com.example.ui.theme.TailwindBlueDark
 fun PackSelectionScreen(
     packSummaries: List<PackProgressSummary>,
     userProfile: UserProfileEntity?,
+    isAdminMode: Boolean = false,
     onSelectPack: (String) -> Unit,
     onEarnCoinsClick: () -> Unit,
+    onSwitchMode: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val totalSolved = packSummaries.sumOf { it.completedLevels }
@@ -87,12 +94,12 @@ fun PackSelectionScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = TailwindBlue,
+                            color = if (isAdminMode) Color(0xFF1D4ED8) else TailwindBlue,
                             modifier = Modifier.size(34.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
-                                    text = "Q",
+                                    text = if (isAdminMode) "A" else "Q",
                                     color = Color.White,
                                     fontWeight = FontWeight.Black,
                                     fontSize = 20.sp
@@ -108,15 +115,53 @@ fun PackSelectionScreen(
                                 color = Slate900
                             )
                             Text(
-                                text = "Champion Edition",
+                                text = if (isAdminMode) "Admin Test Mode" else "Champion Edition",
                                 fontSize = 11.sp,
-                                color = Slate500,
-                                fontWeight = FontWeight.Medium
+                                color = if (isAdminMode) Color(0xFF2563EB) else Slate500,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                 },
                 actions = {
+                    // Mode Switcher Pill
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isAdminMode) Color(0xFFEFF6FF) else Color(0xFFF1F5F9),
+                        border = BorderStroke(1.dp, if (isAdminMode) Color(0xFFBFDBFE) else Slate200),
+                        modifier = Modifier
+                            .clickable { onSwitchMode() }
+                            .testTag("switch_mode_pill")
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (isAdminMode) Icons.Rounded.AdminPanelSettings else Icons.Rounded.Person,
+                                contentDescription = "Current mode",
+                                tint = if (isAdminMode) Color(0xFF1D4ED8) else Slate700,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isAdminMode) "Admin" else "User",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = if (isAdminMode) Color(0xFF1D4ED8) else Slate700
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Icon(
+                                imageVector = Icons.Rounded.SwapHoriz,
+                                contentDescription = "Switch mode",
+                                tint = Slate400,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
                     // Coins Pill
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -166,6 +211,73 @@ fun PackSelectionScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // Admin Mode Notice Banner if active
+            if (isAdminMode) {
+                item {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFFEFF6FF),
+                        border = BorderStroke(1.dp, Color(0xFF93C5FD)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(Color(0xFF2563EB), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AdminPanelSettings,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Admin Mode Active",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF1E3A8A)
+                                    )
+                                    Text(
+                                        text = "All levels unlocked for instant testing",
+                                        fontSize = 12.sp,
+                                        color = Color(0xFF2563EB)
+                                    )
+                                }
+                            }
+                            OutlinedButton(
+                                onClick = onSwitchMode,
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, Color(0xFF2563EB)),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                modifier = Modifier.testTag("switch_to_user_mode_button")
+                            ) {
+                                Text(
+                                    text = "Switch",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color(0xFF2563EB)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // Hero Status Card
             item {
                 HeroStatsCard(
@@ -178,28 +290,16 @@ fun PackSelectionScreen(
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "THEMATIC PACKS",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Slate500,
-                        letterSpacing = 1.sp
-                    )
-                    Text(
-                        text = "Stages 1-5 Free • 6-10 Ad Unlock",
-                        fontSize = 11.sp,
-                        color = Slate400,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                Text(
+                    text = "THEMATIC PACKS",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Slate500,
+                    letterSpacing = 1.sp
+                )
             }
 
-            // The 4 Pack Cards
+            // The Pack Cards
             items(packSummaries) { summary ->
                 PackCard(
                     summary = summary,

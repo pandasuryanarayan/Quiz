@@ -520,10 +520,21 @@ object QuizPackData {
      */
     fun getLevelLockStatus(
         level: QuizLevel,
-        allProgress: List<LevelProgressEntity>
+        allProgress: List<LevelProgressEntity>,
+        isAdminMode: Boolean = false
     ): LevelLockStatus {
         val progress = allProgress.find { it.id == level.id }
         val isCompleted = progress?.isCompleted == true
+
+        if (isAdminMode) {
+            return LevelLockStatus(
+                isCompleted = isCompleted,
+                isUnlocked = true,
+                isAdGated = false,
+                isStrictlyLocked = false,
+                requiredPreviousLevel = null
+            )
+        }
 
         if (isCompleted) {
             return LevelLockStatus(
@@ -591,14 +602,18 @@ object QuizPackData {
     /**
      * Returns only the levels that should be shown to the user for a pack.
      * Rule:
-     * - Level 1 is always shown.
-     * - Level N (where N > 1) is ONLY shown when Level N-1 has been passed (completed).
+     * - In Admin mode: All levels are visible and accessible.
+     * - In User mode: Level 1 is always shown. Level N (where N > 1) is ONLY shown when Level N-1 has been passed (completed).
      */
     fun getVisibleLevelsForPack(
         packId: String,
-        allProgress: List<LevelProgressEntity>
+        allProgress: List<LevelProgressEntity>,
+        isAdminMode: Boolean = false
     ): List<QuizLevel> {
         val packLevels = getLevelsForPack(packId).sortedBy { it.levelNumber }
+        if (isAdminMode) {
+            return packLevels
+        }
         val visibleList = mutableListOf<QuizLevel>()
 
         for (level in packLevels) {
