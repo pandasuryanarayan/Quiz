@@ -16,67 +16,18 @@ object RemoteLogoSyncManager {
     private const val PREFS_NAME = "logo_quiz_remote_sync"
     private const val KEY_CACHED_REMOTE_LEVELS = "cached_remote_levels_json"
 
-    private const val GITHUB_API_BASE = "https://api.github.com/repos/pandasuryanarayan/logoquiz/contents"
-    private const val CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz"
+    // Primary: jsDelivr Data API fetches the directory and file tree of the package
+    private const val JSDELIVR_DATA_API = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@main"
+    private const val JSDELIVR_DATA_API_FALLBACK = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@HEAD"
+    private const val GITHUB_TREE_API = "https://api.github.com/repos/pandasuryanarayan/logoquiz/git/trees/main?recursive=1"
+    private const val GITHUB_CONTENTS_BASE = "https://api.github.com/repos/pandasuryanarayan/logoquiz/contents"
+    const val CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz"
 
     data class SyncResult(
         val success: Boolean,
         val newLevelsCount: Int,
         val totalLevels: Int,
         val message: String
-    )
-
-    data class FolderMapping(
-        val folderName: String,
-        val packId: String
-    )
-
-    private val FOLDERS = PackCategory.entries.map {
-        FolderMapping(folderName = it.folderName, packId = it.id)
-    }
-
-    // Curated catalog for famous brands so any newly uploaded logo gets high-quality answers & trivia
-    private val BRAND_KNOWLEDGE = mapOf(
-        "microsoft" to BrandMeta("MICROSOFT", "Global software giant famous for Windows, Office, and Xbox", "Founded in 1975 by Bill Gates and Paul Allen, Microsoft's name is a portmanteau of 'microcomputer' and 'software'."),
-        "samsung" to BrandMeta("SAMSUNG", "South Korean tech titan famous for Galaxy phones, memory chips, and smart TVs", "In Korean, 'Samsung' means 'three stars', symbolizing big, numerous, and powerful."),
-        "intel" to BrandMeta("INTEL", "Semiconductor pioneer known for processors powering personal computers worldwide", "The name Intel is a portmanteau of 'Integrated Electronics', founded in 1968 by Robert Noyce and Gordon Moore."),
-        "sony" to BrandMeta("SONY", "Japanese entertainment and tech giant famous for PlayStation, cameras, and audio", "The name Sony comes from the Latin word 'sonus' (sound) and the slang term 'sonny boy'."),
-        "adobe" to BrandMeta("ADOBE", "Creative software powerhouse behind Photoshop, Acrobat, and Illustrator", "Adobe was named after Adobe Creek in Los Altos, California, which ran behind co-founder John Warnock's house."),
-        "starbucks" to BrandMeta("STARBUCKS", "Global coffeehouse chain with a twin-tailed siren emblem", "The Starbucks siren is named after the legendary twin-tailed creature from 16th-century Norse mythology."),
-        "twitter" to BrandMeta("TWITTER", "Social microblogging platform recognized by a soaring blue bird", "Twitter's original bird logo was named 'Larry' in honor of NBA Hall of Famer Larry Bird."),
-        "visa" to BrandMeta("VISA", "Global payments technology network connecting consumers and merchants", "The name VISA was chosen because it sounds the same and is recognizable in dozens of languages."),
-        "mastercard" to BrandMeta("MASTERCARD", "Financial services giant with interlocking red and yellow circles", "Originally known as Master Charge: The Interbank Card before adopting Mastercard in 1979."),
-        "ebay" to BrandMeta("EBAY", "Pioneering online auction and shopping marketplace", "The first item ever sold on eBay was a broken laser pointer for $14.83 in 1995."),
-        "marvel" to BrandMeta("MARVEL", "Superhero comic powerhouse with a bold red badge", "Marvel was originally launched in 1939 as Timely Publications before adopting Marvel Comics."),
-        "hbo" to BrandMeta("HBO", "Prestige cable and streaming pioneer with a static circle in its O", "Home Box Office launched in November 1972, broadcasting an NHL hockey game to 365 subscribers."),
-        "paramount" to BrandMeta("PARAMOUNT", "Legendary film studio with a mountain peak encircled by stars", "Paramount Pictures was founded in 1912, making it the second-oldest surviving film studio in the US."),
-        "pixar" to BrandMeta("PIXAR", "Pioneering CGI animation studio featuring a hopping desk lamp", "The playful desk lamp is named Luxo Jr., starring in Pixar's groundbreaking 1986 computer short."),
-        "hulu" to BrandMeta("HULU", "Popular streaming service known for award-winning original dramas and comedies", "The name Hulu comes from two Mandarin Chinese proverbs relating to 'holder of precious things'."),
-        "universal" to BrandMeta("UNIVERSAL", "Historic movie studio recognized by a revolving globe of planet Earth", "Universal Pictures was founded in 1912 by Carl Laemmle and is one of the original 'Big Five' studios."),
-        "dreamworks" to BrandMeta("DREAMWORKS", "Animation studio famous for Shrek and a boy fishing from a crescent moon", "Founded in 1994 by Steven Spielberg, Jeffrey Katzenberg, and David Geffen (the 'SKG')."),
-        "crunchyroll" to BrandMeta("CRUNCHYROLL", "Leading global anime streaming service with an orange eye emblem", "Crunchyroll hosts the world's largest anime streaming library with over 1,000 titles."),
-        "subway" to BrandMeta("SUBWAY", "Fresh sub sandwich chain with green and yellow directional arrows", "Subway serves more than 5,300 sandwiches every minute across more than 37,000 global restaurants."),
-        "pringles" to BrandMeta("PRINGLES", "Stackable potato crisp can featuring a mustachioed mascot named Julius", "The shape of a Pringle is mathematically known as a hyperbolic paraboloid, engineered to resist breakage."),
-        "oreo" to BrandMeta("OREO", "World's favorite sandwich cookie with embossed chocolate wafers", "Over 500 billion Oreo cookies have been produced since their introduction in 1912 in New York City."),
-        "nutella" to BrandMeta("NUTELLA", "Famous cocoa and hazelnut breakfast spread in a distinctive jar", "One jar of Nutella is sold somewhere in the world every 2.5 seconds, using 25% of global hazelnuts."),
-        "kitkat" to BrandMeta("KITKAT", "Crisp wafer fingers coated in smooth milk chocolate: 'Have a break'", "KitKat was invented by Rowntree's in York, England in 1935 as Rowntree's Chocolate Crisp."),
-        "doritos" to BrandMeta("DORITOS", "Flavored tortilla chips famous for triangular shape and bold Nacho Cheese", "Doritos were invented in 1966 at Casa de Fritos restaurant located inside Disneyland."),
-        "pizzahut" to BrandMeta("PIZZAHUT", "Global pizza franchise famous for its iconic red roof logo and Pan Pizza", "Founded in 1958 in Wichita, Kansas by brothers Dan and Frank Carney with just $600."),
-        "wendys" to BrandMeta("WENDYS", "Fast-food burger chain famous for fresh square patties and Frosty desserts", "Wendy's famous square burger patties were created so the meat hangs over the bun edges."),
-        "snickers" to BrandMeta("SNICKERS", "Nougat, peanuts, and caramel candy bar: 'You're not you when you're hungry'", "Introduced in 1930 by Frank Mars, the candy bar was named after the Mars family's favorite horse."),
-        "porsche" to BrandMeta("PORSCHE", "German sports car manufacturer featuring Stuttgart's crest and prancing horse", "The Porsche crest is based on the coat of arms of the Free People's State of Württemberg."),
-        "lamborghini" to BrandMeta("LAMBORGHINI", "Italian luxury sports car maker with a charging golden bull emblem", "Ferruccio Lamborghini chose a charging bull because his astrological sign was Taurus."),
-        "toyota" to BrandMeta("TOYOTA", "Japanese auto giant with three overlapping ellipses forming a T", "The three ovals represent the heart of the customer, the heart of the product, and endless progress."),
-        "honda" to BrandMeta("HONDA", "Automotive and motorcycle leader with a bold silver H within a badge", "Honda is the world's largest manufacturer of internal combustion engines and motorcycles."),
-        "underarmour" to BrandMeta("UNDERARMOUR", "Athletic apparel brand with an interlocking U and A emblem", "Founded in 1996 by former University of Maryland football player Kevin Plank in his grandmother's basement."),
-        "nfl" to BrandMeta("NFL", "America's premier professional football league with a shield and eight stars", "The eight stars in the modern NFL shield represent the league's eight competitive divisions."),
-        "harley" to BrandMeta("HARLEY", "Legendary American motorcycle manufacturer with an iconic Bar and Shield", "Harley-Davidson was founded in Milwaukee, Wisconsin in 1903 in a small 10x15 foot wooden shed.")
-    )
-
-    private data class BrandMeta(
-        val answer: String,
-        val hint: String,
-        val trivia: String
     )
 
     /**
@@ -90,6 +41,13 @@ object RemoteLogoSyncManager {
             val list = mutableListOf<QuizLevel>()
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
+                val alternates = mutableListOf<String>()
+                val altArray = obj.optJSONArray("alternateAnswers")
+                if (altArray != null) {
+                    for (j in 0 until altArray.length()) {
+                        alternates.add(altArray.getString(j))
+                    }
+                }
                 list.add(
                     QuizLevel(
                         id = obj.getString("id"),
@@ -99,7 +57,9 @@ object RemoteLogoSyncManager {
                         hintSentence = obj.getString("hintSentence"),
                         triviaFact = obj.getString("triviaFact"),
                         logoKey = obj.getString("logoKey"),
-                        imageUrl = obj.optString("imageUrl", null)
+                        imageUrl = if (obj.has("imageUrl") && !obj.isNull("imageUrl")) obj.getString("imageUrl") else null,
+                        originalName = obj.optString("originalName", obj.getString("answer")),
+                        alternateAnswers = alternates
                     )
                 )
             }
@@ -123,6 +83,10 @@ object RemoteLogoSyncManager {
                 obj.put("triviaFact", level.triviaFact)
                 obj.put("logoKey", level.logoKey)
                 obj.put("imageUrl", level.imageUrl)
+                obj.put("originalName", level.originalName)
+                val altArray = JSONArray()
+                level.alternateAnswers.forEach { altArray.put(it) }
+                obj.put("alternateAnswers", altArray)
                 jsonArray.put(obj)
             }
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -133,97 +97,140 @@ object RemoteLogoSyncManager {
     }
 
     /**
-     * Queries GitHub API in real time, discovers newly added logo files,
+     * Queries jsDelivr CDN in real time, discovers logos across all topic folders,
      * assigns sequential level numbers, and reconciles QuizPackData.
      */
     suspend fun syncRemoteLogos(context: Context, targetPackId: String? = null): SyncResult = withContext(Dispatchers.IO) {
         val currentLevels = QuizPackData.allLevels.toMutableList()
         var newLevelsAddedCount = 0
 
-        val foldersToSync = if (targetPackId != null) {
-            FOLDERS.filter { it.packId == targetPackId }
-        } else {
-            FOLDERS
+        // 1. Primary: Query jsDelivr CDN Package Data API directly
+        var treeFiles = fetchJsDelivrTree()
+
+        // 2. Secondary fallback: Git Trees recursive API if jsDelivr Data API was unreachable
+        if (treeFiles.isEmpty()) {
+            Log.w(TAG, "jsDelivr tree empty or unreachable, attempting Git Tree fallback")
+            treeFiles = fetchGitHubTree()
         }
 
-        for (mapping in foldersToSync) {
-            try {
-                val encodedFolder = URLEncoder.encode(mapping.folderName, "UTF-8").replace("+", "%20")
-                val apiUrl = "$GITHUB_API_BASE/$encodedFolder"
+        if (treeFiles.isNotEmpty()) {
+            for ((folderName, fileList) in treeFiles) {
+                val packCategory = resolvePackCategory(folderName) ?: continue
+                if (targetPackId != null && packCategory.id != targetPackId) continue
 
-                val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 7000
-                    readTimeout = 7000
-                    setRequestProperty("User-Agent", "LogoQuiz-Android")
-                    setRequestProperty("Accept", "application/vnd.github.v3+json")
+                val existingPackLevels = currentLevels.filter { it.packId == packCategory.id }.toMutableList()
+                val seenInThisRun = mutableSetOf<String>()
+
+                for (fileName in fileList) {
+                    if (!isImageFile(fileName)) continue
+                    val cleanAnswer = extractCleanAnswer(fileName)
+                    if (cleanAnswer.isBlank()) continue
+                    if (cleanAnswer in seenInThisRun) continue
+                    seenInThisRun.add(cleanAnswer)
+
+                    val cdnUrl = QuizPackData.buildCdnUrl(folderName, fileName)
+
+                    // Check if already registered
+                    val alreadyRegistered = existingPackLevels.any { lvl ->
+                        lvl.imageUrl == cdnUrl ||
+                                lvl.answer.equals(cleanAnswer, ignoreCase = true) ||
+                                lvl.logoKey.equals(cleanAnswer, ignoreCase = true)
+                    }
+
+                    if (!alreadyRegistered) {
+                        val newLevelNumber = (existingPackLevels.maxOfOrNull { it.levelNumber } ?: 0) + 1
+                        val resolved = resolveBrandMeta(folderName, fileName, packCategory.title)
+
+                        val newLevel = QuizLevel(
+                            id = "${packCategory.id}_$newLevelNumber",
+                            packId = packCategory.id,
+                            levelNumber = newLevelNumber,
+                            answer = resolved.answer,
+                            hintSentence = resolved.hint,
+                            triviaFact = resolved.trivia,
+                            logoKey = cleanAnswer.lowercase(),
+                            imageUrl = cdnUrl,
+                            originalName = resolved.originalName,
+                            alternateAnswers = resolved.alternateAnswers
+                        )
+
+                        existingPackLevels.add(newLevel)
+                        currentLevels.add(newLevel)
+                        newLevelsAddedCount++
+                        Log.d(TAG, "Discovered new logo from jsDelivr CDN: ${newLevel.originalName} (${newLevel.answer}) in ${packCategory.title}")
+                    }
                 }
+            }
+        } else {
+            // Fallback to per-folder contents endpoint if both jsDelivr and Git Tree APIs are unavailable
+            Log.w(TAG, "Both jsDelivr and Git Tree APIs returned 0 items, falling back to contents endpoint")
+            for (pack in PackCategory.entries) {
+                if (targetPackId != null && pack.id != targetPackId) continue
+                try {
+                    val encodedFolder = URLEncoder.encode(pack.folderName, "UTF-8").replace("+", "%20")
+                    val apiUrl = "$GITHUB_CONTENTS_BASE/$encodedFolder"
+                    val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
+                        connectTimeout = 6000
+                        readTimeout = 6000
+                        setRequestProperty("User-Agent", "LogoQuiz-Android")
+                        setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    }
+                    if (connection.responseCode == 200) {
+                        val body = connection.inputStream.bufferedReader().use { it.readText() }
+                        val array = JSONArray(body)
+                        val existingPackLevels = currentLevels.filter { it.packId == pack.id }.toMutableList()
 
-                val responseCode = connection.responseCode
-                if (responseCode == 200) {
-                    val body = connection.inputStream.bufferedReader().use { it.readText() }
-                    val array = JSONArray(body)
+                        for (i in 0 until array.length()) {
+                            val item = array.getJSONObject(i)
+                            if (item.optString("type") != "file") continue
+                            val fileName = item.getString("name")
+                            if (!isImageFile(fileName)) continue
 
-                    val existingPackLevels = currentLevels.filter { it.packId == mapping.packId }.toMutableList()
+                            val cleanAnswer = extractCleanAnswer(fileName)
+                            if (cleanAnswer.isBlank()) continue
 
-                    for (i in 0 until array.length()) {
-                        val item = array.getJSONObject(i)
-                        val type = item.optString("type")
-                        if (type != "file") continue
-
-                        val fileName = item.getString("name")
-                        if (!isImageFile(fileName)) continue
-
-                        val encodedFileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20")
-                        val cdnUrl = "$CDN_BASE_URL/$encodedFolder/$encodedFileName"
-
-                        // Check if already registered
-                        val alreadyRegistered = existingPackLevels.any { lvl ->
-                            lvl.imageUrl == cdnUrl || isSameBrand(lvl, fileName)
-                        }
-
-                        if (!alreadyRegistered) {
-                            // Discover & build new level
-                            val newLevelNumber = (existingPackLevels.maxOfOrNull { it.levelNumber } ?: 0) + 1
-                            val brandInfo = resolveBrandMeta(fileName, mapping.packId)
-
-                            val newLevel = QuizLevel(
-                                id = "${mapping.packId}_$newLevelNumber",
-                                packId = mapping.packId,
-                                levelNumber = newLevelNumber,
-                                answer = brandInfo.answer,
-                                hintSentence = brandInfo.hint,
-                                triviaFact = brandInfo.trivia,
-                                logoKey = brandInfo.logoKey,
-                                imageUrl = cdnUrl
-                            )
-
-                            existingPackLevels.add(newLevel)
-                            currentLevels.add(newLevel)
-                            newLevelsAddedCount++
-                            Log.d(TAG, "Discovered new level: ${newLevel.id} (${newLevel.answer}) in pack ${mapping.packId}")
+                            val cdnUrl = QuizPackData.buildCdnUrl(pack.folderName, fileName)
+                            val exists = existingPackLevels.any { lvl ->
+                                lvl.imageUrl == cdnUrl || lvl.answer.equals(cleanAnswer, ignoreCase = true)
+                            }
+                            if (!exists) {
+                                val nextNum = (existingPackLevels.maxOfOrNull { it.levelNumber } ?: 0) + 1
+                                val resolved = resolveBrandMeta(pack.folderName, fileName, pack.title)
+                                val newLevel = QuizLevel(
+                                    id = "${pack.id}_$nextNum",
+                                    packId = pack.id,
+                                    levelNumber = nextNum,
+                                    answer = resolved.answer,
+                                    hintSentence = resolved.hint,
+                                    triviaFact = resolved.trivia,
+                                    logoKey = cleanAnswer.lowercase(),
+                                    imageUrl = cdnUrl,
+                                    originalName = resolved.originalName,
+                                    alternateAnswers = resolved.alternateAnswers
+                                )
+                                existingPackLevels.add(newLevel)
+                                currentLevels.add(newLevel)
+                                newLevelsAddedCount++
+                            }
                         }
                     }
-                } else {
-                    Log.w(TAG, "GitHub API returned $responseCode for folder ${mapping.folderName}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Fallback contents error for ${pack.folderName}", e)
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed syncing folder ${mapping.folderName}", e)
             }
         }
 
         if (newLevelsAddedCount > 0) {
-            // Update in-memory dynamic levels list
             QuizPackData.updateLevels(currentLevels)
-            // Persist newly discovered remote levels
             val dynamicOnly = currentLevels.filter { it !in QuizPackData.bundledLevels }
             saveCachedLevels(context, dynamicOnly)
         }
 
         val total = currentLevels.size
         val message = if (newLevelsAddedCount > 0) {
-            "Found $newLevelsAddedCount new logo${if (newLevelsAddedCount > 1) "s" else ""}! Pack updated."
+            "Synced $newLevelsAddedCount new real logo${if (newLevelsAddedCount > 1) "s" else ""} from jsDelivr CDN!"
         } else {
-            "All logos are up to date."
+            "All logos from jsDelivr CDN are synced and up to date."
         }
 
         SyncResult(
@@ -234,61 +241,154 @@ object RemoteLogoSyncManager {
         )
     }
 
+    private fun fetchJsDelivrTree(): Map<String, List<String>> {
+        val result = mutableMapOf<String, MutableList<String>>()
+        val urlsToTry = listOf(JSDELIVR_DATA_API, JSDELIVR_DATA_API_FALLBACK)
+
+        for (apiUrl in urlsToTry) {
+            try {
+                val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 7000
+                    readTimeout = 7000
+                    setRequestProperty("User-Agent", "LogoQuiz-Android")
+                    setRequestProperty("Accept", "application/json")
+                }
+                if (connection.responseCode == 200) {
+                    val body = connection.inputStream.bufferedReader().use { it.readText() }
+                    val root = JSONObject(body)
+                    val filesArray = root.optJSONArray("files") ?: continue
+
+                    for (i in 0 until filesArray.length()) {
+                        val entry = filesArray.getJSONObject(i)
+                        val type = entry.optString("type")
+                        val folderName = entry.optString("name")
+                        if (type == "directory") {
+                            val subFiles = entry.optJSONArray("files") ?: continue
+                            for (j in 0 until subFiles.length()) {
+                                val fileItem = subFiles.getJSONObject(j)
+                                if (fileItem.optString("type") == "file") {
+                                    val fileName = fileItem.getString("name")
+                                    if (isImageFile(fileName)) {
+                                        result.getOrPut(folderName) { mutableListOf() }.add(fileName)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (result.isNotEmpty()) {
+                        Log.d(TAG, "Fetched ${result.values.sumOf { it.size }} logos across ${result.size} categories from jsDelivr CDN")
+                        return result
+                    }
+                } else {
+                    Log.w(TAG, "jsDelivr CDN API returned HTTP ${connection.responseCode} on $apiUrl")
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "jsDelivr CDN tree fetch exception on $apiUrl", e)
+            }
+        }
+        return result
+    }
+
+    private fun fetchGitHubTree(): Map<String, List<String>> {
+        val result = mutableMapOf<String, MutableList<String>>()
+        try {
+            val connection = (URL(GITHUB_TREE_API).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 7000
+                readTimeout = 7000
+                setRequestProperty("User-Agent", "LogoQuiz-Android")
+                setRequestProperty("Accept", "application/vnd.github.v3+json")
+            }
+            if (connection.responseCode == 200) {
+                val body = connection.inputStream.bufferedReader().use { it.readText() }
+                val root = JSONObject(body)
+                val tree = root.optJSONArray("tree") ?: return emptyMap()
+
+                for (i in 0 until tree.length()) {
+                    val item = tree.getJSONObject(i)
+                    val type = item.optString("type")
+                    if (type != "blob") continue
+                    val path = item.getString("path")
+                    if ("/" in path) {
+                        val folder = path.substringBefore("/")
+                        val file = path.substringAfterLast("/")
+                        result.getOrPut(folder) { mutableListOf() }.add(file)
+                    }
+                }
+            } else {
+                Log.w(TAG, "Git tree API returned HTTP ${connection.responseCode}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Git tree fetch error", e)
+        }
+        return result
+    }
+
+    private fun resolvePackCategory(folderName: String): PackCategory? {
+        val cleanFolder = folderName.replace("&", "and").replace(" ", "").lowercase()
+        return PackCategory.entries.find { cat ->
+            val cleanCatFolder = cat.folderName.replace("&", "and").replace(" ", "").lowercase()
+            val cleanCatTitle = cat.title.replace("&", "and").replace(" ", "").lowercase()
+            cleanCatFolder == cleanFolder || cleanCatTitle == cleanFolder
+        }
+    }
+
     private fun isImageFile(fileName: String): Boolean {
         val lower = fileName.lowercase()
         return lower.endsWith(".webp") || lower.endsWith(".png") || lower.endsWith(".jpg") ||
                 lower.endsWith(".jpeg") || lower.endsWith(".svg")
     }
 
-    private fun isSameBrand(level: QuizLevel, fileName: String): Boolean {
-        val cleanName = cleanBrandName(fileName).lowercase()
-        return level.answer.lowercase() == cleanName || level.logoKey.lowercase() == cleanName
+    fun extractCleanAnswer(fileName: String): String {
+        val base = fileName.substringBeforeLast(".")
+        return base.filter { it.isLetter() }.uppercase()
     }
 
-    private fun cleanBrandName(fileName: String): String {
-        var base = fileName.substringBeforeLast(".")
-        base = base.replace("-logo", "", ignoreCase = true)
-        base = base.replace("_logo", "", ignoreCase = true)
-        base = base.replace(".wine", "", ignoreCase = true)
-        base = base.replace("--streamline-simple-icons", "", ignoreCase = true)
-        base = base.replace("_bullseye", "", ignoreCase = true)
-        base = base.replace("_rings_without_rims", "", ignoreCase = true)
-        base = base.replace(",_inc.-logomark-black-logo", "", ignoreCase = true)
-        base = base.replace("_corporation-logo", "", ignoreCase = true)
-        base = base.replace(" ", "")
-        base = base.replace("_", "")
-        base = base.replace("-", "")
-        base = base.replace("'", "")
-        base = base.replace("+", "")
-        return base.filter { it.isLetter() }
-    }
-
-    private data class ResolvedBrand(
+    private data class BrandMeta(
+        val originalName: String,
         val answer: String,
         val hint: String,
         val trivia: String,
-        val logoKey: String
+        val alternateAnswers: List<String> = emptyList()
     )
 
-    private fun resolveBrandMeta(fileName: String, packId: String): ResolvedBrand {
-        val clean = cleanBrandName(fileName).lowercase()
-        val meta = BRAND_KNOWLEDGE[clean]
+    private fun resolveBrandMeta(folderName: String, fileName: String, categoryTitle: String): BrandMeta {
+        val rawBase = fileName.substringBeforeLast(".")
+        val clean = extractCleanAnswer(fileName)
 
-        return if (meta != null) {
-            ResolvedBrand(
-                answer = meta.answer,
-                hint = meta.hint,
-                trivia = meta.trivia,
-                logoKey = clean
-            )
-        } else {
-            val uppercaseAnswer = clean.uppercase().take(12)
-            ResolvedBrand(
-                answer = if (uppercaseAnswer.isNotBlank()) uppercaseAnswer else "BRAND",
-                hint = "Iconic worldwide brand recognized by its distinctive emblem",
-                trivia = "A world-renowned brand mark celebrated in its industry with millions of daily users.",
-                logoKey = clean
+        // Check if bundled level exists for this brand
+        val existingBundled = QuizPackData.bundledLevels.find {
+            it.answer.equals(clean, ignoreCase = true) || it.logoKey.equals(clean, ignoreCase = true)
+        }
+        if (existingBundled != null) {
+            return BrandMeta(
+                originalName = existingBundled.originalName,
+                answer = existingBundled.answer,
+                hint = existingBundled.hintSentence,
+                trivia = existingBundled.triviaFact,
+                alternateAnswers = existingBundled.alternateAnswers
             )
         }
+
+        // Format clean original name (e.g. "alfa-romeo" -> "Alfa Romeo", "taco bell" -> "Taco Bell")
+        val formattedName = rawBase
+            .replace("-", " ")
+            .replace("_", " ")
+            .split(" ")
+            .filter { it.isNotBlank() }
+            .joinToString(" ") { word ->
+                word.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            }
+
+        val hint = "Iconic brand in $categoryTitle recognized worldwide"
+        val trivia = "A globally recognized brand mark celebrated in $categoryTitle with millions of daily users."
+
+        return BrandMeta(
+            originalName = formattedName.ifBlank { clean },
+            answer = clean,
+            hint = hint,
+            trivia = trivia,
+            alternateAnswers = emptyList()
+        )
     }
 }

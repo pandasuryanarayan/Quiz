@@ -182,7 +182,7 @@ fun LevelCompleteDialog(
                                 }
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = level.answer,
+                                    text = level.originalName.ifBlank { level.answer },
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = WarmText

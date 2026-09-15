@@ -23,11 +23,13 @@ import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -73,6 +75,8 @@ fun PackSelectionScreen(
     onQuickPlayClick: () -> Unit = {},
     onEarnCoinsClick: () -> Unit,
     onSwitchMode: () -> Unit = {},
+    isRefreshing: Boolean = false,
+    onRefreshClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -93,6 +97,20 @@ fun PackSelectionScreen(
                     }
                 },
                 actions = {
+                    // Sync jsDelivr CDN Logos
+                    IconButton(
+                        onClick = onRefreshClick,
+                        enabled = !isRefreshing,
+                        modifier = Modifier.testTag("sync_cdn_main_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Sync jsDelivr CDN logos",
+                            tint = WireTeal,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
                     // Mode Switcher Pill (Keeps Admin / User Mode intact)
                     Surface(
                         shape = RoundedCornerShape(16.dp),

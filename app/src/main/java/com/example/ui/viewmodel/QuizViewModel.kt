@@ -60,7 +60,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             repository.initializeDefaultsIfNeeded()
             repository.loadCachedRemoteLevels(application)
             _dynamicLevelsTrigger.value++
-            // Perform real-time background synchronization with GitHub on app start
+            // Perform real-time background synchronization with jsDelivr CDN on app start
             refreshRemoteLogos(silent = true)
         }
     }
@@ -366,7 +366,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         val level = _activeLevel.value ?: return
         val enteredWord = filledSlots.map { it.char }.joinToString("")
 
-        if (enteredWord.equals(level.answer, ignoreCase = true)) {
+        val isCorrect = enteredWord.equals(level.answer, ignoreCase = true) ||
+                level.alternateAnswers.any { enteredWord.equals(it, ignoreCase = true) }
+
+        if (isCorrect) {
             // Correct Answer!
             _slotState.value = SlotState.CORRECT
             viewModelScope.launch {

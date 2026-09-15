@@ -27,6 +27,8 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -128,20 +130,17 @@ fun LevelGridScreen(
                     }
                 },
                 actions = {
-                    // Admin Sync Button if Admin Mode
-                    if (isAdminMode) {
-                        IconButton(
-                            onClick = onRefreshClick,
-                            enabled = !isRefreshing,
-                            modifier = Modifier.testTag("admin_refresh_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Refresh,
-                                contentDescription = "Sync logos",
-                                tint = WireTeal,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                    IconButton(
+                        onClick = onRefreshClick,
+                        enabled = !isRefreshing,
+                        modifier = Modifier.testTag("sync_cdn_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Sync jsDelivr CDN logos",
+                            tint = WireTeal,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
 
                     // Coins Pill
@@ -321,21 +320,84 @@ fun LevelGridScreen(
             }
 
             // Logo Rows (Wireframe level-list style)
-            items(packLevels) { level ->
-                val progress = allProgress.find { it.id == level.id }
-                val isCompleted = progress?.isCompleted == true
-                val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode)
+            if (packLevels.isEmpty()) {
+                item {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = WarmSurface,
+                        border = BorderStroke(1.dp, WarmBorder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "📂",
+                                fontSize = 36.sp
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = "No logos found on CDN yet",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = WarmText
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "To add logos to this category, upload webp or png files into the '${pack.folderName}' folder to be served by jsDelivr CDN, then tap Sync below.",
+                                fontSize = 12.sp,
+                                color = WarmTextDim,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                lineHeight = 17.sp
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = onRefreshClick,
+                                enabled = !isRefreshing,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = WireTeal,
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.testTag("empty_state_sync_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (isRefreshing) "Syncing..." else "Sync from CDN",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                items(packLevels) { level ->
+                    val progress = allProgress.find { it.id == level.id }
+                    val isCompleted = progress?.isCompleted == true
+                    val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode)
 
-                LogoWireRow(
-                    level = level,
-                    isCompleted = isCompleted,
-                    isUnlocked = lockStatus.isUnlocked,
-                    isAdGated = lockStatus.isAdGated,
-                    stars = progress?.stars ?: 0,
-                    packColor = packColor,
-                    onClick = { onLevelClick(level.id) },
-                    modifier = Modifier.testTag("logo_row_${level.id}")
-                )
+                    LogoWireRow(
+                        level = level,
+                        isCompleted = isCompleted,
+                        isUnlocked = lockStatus.isUnlocked,
+                        isAdGated = lockStatus.isAdGated,
+                        stars = progress?.stars ?: 0,
+                        packColor = packColor,
+                        onClick = { onLevelClick(level.id) },
+                        modifier = Modifier.testTag("logo_row_${level.id}")
+                    )
+                }
             }
 
             item {

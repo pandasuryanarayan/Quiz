@@ -8,6 +8,8 @@ import com.example.data.QuizDatabase
 import com.example.data.QuizRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,39 +29,32 @@ class ExampleRobolectricTest {
   @Test
   fun `verify quiz packs catalog and CDN mappings`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(130, levels.size)
+    assertEquals(101, levels.size)
 
     // Verify Automotive sequence
     val automotive = com.example.data.QuizPackData.getLevelsForPack("automotive")
-    assertEquals(10, automotive.size)
+    assertEquals(65, automotive.size)
     assertEquals("TOYOTA", automotive[0].answer)
     assertEquals("BMW", automotive[1].answer)
-    assertEquals("FERRARI", automotive[2].answer)
     automotive.forEach { lvl ->
-      org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Automotive/"))
+      assertNotNull(lvl.imageUrl)
+      assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Automotive/"))
     }
 
-    // Verify Food & Beverage sequence
+    // Verify Food & Beverages sequence
     val food = com.example.data.QuizPackData.getLevelsForPack("food_beverage")
-    assertEquals(10, food.size)
-    assertEquals("MCDONALDS", food[0].answer)
-    assertEquals("KFC", food[1].answer)
-    assertEquals("COCACOLA", food[2].answer)
+    assertEquals(13, food.size)
     food.forEach { lvl ->
-      org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Beverage/"))
+      assertNotNull(lvl.imageUrl)
+      assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Beverages/"))
     }
 
-    // Verify Energy & Telecom sequence
-    val energy = com.example.data.QuizPackData.getLevelsForPack("energy_telecom")
-    assertEquals(10, energy.size)
-    assertEquals("SHELL", energy[0].answer)
-    assertEquals("VODAFONE", energy[1].answer)
-    assertEquals("VERIZON", energy[2].answer)
-    energy.forEach { lvl ->
-      org.junit.Assert.assertNotNull(lvl.imageUrl)
-      org.junit.Assert.assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Energy%20%26%20Telecom/"))
+    // Verify Technology sequence
+    val tech = com.example.data.QuizPackData.getLevelsForPack("technology")
+    assertEquals(9, tech.size)
+    tech.forEach { lvl ->
+      assertNotNull(lvl.imageUrl)
+      assertTrue(lvl.imageUrl!!.startsWith("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Technology/"))
     }
   }
 
@@ -97,7 +92,6 @@ class ExampleRobolectricTest {
     val level6 = com.example.data.QuizPackData.getLevelById("automotive_6")!!
     val level7 = com.example.data.QuizPackData.getLevelById("automotive_7")!!
 
-    var allProgress = db.quizDao().getAllLevelProgress()
     // Helper to get sync list
     fun getProgressList() = runBlocking {
       com.example.data.QuizPackData.allLevels.mapNotNull { lvl ->
@@ -206,17 +200,32 @@ class ExampleRobolectricTest {
     val repo = QuizRepository(db.quizDao())
     repo.initializeDefaultsIfNeeded()
 
-    assertEquals(13, PackCategory.entries.size)
+    assertEquals(8, PackCategory.entries.size)
 
     for (pack in PackCategory.entries) {
       val packLevels = com.example.data.QuizPackData.getLevelsForPack(pack.id)
-      assertEquals("Pack ${pack.id} size mismatch", 10, packLevels.size)
+      assertTrue("Pack ${pack.id} should have real levels from jsDelivr CDN", packLevels.isNotEmpty())
       // Level 1 should be free & visible initially
       val visible = com.example.data.QuizPackData.getVisibleLevelsForPack(pack.id, repo.allProgress.value)
-      assertEquals("Pack ${pack.id} should show only Level 1 initially", 1, visible.size)
+      assertEquals("Pack ${pack.id} should show Level 1 initially", 1, visible.size)
       assertEquals("${pack.id}_1", visible[0].id)
     }
 
     db.close()
+  }
+
+  @Test
+  fun `verify jsDelivr CDN url builder and brand cleaning`() {
+    val url1 = com.example.data.QuizPackData.buildCdnUrl("Food & Beverages", "McDonald's.webp")
+    assertEquals("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Food%20%26%20Beverages/McDonald%27s.webp", url1)
+
+    val url2 = com.example.data.QuizPackData.buildCdnUrl("Automotive", "Alfa Romeo.webp")
+    assertEquals("https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz/Automotive/Alfa%20Romeo.webp", url2)
+
+    val clean1 = com.example.data.RemoteLogoSyncManager.extractCleanAnswer("McDonald's.webp")
+    assertEquals("MCDONALDS", clean1)
+
+    val clean2 = com.example.data.RemoteLogoSyncManager.extractCleanAnswer("Alfa Romeo.webp")
+    assertEquals("ALFAROMEO", clean2)
   }
 }

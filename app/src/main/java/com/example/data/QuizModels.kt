@@ -25,9 +25,9 @@ enum class PackCategory(
     ),
     FOOD_BEVERAGE(
         id = "food_beverage",
-        title = "Food & Beverage",
+        title = "Food & Beverages",
         subtitle = "Fast food, drinks & snacks",
-        folderName = "Food & Beverage",
+        folderName = "Food & Beverages",
         emoji = "🍔",
         primaryColorHex = 0xFFE11D48,
         dimColorHex = 0xFFFFF1F2,
@@ -73,16 +73,6 @@ enum class PackCategory(
         dimColorHex = 0xFFEFF6FF,
         gradientColorsHex = listOf(0xFF1D4ED8, 0xFF60A5FA)
     ),
-    TRAVEL_AIRLINES(
-        id = "travel_airlines",
-        title = "Travel & Airlines",
-        subtitle = "Airlines, hotels & booking",
-        folderName = "Travel & Airlines",
-        emoji = "✈️",
-        primaryColorHex = 0xFF0284C7,
-        dimColorHex = 0xFFF0F9FF,
-        gradientColorsHex = listOf(0xFF0369A1, 0xFF38BDF8)
-    ),
     SPORTS(
         id = "sports",
         title = "Sports",
@@ -93,16 +83,6 @@ enum class PackCategory(
         dimColorHex = 0xFFF7FEE7,
         gradientColorsHex = listOf(0xFF4D7C0F, 0xFFA3E635)
     ),
-    BEAUTY_PERSONAL_CARE(
-        id = "beauty_personal_care",
-        title = "Beauty & Personal Care",
-        subtitle = "Cosmetics, skincare & perfume",
-        folderName = "Beauty & Personal Care",
-        emoji = "🧴",
-        primaryColorHex = 0xFFDB2777,
-        dimColorHex = 0xFFFDF2F8,
-        gradientColorsHex = listOf(0xFFBE185D, 0xFFF472B6)
-    ),
     RETAIL_SUPERMARKETS(
         id = "retail_supermarkets",
         title = "Retail & Supermarkets",
@@ -112,36 +92,6 @@ enum class PackCategory(
         primaryColorHex = 0xFFCA8A04,
         dimColorHex = 0xFFFEFCE8,
         gradientColorsHex = listOf(0xFFA16207, 0xFFFACC15)
-    ),
-    SOCIAL_MEDIA(
-        id = "social_media",
-        title = "Social Media",
-        subtitle = "Social platforms & video",
-        folderName = "Social Media",
-        emoji = "📱",
-        primaryColorHex = 0xFF4F46E5,
-        dimColorHex = 0xFFEEF2FF,
-        gradientColorsHex = listOf(0xFF4338CA, 0xFF818CF8)
-    ),
-    HEALTH_PHARMA(
-        id = "health_pharma",
-        title = "Health & Pharma",
-        subtitle = "Pharma & health giants",
-        folderName = "Health & Pharma",
-        emoji = "🏥",
-        primaryColorHex = 0xFF059669,
-        dimColorHex = 0xFFECFDF5,
-        gradientColorsHex = listOf(0xFF047857, 0xFF34D399)
-    ),
-    ENERGY_TELECOM(
-        id = "energy_telecom",
-        title = "Energy & Telecom",
-        subtitle = "Energy & telecom networks",
-        folderName = "Energy & Telecom",
-        emoji = "⚡",
-        primaryColorHex = 0xFF0891B2,
-        dimColorHex = 0xFFECFEFF,
-        gradientColorsHex = listOf(0xFF0E7490, 0xFF22D3EE)
     )
 }
 
@@ -158,7 +108,9 @@ data class QuizLevel(
     val hintSentence: String,
     val triviaFact: String,
     val logoKey: String,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val originalName: String = answer,
+    val alternateAnswers: List<String> = emptyList()
 )
 
 @Entity(tableName = "level_progress")
