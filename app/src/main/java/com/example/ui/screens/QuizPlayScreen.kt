@@ -20,10 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.MonetizationOn
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -172,37 +169,6 @@ fun QuizPlayScreen(
                             )
                         }
                     }
-
-                    // Hint button with badge
-                    IconButton(
-                        onClick = onOpenHint,
-                        modifier = Modifier.testTag("hint_button")
-                    ) {
-                        if (freeHintAvailable) {
-                            BadgedBox(
-                                badge = {
-                                    Badge(
-                                        containerColor = WireSage,
-                                        modifier = Modifier.size(7.dp)
-                                    )
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Lightbulb,
-                                    contentDescription = "Hints",
-                                    tint = WireAmber,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                        } else {
-                            Icon(
-                                imageVector = Icons.Rounded.Lightbulb,
-                                contentDescription = "Hints",
-                                tint = WireAmber,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBg)
             )
@@ -223,7 +189,7 @@ fun QuizPlayScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // Logo Area Box (Wireframe logo-box styling)
                 Surface(
@@ -246,33 +212,7 @@ fun QuizPlayScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Logo hint display: Hint sentence in warm surface
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = WarmSurface,
-                    border = BorderStroke(1.dp, WarmBorder),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Hint: ${level.hintSentence}",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = WarmTextDim,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 // Answer Slots Row
                 LetterSlotsRow(
@@ -317,7 +257,9 @@ fun QuizPlayScreen(
                             contentColor = WarmText
                         ),
                         border = BorderStroke(1.dp, WarmBorder),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("hint_button")
                     ) {
                         Text(
                             text = "Hint",
