@@ -48,6 +48,11 @@ object RemoteLogoSyncManager {
                         alternates.add(altArray.getString(j))
                     }
                 }
+                val rawUrl = if (obj.has("imageUrl") && !obj.isNull("imageUrl")) obj.getString("imageUrl") else null
+                // Ensure only authentic real logos directly fetched from jsDelivr CDN are loaded
+                if (rawUrl.isNullOrBlank() || !rawUrl.startsWith(CDN_BASE_URL)) {
+                    continue
+                }
                 list.add(
                     QuizLevel(
                         id = obj.getString("id"),
@@ -57,7 +62,7 @@ object RemoteLogoSyncManager {
                         hintSentence = obj.getString("hintSentence"),
                         triviaFact = obj.getString("triviaFact"),
                         logoKey = obj.getString("logoKey"),
-                        imageUrl = if (obj.has("imageUrl") && !obj.isNull("imageUrl")) obj.getString("imageUrl") else null,
+                        imageUrl = rawUrl,
                         originalName = obj.optString("originalName", obj.getString("answer")),
                         alternateAnswers = alternates
                     )
@@ -228,9 +233,9 @@ object RemoteLogoSyncManager {
 
         val total = currentLevels.size
         val message = if (newLevelsAddedCount > 0) {
-            "Synced $newLevelsAddedCount new real logo${if (newLevelsAddedCount > 1) "s" else ""} from jsDelivr CDN!"
+            "⚡ New Quest Unlocked! Added $newLevelsAddedCount fresh logo challenge${if (newLevelsAddedCount > 1) "s" else ""} to the arena!"
         } else {
-            "All logos from jsDelivr CDN are synced and up to date."
+            "🏆 You're all set! All logo quests are primed and ready to conquer!"
         }
 
         SyncResult(

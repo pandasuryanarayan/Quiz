@@ -111,7 +111,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 }
             } catch (e: Exception) {
                 if (!silent) {
-                    _refreshStatusMessage.value = "All logos are up to date."
+                    _refreshStatusMessage.value = "🛡️ Arena ready! All logo challenges are primed for play!"
                 }
             } finally {
                 if (!silent) _isRefreshingLevels.value = false

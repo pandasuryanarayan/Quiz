@@ -112,10 +112,10 @@ fun AdPromptDialog(
                 }
 
                 val subtitle = when (purpose) {
-                    AdPurpose.UNLOCK_LEVEL -> "Logos 6 and above are locked. Watch a quick 5-second sponsor video to permanently unlock this logo!"
-                    AdPurpose.REMOVE_WRONG_LETTERS -> "Watch a quick sponsor video to eliminate 3 distracting letter tiles from the scrambled bank."
+                    AdPurpose.UNLOCK_LEVEL -> "Logos 6 and above are locked. Watch a quick 5-second video to permanently unlock this logo!"
+                    AdPurpose.REMOVE_WRONG_LETTERS -> "Watch a quick video to eliminate 3 distracting letter tiles from the scrambled bank."
                     AdPurpose.REVEAL_LETTER -> "Watch a short video to place the next correct letter in your answer slots."
-                    AdPurpose.EARN_COINS -> "Watch a short sponsor video to instantly claim 50 free game coins!"
+                    AdPurpose.EARN_COINS -> "Watch a short video to instantly claim 50 free game coins!"
                 }
 
                 Text(

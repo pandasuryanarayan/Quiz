@@ -33,11 +33,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,9 +81,21 @@ fun PackSelectionScreen(
     onSwitchMode: () -> Unit = {},
     isRefreshing: Boolean = false,
     onRefreshClick: () -> Unit = {},
+    refreshMessage: String? = null,
+    onClearRefreshMessage: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(refreshMessage) {
+        refreshMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onClearRefreshMessage?.invoke()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -404,11 +420,11 @@ private fun EarnCoinsHeroBanner(
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Watch a quick sponsor ad to get +50 coins",
+                        text = "Watch a quick ad to get +50 coins",
                         fontSize = 11.sp,
                         color = WarmTextDim,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        maxLines = 2,
+                        lineHeight = 14.sp
                     )
                 }
             }
