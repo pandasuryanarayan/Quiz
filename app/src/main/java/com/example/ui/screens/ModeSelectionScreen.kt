@@ -18,11 +18,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,7 +52,9 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.AppMode
 import com.example.ui.components.AdminPasswordDialog
+import com.example.ui.components.LegalDisclaimerDialog
 import com.example.ui.theme.WarmBg
+import com.example.ui.theme.WarmBorder
 import com.example.ui.theme.WarmBorderBright
 import com.example.ui.theme.WarmText
 import com.example.ui.theme.WarmTextDim
@@ -58,6 +66,8 @@ fun ModeSelectionScreen(
     modifier: Modifier = Modifier
 ) {
     var showAdminPasswordDialog by remember { mutableStateOf(false) }
+    var showDisclaimerInfoDialog by remember { mutableStateOf(false) }
+    var showAgreementDisclaimerDialog by remember { mutableStateOf(false) }
 
     if (showAdminPasswordDialog) {
         AdminPasswordDialog(
@@ -67,6 +77,26 @@ fun ModeSelectionScreen(
             },
             onDismiss = {
                 showAdminPasswordDialog = false
+            }
+        )
+    }
+
+    if (showDisclaimerInfoDialog) {
+        LegalDisclaimerDialog(
+            isAgreementMode = false,
+            onDismiss = { showDisclaimerInfoDialog = false }
+        )
+    }
+
+    if (showAgreementDisclaimerDialog) {
+        LegalDisclaimerDialog(
+            isAgreementMode = true,
+            onAgree = {
+                showAgreementDisclaimerDialog = false
+                onSelectMode(AppMode.USER)
+            },
+            onDismiss = {
+                showAgreementDisclaimerDialog = false
             }
         )
     }
@@ -81,6 +111,26 @@ fun ModeSelectionScreen(
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
+            // '?' Question Mark Icon for Quick Legal & Trademark Disclaimer Access
+            IconButton(
+                onClick = { showDisclaimerInfoDialog = true },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(44.dp)
+                    .shadow(3.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .border(BorderStroke(1.dp, WarmBorderBright), CircleShape)
+                    .testTag("help_disclaimer_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.HelpOutline,
+                    contentDescription = "Legal & Trademark Disclaimer",
+                    tint = WireTeal,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .widthIn(max = 420.dp)
@@ -136,7 +186,7 @@ fun ModeSelectionScreen(
 
                 // User Start Playing Section
                 Button(
-                    onClick = { onSelectMode(AppMode.USER) },
+                    onClick = { showAgreementDisclaimerDialog = true },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = WireTeal,
@@ -167,7 +217,30 @@ fun ModeSelectionScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Subtle link to review disclaimer anytime
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .clickable { showDisclaimerInfoDialog = true }
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "Subject to ",
+                        fontSize = 11.5.sp,
+                        color = WarmTextDim
+                    )
+                    Text(
+                        text = "Legal & Trademark Disclaimer",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = WireTeal
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Admin Login Section (Transparent button without descriptions, preserving password logic)
                 Row(

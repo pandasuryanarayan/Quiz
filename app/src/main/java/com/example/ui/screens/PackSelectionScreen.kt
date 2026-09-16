@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -41,7 +42,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.PackProgressSummary
 import com.example.data.UserProfileEntity
 import com.example.ui.components.CategoryHeroImage
+import com.example.ui.components.LegalDisclaimerDialog
 import com.example.ui.theme.AmberStar
 import com.example.ui.theme.WarmBg
 import com.example.ui.theme.WarmBorder
@@ -86,12 +91,20 @@ fun PackSelectionScreen(
     modifier: Modifier = Modifier
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDisclaimerDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(refreshMessage) {
         refreshMessage?.let {
             snackbarHostState.showSnackbar(it)
             onClearRefreshMessage?.invoke()
         }
+    }
+
+    if (showDisclaimerDialog) {
+        LegalDisclaimerDialog(
+            isAgreementMode = false,
+            onDismiss = { showDisclaimerDialog = false }
+        )
     }
 
     Scaffold(
@@ -113,6 +126,19 @@ fun PackSelectionScreen(
                     }
                 },
                 actions = {
+                    // Legal Disclaimer '?' Mark Icon
+                    IconButton(
+                        onClick = { showDisclaimerDialog = true },
+                        modifier = Modifier.testTag("help_disclaimer_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.HelpOutline,
+                            contentDescription = "Legal & Trademark Disclaimer",
+                            tint = WarmTextDim,
+                            modifier = Modifier.size(21.dp)
+                        )
+                    }
+
                     // Sync jsDelivr CDN Logos
                     IconButton(
                         onClick = onRefreshClick,
