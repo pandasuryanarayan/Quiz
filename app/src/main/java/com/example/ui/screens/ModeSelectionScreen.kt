@@ -2,6 +2,8 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,11 +40,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,12 +54,21 @@ import com.example.R
 import com.example.data.AppMode
 import com.example.ui.components.AdminPasswordDialog
 import com.example.ui.components.LegalDisclaimerDialog
-import com.example.ui.theme.WarmBg
-import com.example.ui.theme.WarmBorder
-import com.example.ui.theme.WarmBorderBright
-import com.example.ui.theme.WarmText
-import com.example.ui.theme.WarmTextDim
-import com.example.ui.theme.WireTeal
+import com.example.ui.theme.ArcadeBg
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeCanvas
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeFlame
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonCyan
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadePurple
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextMuted
 
 @Composable
 fun ModeSelectionScreen(
@@ -103,7 +113,7 @@ fun ModeSelectionScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = WarmBg
+        color = ArcadeBg
     ) {
         Box(
             modifier = Modifier
@@ -111,23 +121,21 @@ fun ModeSelectionScreen(
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            // '?' Question Mark Icon for Quick Legal & Trademark Disclaimer Access
+            // Legal Lore icon in top right
             IconButton(
                 onClick = { showDisclaimerInfoDialog = true },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .size(44.dp)
-                    .shadow(3.dp, CircleShape)
+                    .size(42.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
-                    .border(BorderStroke(1.dp, WarmBorderBright), CircleShape)
+                    .background(ArcadeCardElevated)
                     .testTag("help_disclaimer_button")
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.HelpOutline,
+                    imageVector = Icons.Rounded.Description,
                     contentDescription = "Legal & Trademark Disclaimer",
-                    tint = WireTeal,
-                    modifier = Modifier.size(24.dp)
+                    tint = ArcadeTextDim,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -139,17 +147,23 @@ fun ModeSelectionScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Official App Logo Badge
+                // Glowing App Icon Squircle
                 Surface(
-                    shape = RoundedCornerShape(26.dp),
-                    color = Color.White,
-                    shadowElevation = 8.dp,
-                    border = BorderStroke(1.dp, WarmBorderBright),
-                    modifier = Modifier.size(110.dp)
+                    shape = RoundedCornerShape(32.dp),
+                    color = ArcadeFlame,
+                    border = BorderStroke(2.dp, ArcadeBorderBright),
+                    modifier = Modifier.size(114.dp)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(10.dp)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(ArcadeFlame, ArcadeGold)
+                                )
+                            )
+                            .padding(10.dp)
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.app_logo),
@@ -157,18 +171,18 @@ fun ModeSelectionScreen(
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(RoundedCornerShape(22.dp))
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(22.dp))
 
                 Text(
-                    text = "Logo Quiz",
+                    text = "LOGO QUIZ",
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = WarmText,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText,
                     letterSpacing = (-0.5).sp,
                     textAlign = TextAlign.Center
                 )
@@ -176,26 +190,26 @@ fun ModeSelectionScreen(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Guess the brands • Master the challenge",
-                    fontSize = 13.5.sp,
-                    color = WarmTextDim,
+                    text = "101 Real Brand Logos • 8 Distinct Worlds",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
 
-                // User Start Playing Section
+                // Start Playing Button
                 Button(
                     onClick = { showAgreementDisclaimerDialog = true },
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = WireTeal,
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp)
-                        .shadow(4.dp, RoundedCornerShape(16.dp))
+                        .height(56.dp)
                         .testTag("start_playing_button")
                         .testTag("mode_user_button")
                 ) {
@@ -206,20 +220,23 @@ fun ModeSelectionScreen(
                         Icon(
                             imageVector = Icons.Rounded.PlayArrow,
                             contentDescription = null,
+                            tint = Color.Black,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Start Playing",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            text = "START PLAYING",
+                            fontSize = 14.5.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp,
+                            color = Color.Black
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Subtle link to review disclaimer anytime
+                // Disclaimer link
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -230,45 +247,44 @@ fun ModeSelectionScreen(
                     Text(
                         text = "Subject to ",
                         fontSize = 11.5.sp,
-                        color = WarmTextDim
+                        color = ArcadeTextMuted
                     )
                     Text(
-                        text = "Legal & Trademark Disclaimer",
+                        text = "Legal & Trademark Notice",
                         fontSize = 11.5.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = WireTeal
+                        fontWeight = FontWeight.Bold,
+                        color = ArcadeNeonCyan
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                // Admin Login Section (Transparent button without descriptions, preserving password logic)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
+                // Admin Login Row
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = ArcadeCardSecondary,
+                    border = BorderStroke(1.dp, ArcadeBorder),
+                    modifier = Modifier
+                        .clickable { showAdminPasswordDialog = true }
+                        .testTag("mode_admin_button")
                 ) {
-                    Text(
-                        text = "Are you Admin?",
-                        fontSize = 13.sp,
-                        color = WarmTextDim
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    OutlinedButton(
-                        onClick = { showAdminPasswordDialog = true },
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, WarmBorderBright),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = WarmText
-                        ),
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-                        modifier = Modifier.testTag("mode_admin_button")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Rounded.AdminPanelSettings,
+                            contentDescription = null,
+                            tint = ArcadeTextDim,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Admin",
-                            fontSize = 12.5.sp,
-                            fontWeight = FontWeight.SemiBold
+                            text = "Admin Sandbox Login",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ArcadeTextDim
                         )
                     }
                 }

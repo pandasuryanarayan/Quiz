@@ -16,20 +16,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.MonetizationOn
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,38 +39,39 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.LevelProgressEntity
 import com.example.data.PackCategory
 import com.example.data.QuizLevel
 import com.example.data.QuizPackData
-import com.example.ui.components.CategoryHeroImage
-import com.example.ui.components.LegalDisclaimerDialog
-import com.example.ui.theme.AmberStar
-import com.example.ui.theme.WarmBg
-import com.example.ui.theme.WarmBorder
-import com.example.ui.theme.WarmBorderBright
-import com.example.ui.theme.WarmSurface
-import com.example.ui.theme.WarmSurface2
-import com.example.ui.theme.WarmText
-import com.example.ui.theme.WarmTextDim
-import com.example.ui.theme.WireAmber
-import com.example.ui.theme.WireSage
-import com.example.ui.theme.WireSageDim
-import com.example.ui.theme.WireTeal
+import com.example.ui.theme.ArcadeBg
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeBorderSubtle
+import com.example.ui.theme.ArcadeCanvas
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeFlame
+import com.example.ui.theme.ArcadeFlameSecondary
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonCyan
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextDisabled
+import com.example.ui.theme.ArcadeTextMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,16 +91,16 @@ fun LevelGridScreen(
 ) {
     val pack = PackCategory.entries.find { it.id == packId } ?: PackCategory.AUTOMOTIVE
     val packLevels = QuizPackData.getLevelsForPack(packId)
-    val packColor = Color(pack.primaryColorHex)
-    val packDimColor = Color(pack.dimColorHex)
+    val gradientColors = pack.gradientColorsHex.map { Color(it) }
+    val accentColor = Color(pack.accentColorHex)
 
     val completedCount = packLevels.count { level ->
         allProgress.find { it.id == level.id }?.isCompleted == true
     }
     val percentage = if (packLevels.isNotEmpty()) (completedCount * 100 / packLevels.size) else 0
+    val totalXp = completedCount * 100
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDisclaimerDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(refreshMessage) {
         refreshMessage?.let {
@@ -112,60 +109,93 @@ fun LevelGridScreen(
         }
     }
 
-    if (showDisclaimerDialog) {
-        LegalDisclaimerDialog(
-            isAgreementMode = false,
-            onDismiss = { showDisclaimerDialog = false }
-        )
-    }
-
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    Surface(
+                        shape = CircleShape,
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .size(38.dp)
+                            .clickable { onBack() }
+                            .testTag("back_button")
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back",
+                                tint = ArcadeText,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                },
                 title = {
                     Row(
-                        modifier = Modifier.clickable { onBack() },
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(start = 8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = WarmTextDim,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = accentColor,
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Brush.linearGradient(gradientColors)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = pack.emoji, fontSize = 16.sp)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         Text(
-                            text = "Back",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = WarmTextDim
+                            text = pack.title,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Black,
+                            color = ArcadeText,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = ArcadeCardElevated,
+                            border = BorderStroke(0.5.dp, ArcadeBorder),
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "${packLevels.size} LOGOS",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp,
+                                color = ArcadeTextDim,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                            )
+                        }
                     }
                 },
                 actions = {
-                    // Legal Disclaimer '?' Mark Icon
-                    IconButton(
-                        onClick = { showDisclaimerDialog = true },
-                        modifier = Modifier.testTag("help_disclaimer_button")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.HelpOutline,
-                            contentDescription = "Legal & Trademark Disclaimer",
-                            tint = WarmTextDim,
-                            modifier = Modifier.size(21.dp)
-                        )
-                    }
-
+                    // Sync CDN Button
                     IconButton(
                         onClick = onRefreshClick,
                         enabled = !isRefreshing,
-                        modifier = Modifier.testTag("sync_cdn_button")
+                        modifier = Modifier.testTag("sync_cdn_pack_button")
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Sync jsDelivr CDN logos",
-                            tint = WireTeal,
+                            contentDescription = "Sync logos",
+                            tint = ArcadeNeonCyan,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -173,415 +203,370 @@ fun LevelGridScreen(
                     // Coins Pill
                     Surface(
                         shape = RoundedCornerShape(16.dp),
-                        color = Color(0xFFFEF3C7),
-                        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder),
                         modifier = Modifier
+                            .padding(end = 12.dp)
                             .clickable { onEarnCoinsClick() }
-                            .testTag("grid_earn_coins_button")
+                            .testTag("earn_coins_button")
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.MonetizationOn,
-                                contentDescription = "Coins",
-                                tint = AmberStar,
-                                modifier = Modifier.size(16.dp)
-                            )
+                            Text(text = "🪙", fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "$coins",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                color = Color(0xFFB45309)
+                                fontWeight = FontWeight.Black,
+                                fontSize = 12.sp,
+                                color = ArcadeText
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = "+",
                                 fontWeight = FontWeight.Black,
-                                fontSize = 13.sp,
-                                color = AmberStar
+                                fontSize = 12.sp,
+                                color = Color.White
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.width(14.dp))
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = ArcadeBg)
             )
         },
-        containerColor = WarmBg
+        containerColor = ArcadeBg
     ) { innerPadding ->
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Admin Mode Active Banner
-            if (isAdminMode) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFFEFF6FF),
-                        border = BorderStroke(1.dp, Color(0xFF93C5FD)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.AdminPanelSettings,
-                                contentDescription = null,
-                                tint = Color(0xFF1D4ED8),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Admin Mode • All logos unlocked for testing",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1D4ED8)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Category Hero Banner
+            // Pack Progress Hero Banner
             item {
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = WarmSurface,
-                    border = BorderStroke(1.dp, WarmBorderBright),
-                    shadowElevation = 2.dp,
+                    shape = RoundedCornerShape(22.dp),
+                    color = ArcadeCard,
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        CategoryHeroImage(
-                            pack = pack,
-                            height = 110.dp,
-                            totalLogos = packLevels.size,
-                            shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
-                        )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 14.dp)
-                        ) {
-                            Text(
-                                text = pack.title,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = WarmText,
-                                letterSpacing = (-0.3).sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = pack.subtitle,
-                                fontSize = 12.sp,
-                                color = WarmTextDim
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            LinearProgressIndicator(
-                                progress = { if (packLevels.isNotEmpty()) completedCount.toFloat() / packLevels.size else 0f },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(5.dp)
-                                    .clip(RoundedCornerShape(2.5.dp)),
-                                color = packColor,
-                                trackColor = WarmBorder
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "$completedCount / ${packLevels.size} identified",
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = WarmTextDim
-                                )
-                                Text(
-                                    text = "$percentage%",
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = packColor
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Section Heading: LOGOS
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 2.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "LOGOS",
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.5.sp,
-                        color = WarmTextDim
-                    )
-                    Text(
-                        text = "$completedCount of ${packLevels.size} Solved",
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 10.sp,
-                        color = WarmTextDim
-                    )
-                }
-            }
-
-            // Logo Rows (Wireframe level-list style)
-            if (packLevels.isEmpty()) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = WarmSurface,
-                        border = BorderStroke(1.dp, WarmBorder),
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
+                            .padding(16.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "📂",
-                                fontSize = 36.sp
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "No logos found on CDN yet",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = WarmText
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = "To add logos to this category, upload webp or png files into the '${pack.folderName}' folder to be served by jsDelivr CDN, then tap Sync below.",
-                                fontSize = 12.sp,
-                                color = WarmTextDim,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                lineHeight = 17.sp
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = onRefreshClick,
-                                enabled = !isRefreshing,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = WireTeal,
-                                    contentColor = Color.White
-                                ),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.testTag("empty_state_sync_button")
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Refresh,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                // Level badge
+                                Surface(
+                                    shape = CircleShape,
+                                    color = ArcadeFlame,
+                                    modifier = Modifier.size(38.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                Brush.linearGradient(
+                                                    listOf(ArcadeFlame, ArcadeGold)
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "$completedCount",
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 15.sp,
+                                            color = ArcadeCanvas
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Column {
+                                    Text(
+                                        text = "Level $completedCount Explorer",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = ArcadeText
+                                    )
+                                    Text(
+                                        text = "$completedCount/${packLevels.size} conquered",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = ArcadeTextDim
+                                    )
+                                }
+                            }
+
+                            Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = if (isRefreshing) "Syncing..." else "Sync from CDN",
+                                    text = "$totalXp XP",
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Black,
+                                    color = ArcadeText
+                                )
+                                Text(
+                                    text = "NEXT LVL ${(completedCount + 1) * 100}",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = 1.sp,
+                                    color = ArcadeFlameSecondary
                                 )
                             }
                         }
-                    }
-                }
-            } else {
-                items(packLevels) { level ->
-                    val progress = allProgress.find { it.id == level.id }
-                    val isCompleted = progress?.isCompleted == true
-                    val lockStatus = QuizPackData.getLevelLockStatus(level, allProgress, isAdminMode)
 
-                    LogoWireRow(
-                        level = level,
-                        isCompleted = isCompleted,
-                        isUnlocked = lockStatus.isUnlocked,
-                        isAdGated = lockStatus.isAdGated,
-                        stars = progress?.stars ?: 0,
-                        packColor = packColor,
-                        onClick = { onLevelClick(level.id) },
-                        modifier = Modifier.testTag("logo_row_${level.id}")
-                    )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Glowing progress bar
+                        LinearProgressIndicator(
+                            progress = { if (packLevels.isNotEmpty()) completedCount.toFloat() / packLevels.size else 0f },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(7.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = ArcadeFlame,
+                            trackColor = Color(0xFF0F0F18)
+                        )
+                    }
                 }
             }
 
+            // Levels Vertical Journey Timeline Header
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "CAMPAIGN PATH",
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.4.sp,
+                    color = ArcadeTextMuted,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
+
+            // Levels Vertical Journey
+            itemsIndexed(packLevels) { index, level ->
+                val progress = allProgress.find { it.id == level.id }
+                val isCompleted = progress?.isCompleted == true
+                val isUnlocked = isAdminMode || (progress?.isUnlocked == true) || index == 0 || (index > 0 && allProgress.find { it.id == packLevels[index - 1].id }?.isCompleted == true)
+                val stars = progress?.stars ?: 0
+                val isNextActive = isUnlocked && !isCompleted && (index == 0 || allProgress.find { it.id == packLevels[index - 1].id }?.isCompleted == true)
+
+                ArcadeLevelTimelineRow(
+                    level = level,
+                    levelNumber = index + 1,
+                    isCompleted = isCompleted,
+                    isUnlocked = isUnlocked,
+                    isNextActive = isNextActive,
+                    stars = stars,
+                    onClick = { onLevelClick(level.id) },
+                    modifier = Modifier.testTag("level_item_${level.id}")
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(30.dp))
             }
         }
     }
 }
 
+/**
+ * Vertical Journey Row with node bubble and card
+ */
 @Composable
-private fun LogoWireRow(
+private fun ArcadeLevelTimelineRow(
     level: QuizLevel,
+    levelNumber: Int,
     isCompleted: Boolean,
     isUnlocked: Boolean,
-    isAdGated: Boolean,
+    isNextActive: Boolean,
     stars: Int,
-    packColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val rowBg = when {
-        isCompleted -> WireSageDim
-        isUnlocked -> WarmSurface
-        else -> WarmSurface.copy(alpha = 0.55f)
-    }
-
-    val rowBorder = when {
-        isCompleted -> WireSage
-        isUnlocked -> WarmBorder
-        else -> WarmBorder.copy(alpha = 0.6f)
-    }
-
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = rowBg,
-        border = BorderStroke(1.dp, rowBorder),
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(enabled = isUnlocked) { onClick() },
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 11.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // Timeline Node Bubble
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = when {
+                isCompleted -> ArcadeCard
+                isNextActive -> Color.White
+                isUnlocked -> ArcadeCardElevated
+                else -> ArcadeCardSecondary
+            },
+            border = BorderStroke(
+                width = if (isNextActive) 2.dp else 1.5.dp,
+                color = when {
+                    isCompleted -> ArcadeNeonGreen.copy(alpha = 0.5f)
+                    isNextActive -> Color.White
+                    isUnlocked -> ArcadeBorderBright
+                    else -> ArcadeBorderSubtle
+                }
+            ),
+            modifier = Modifier.size(52.dp)
         ) {
-            // Circle Status Indicator
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
-                    .background(
-                        when {
-                            isCompleted -> WireSage
-                            isUnlocked -> WarmSurface2
-                            else -> WarmSurface2.copy(alpha = 0.6f)
-                        }
-                    )
-                    .then(
-                        if (!isCompleted && isUnlocked) {
-                            Modifier.background(WarmSurface2)
-                        } else Modifier
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(contentAlignment = Alignment.Center) {
                 when {
                     isCompleted -> {
-                        Icon(
-                            imageVector = Icons.Rounded.Check,
-                            contentDescription = "Solved",
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                        Surface(
+                            shape = CircleShape,
+                            color = ArcadeNeonGreen,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Check,
+                                    contentDescription = "Solved",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                    isNextActive -> {
+                        Text(
+                            text = "$levelNumber",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 17.sp,
+                            color = Color.Black
                         )
                     }
                     isUnlocked -> {
                         Text(
-                            text = "${level.levelNumber}",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 13.sp,
+                            text = "$levelNumber",
                             fontWeight = FontWeight.Bold,
-                            color = WireAmber
+                            fontSize = 15.sp,
+                            color = ArcadeText
                         )
                     }
                     else -> {
                         Icon(
                             imageVector = Icons.Rounded.Lock,
                             contentDescription = "Locked",
-                            tint = WarmTextDim,
-                            modifier = Modifier.size(14.dp)
+                            tint = ArcadeTextDisabled,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-            // Logo Name & Subtitle
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Logo ${level.levelNumber}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isUnlocked || isCompleted) WarmText else WarmTextDim
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = when {
-                        isCompleted -> "${level.answer.length} letters • Solved"
-                        isUnlocked -> "${level.answer.length} letters"
-                        isAdGated -> "Watch Ad to unlock"
-                        else -> "Complete Logo ${level.levelNumber - 1} to unlock"
-                    },
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                    color = when {
-                        isCompleted -> WireSage
-                        isUnlocked -> WarmTextDim
-                        isAdGated -> WireAmber
-                        else -> WarmTextDim.copy(alpha = 0.7f)
-                    }
-                )
-            }
-
-            // Right side stars or lock indicator
-            if (isCompleted) {
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                    val filledStars = if (stars > 0) stars else 3
-                    repeat(filledStars) {
-                        Icon(
-                            imageVector = Icons.Rounded.Star,
-                            contentDescription = null,
-                            tint = WireAmber,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
-            } else if (isUnlocked) {
-                Text(
-                    text = "Play ›",
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = WireTeal
-                )
-            } else {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isAdGated) WireAmber.copy(alpha = 0.12f) else Color.Transparent
-                ) {
+        // Level Details Card
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            color = when {
+                isNextActive -> Color.White
+                isUnlocked -> ArcadeCard
+                else -> ArcadeCardSecondary
+            },
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (isNextActive) Color.White else ArcadeBorder
+            ),
+            modifier = Modifier.weight(1f)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isAdGated) "Ad Unlock" else "Locked",
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (isAdGated) WireAmber else WarmTextDim,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        text = "Logo $levelNumber",
+                        fontSize = 14.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = if (isNextActive) Color.Black else ArcadeText
                     )
+
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = if (isNextActive) Color.Black.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.06f),
+                            border = BorderStroke(0.5.dp, if (isNextActive) Color.Black.copy(alpha = 0.15f) else ArcadeBorderSubtle)
+                        ) {
+                            Text(
+                                text = "${level.answer.length} LETTERS",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.8.sp,
+                                color = if (isNextActive) Color.Black.copy(alpha = 0.7f) else ArcadeTextDim,
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        Text(
+                            text = when {
+                                isCompleted -> "Solved • 300 XP"
+                                isNextActive -> "Current • Tap to Play"
+                                isUnlocked -> "Unlocked"
+                                else -> "Locked"
+                            },
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isNextActive) Color.Black.copy(alpha = 0.6f) else ArcadeTextMuted
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    // Star Rating
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        repeat(3) { starIdx ->
+                            Icon(
+                                imageVector = Icons.Rounded.Star,
+                                contentDescription = null,
+                                tint = when {
+                                    starIdx < stars -> ArcadeGold
+                                    isNextActive -> Color.Black.copy(alpha = 0.15f)
+                                    else -> Color.White.copy(alpha = 0.12f)
+                                },
+                                modifier = Modifier.size(13.dp)
+                            )
+                        }
+                    }
+                }
+
+                // Action arrow
+                Surface(
+                    shape = CircleShape,
+                    color = if (isNextActive) Color.Black else Color.White.copy(alpha = 0.08f),
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = "Open",
+                            tint = if (isNextActive) Color.White else ArcadeTextDim,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
         }

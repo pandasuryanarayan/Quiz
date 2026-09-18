@@ -11,67 +11,74 @@ enum class PackCategory(
     val emoji: String,
     val primaryColorHex: Long,
     val dimColorHex: Long,
-    val gradientColorsHex: List<Long>
+    val gradientColorsHex: List<Long>,
+    val accentColorHex: Long = primaryColorHex
 ) {
     AUTOMOTIVE(
         id = "automotive",
         title = "Automotive",
         subtitle = "Car brands & motorcycles",
         folderName = "Automotive",
-        emoji = "🚗",
-        primaryColorHex = 0xFFD97706,
-        dimColorHex = 0xFFFDF6EE,
-        gradientColorsHex = listOf(0xFFB45309, 0xFFF59E0B)
+        emoji = "🏎️",
+        primaryColorHex = 0xFFFF6B35,
+        dimColorHex = 0xFF1C1C28,
+        gradientColorsHex = listOf(0xFFFF6B35, 0xFFFFB347),
+        accentColorHex = 0xFFFF6B35
     ),
     FOOD_BEVERAGE(
         id = "food_beverage",
-        title = "Food & Beverages",
+        title = "Food & Drink",
         subtitle = "Fast food, drinks & snacks",
         folderName = "Food & Beverages",
         emoji = "🍔",
-        primaryColorHex = 0xFFE11D48,
-        dimColorHex = 0xFFFFF1F2,
-        gradientColorsHex = listOf(0xFFBE123C, 0xFFFB7185)
+        primaryColorHex = 0xFF00F5A0,
+        dimColorHex = 0xFF182522,
+        gradientColorsHex = listOf(0xFF00F5A0, 0xFF00D9FF),
+        accentColorHex = 0xFF00F5A0
     ),
     TECHNOLOGY(
         id = "technology",
-        title = "Technology",
+        title = "Tech Giants",
         subtitle = "Software, apps & hardware",
         folderName = "Technology",
         emoji = "💻",
-        primaryColorHex = 0xFF0D9488,
-        dimColorHex = 0xFFF0FDFA,
-        gradientColorsHex = listOf(0xFF0F766E, 0xFF14B8A6)
+        primaryColorHex = 0xFF7C3AED,
+        dimColorHex = 0xFF221825,
+        gradientColorsHex = listOf(0xFF7C3AED, 0xFFEC4899),
+        accentColorHex = 0xFF8B5CF6
     ),
     FASHION_CLOTHING(
         id = "fashion_clothing",
-        title = "Fashion & Clothing",
+        title = "Fashion",
         subtitle = "Sportswear & luxury fashion",
         folderName = "Fashion & Clothing",
-        emoji = "👕",
-        primaryColorHex = 0xFF7C3AED,
-        dimColorHex = 0xFFF5F3FF,
-        gradientColorsHex = listOf(0xFF6D28D9, 0xFFA78BFA)
+        emoji = "👟",
+        primaryColorHex = 0xFFFF3B8E,
+        dimColorHex = 0xFF281820,
+        gradientColorsHex = listOf(0xFFFF3B8E, 0xFFFF8E53),
+        accentColorHex = 0xFFFF3B8E
     ),
     ENTERTAINMENT(
         id = "entertainment",
-        title = "Entertainment",
+        title = "Movies & Media",
         subtitle = "Streaming, gaming & movies",
         folderName = "Entertainment",
-        emoji = "📺",
-        primaryColorHex = 0xFFEA580C,
-        dimColorHex = 0xFFFFF7ED,
-        gradientColorsHex = listOf(0xFFC2410C, 0xFFFB923C)
+        emoji = "🎬",
+        primaryColorHex = 0xFF22D3EE,
+        dimColorHex = 0xFF14242A,
+        gradientColorsHex = listOf(0xFF22D3EE, 0xFF3B82F6),
+        accentColorHex = 0xFF22D3EE
     ),
     FINANCE_BANKING(
         id = "finance_banking",
-        title = "Finance & Banking",
+        title = "Finance",
         subtitle = "Banks, cards & payments",
         folderName = "Finance & Banking",
-        emoji = "🏦",
-        primaryColorHex = 0xFF2563EB,
-        dimColorHex = 0xFFEFF6FF,
-        gradientColorsHex = listOf(0xFF1D4ED8, 0xFF60A5FA)
+        emoji = "💳",
+        primaryColorHex = 0xFF3B82F6,
+        dimColorHex = 0xFF161E2C,
+        gradientColorsHex = listOf(0xFF3B82F6, 0xFF60A5FA),
+        accentColorHex = 0xFF3B82F6
     ),
     SPORTS(
         id = "sports",
@@ -79,19 +86,21 @@ enum class PackCategory(
         subtitle = "Teams, leagues & gear",
         folderName = "Sports",
         emoji = "⚽",
-        primaryColorHex = 0xFF65A30D,
-        dimColorHex = 0xFFF7FEE7,
-        gradientColorsHex = listOf(0xFF4D7C0F, 0xFFA3E635)
+        primaryColorHex = 0xFFFACC15,
+        dimColorHex = 0xFF282414,
+        gradientColorsHex = listOf(0xFFFACC15, 0xFFFB923C),
+        accentColorHex = 0xFFFACC15
     ),
     RETAIL_SUPERMARKETS(
         id = "retail_supermarkets",
-        title = "Retail & Supermarkets",
+        title = "Retail",
         subtitle = "Stores & global e-commerce",
         folderName = "Retail & Supermarkets",
-        emoji = "🏪",
-        primaryColorHex = 0xFFCA8A04,
-        dimColorHex = 0xFFFEFCE8,
-        gradientColorsHex = listOf(0xFFA16207, 0xFFFACC15)
+        emoji = "🛒",
+        primaryColorHex = 0xFFF59E0B,
+        dimColorHex = 0xFF262014,
+        gradientColorsHex = listOf(0xFFF59E0B, 0xFFFBBF24),
+        accentColorHex = 0xFFF59E0B
     )
 }
 

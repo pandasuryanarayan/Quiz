@@ -177,6 +177,20 @@ class QuizRepository(private val quizDao: QuizDao) {
         return result
     }
 
+    suspend fun resetPlayerProgress() = withContext(Dispatchers.IO) {
+        quizDao.resetAllLevelProgress()
+        quizDao.resetUserProfile(defaultCoins = 150)
+        // Purge any obsolete or duplicated entries from the database
+        val currentValidIds = QuizPackData.allLevels.map { it.id }.toSet()
+        val allInDb = quizDao.getAllLevelProgressSync()
+        val obsolete = allInDb.filter { it.id !in currentValidIds }
+        for (obs in obsolete) {
+            quizDao.deleteLevelProgress(obs.id)
+        }
+        val refreshed = quizDao.getAllLevelProgressSync()
+        _allProgress.value = refreshed
+    }
+
     private suspend fun reconcileMissingLevelsInDb() = withContext(Dispatchers.IO) {
         val existingProgress = quizDao.getAllLevelProgressSync()
         val existingIds = existingProgress.map { it.id }.toSet()

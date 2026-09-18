@@ -40,7 +40,7 @@ fun CategoryHeroImage(
     modifier: Modifier = Modifier,
     height: Dp = 92.dp,
     packIndex: Int? = null,
-    totalLogos: Int = 10,
+    totalLogos: Int = QuizPackData.getLevelsForPack(pack.id).size,
     shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp)
 ) {
     val coverUrl = QuizPackData.buildCdnUrl(pack.folderName, "cover.webp")
@@ -172,7 +172,7 @@ private fun PremiumCategoryFallbackIllustration(
                 border = BorderStroke(0.8.dp, Color.White.copy(alpha = 0.3f))
             ) {
                 Text(
-                    text = "$totalLogos LOGOS",
+                    text = if (totalLogos == 1) "1 LOGO" else "$totalLogos LOGOS",
                     fontFamily = FontFamily.Monospace,
                     fontSize = 8.5.sp,
                     fontWeight = FontWeight.SemiBold,

@@ -12,51 +12,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme =
-  darkColorScheme(
-    primary = WireTeal,
-    onPrimary = CleanWhite,
-    primaryContainer = Color(0xFF2B2622),
-    onPrimaryContainer = Color(0xFFEDE5DD),
-    secondary = WireAmber,
-    onSecondary = CleanWhite,
-    background = Color(0xFF161311),
-    surface = Color(0xFF221E1B),
-    onBackground = Color(0xFFEDE5DD),
-    onSurface = Color(0xFFEDE5DD),
-  )
+    darkColorScheme(
+        primary = ArcadeFlame,
+        onPrimary = CleanWhite,
+        primaryContainer = ArcadeCardElevated,
+        onPrimaryContainer = CleanWhite,
+        secondary = ArcadeNeonGreen,
+        onSecondary = ArcadeCanvas,
+        background = ArcadeBg,
+        surface = ArcadeCard,
+        onBackground = ArcadeText,
+        onSurface = ArcadeText,
+        surfaceVariant = ArcadeCardSecondary,
+        onSurfaceVariant = ArcadeTextDim
+    )
 
-private val LightColorScheme =
-  lightColorScheme(
-    primary = WireTeal,
-    onPrimary = CleanWhite,
-    primaryContainer = WireTealDim,
-    onPrimaryContainer = WireTeal,
-    secondary = WireAmber,
-    onSecondary = CleanWhite,
-    background = WarmBg,
-    surface = WarmSurface,
-    onBackground = WarmText,
-    onSurface = WarmText,
-    surfaceVariant = WarmSurface2,
-    onSurfaceVariant = WarmTextDim,
-  )
+private val LightColorScheme = DarkColorScheme // Unified Dark Arcade aesthetic matching design artifact
 
 @Composable
 fun MyApplicationTheme(
-  darkTheme: Boolean = isSystemInDarkTheme(),
-  dynamicColor: Boolean = false, // Use intentional game palette by default
-  content: @Composable () -> Unit,
+    darkTheme: Boolean = true,
+    dynamicColor: Boolean = false, // Preserve intentional dark arcade palette
+    content: @Composable () -> Unit,
 ) {
-  val colorScheme =
-    when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-        val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      darkTheme -> DarkColorScheme
-      else -> LightColorScheme
-    }
-
-  MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+    val colorScheme = DarkColorScheme
+    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }
+
 

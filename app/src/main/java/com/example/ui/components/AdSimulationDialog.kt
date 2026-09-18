@@ -3,6 +3,7 @@ package com.example.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,20 +44,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeFlame
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonCyan
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadePurple
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextMuted
 import kotlinx.coroutines.delay
 
 enum class AdPurpose {
@@ -75,29 +85,35 @@ fun AdPromptDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = Color.White,
+            shape = RoundedCornerShape(26.dp),
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(10.dp)
                 .testTag("ad_prompt_dialog")
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header Badge
+                // Top Squircle
                 Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFEFF6FF),
-                    modifier = Modifier.size(64.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    color = ArcadeFlame,
+                    modifier = Modifier.size(56.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Brush.linearGradient(listOf(ArcadeFlame, ArcadeGold)))
+                    ) {
                         Icon(
                             imageVector = Icons.Rounded.Videocam,
                             contentDescription = "Rewarded Ad",
-                            tint = TailwindBlue,
-                            modifier = Modifier.size(32.dp)
+                            tint = Color.Black,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -106,47 +122,50 @@ fun AdPromptDialog(
 
                 val title = when (purpose) {
                     AdPurpose.UNLOCK_LEVEL -> "Unlock Logo $levelNumber"
-                    AdPurpose.REMOVE_WRONG_LETTERS -> "Remove 3 Wrong Letters"
+                    AdPurpose.REMOVE_WRONG_LETTERS -> "Remove 3 Letters"
                     AdPurpose.REVEAL_LETTER -> "Reveal Next Letter"
                     AdPurpose.EARN_COINS -> "Earn +50 Free Coins"
                 }
 
                 val subtitle = when (purpose) {
-                    AdPurpose.UNLOCK_LEVEL -> "Logos 6 and above are locked. Watch a quick 5-second video to permanently unlock this logo!"
-                    AdPurpose.REMOVE_WRONG_LETTERS -> "Watch a quick video to eliminate 3 distracting letter tiles from the scrambled bank."
+                    AdPurpose.UNLOCK_LEVEL -> "Logos 6 and above are locked. Watch a short 5-second video to permanently unlock this logo!"
+                    AdPurpose.REMOVE_WRONG_LETTERS -> "Watch a quick video to eliminate 3 distracting decoy letters from the keyboard."
                     AdPurpose.REVEAL_LETTER -> "Watch a short video to place the next correct letter in your answer slots."
                     AdPurpose.EARN_COINS -> "Watch a short video to instantly claim 50 free game coins!"
                 }
 
                 Text(
                     text = title,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = subtitle,
-                    fontSize = 14.sp,
-                    color = Slate700,
+                    fontSize = 12.5.sp,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 17.sp
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFF1F5F9)
+                    color = ArcadeCardSecondary,
+                    border = BorderStroke(0.5.dp, ArcadeBorder)
                 ) {
                     Text(
-                        text = "LevelPlay · Rewarded Ad",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Slate700,
+                        text = "LEVELPLAY · REWARDED SPONSOR",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp,
+                        color = ArcadeNeonCyan,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -155,8 +174,8 @@ fun AdPromptDialog(
 
                 Button(
                     onClick = onConfirmWatch,
-                    colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
-                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
@@ -165,13 +184,16 @@ fun AdPromptDialog(
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = null,
+                        tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Watch Video to Unlock",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp
+                        text = "WATCH VIDEO TO UNLOCK",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 13.sp,
+                        letterSpacing = 0.5.sp,
+                        color = Color.Black
                     )
                 }
 
@@ -179,8 +201,8 @@ fun AdPromptDialog(
 
                 OutlinedButton(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(14.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Slate200),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
@@ -188,8 +210,9 @@ fun AdPromptDialog(
                 ) {
                     Text(
                         text = "Not Now",
-                        color = Slate700,
-                        fontSize = 14.sp
+                        color = ArcadeTextDim,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -224,7 +247,7 @@ fun RewardedAdPlayerModal(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.94f))
+                .background(Color(0xFF0A0A10).copy(alpha = 0.96f))
                 .testTag("rewarded_ad_player")
         ) {
             Column(
@@ -233,22 +256,24 @@ fun RewardedAdPlayerModal(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Top header bar
+                // Top Header Bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color.White.copy(alpha = 0.2f)
+                        shape = RoundedCornerShape(10.dp),
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder)
                     ) {
                         Text(
-                            text = "LevelPlay · Rewarded",
-                            color = Color.White,
-                            fontSize = 12.sp,
+                            text = "LevelPlay · Rewarded Video",
+                            color = ArcadeTextDim,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         )
                     }
 
@@ -257,20 +282,20 @@ fun RewardedAdPlayerModal(
                             Icon(
                                 imageVector = Icons.Rounded.Close,
                                 contentDescription = "Close ad and claim reward",
-                                tint = Color.White
+                                tint = ArcadeText
                             )
                         }
                     } else {
                         Surface(
                             shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.25f),
-                            modifier = Modifier.padding(4.dp)
+                            color = ArcadeCardElevated,
+                            border = BorderStroke(1.dp, ArcadeBorder)
                         ) {
                             Text(
                                 text = "Reward in ${secondsLeft}s",
-                                color = Color.White,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
+                                color = ArcadeNeonCyan,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Black,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
                         }
@@ -279,8 +304,9 @@ fun RewardedAdPlayerModal(
 
                 // Center Ad Creative Preview
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF1E293B),
+                    shape = RoundedCornerShape(26.dp),
+                    color = ArcadeCard,
+                    border = BorderStroke(1.dp, ArcadeBorderBright),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 24.dp)
@@ -289,18 +315,22 @@ fun RewardedAdPlayerModal(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Game Sponsor Avatar
                         Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = TailwindBlue,
+                            shape = RoundedCornerShape(20.dp),
+                            color = ArcadePurple,
                             modifier = Modifier.size(72.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Brush.linearGradient(listOf(ArcadePurple, ArcadeNeonCyan))),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Star,
                                     contentDescription = null,
-                                    tint = Color(0xFFFDE047),
-                                    modifier = Modifier.size(44.dp)
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(42.dp)
                                 )
                             }
                         }
@@ -309,9 +339,9 @@ fun RewardedAdPlayerModal(
 
                         Text(
                             text = "Super Trivia Quest 3D",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            color = ArcadeText,
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Black,
                             textAlign = TextAlign.Center
                         )
 
@@ -319,9 +349,10 @@ fun RewardedAdPlayerModal(
 
                         Text(
                             text = "Test your brain with 10,000+ brand & logo puzzles! Free on Google Play.",
-                            color = Color(0xFF94A3B8),
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
+                            color = ArcadeTextDim,
+                            fontSize = 12.5.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 17.sp
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -333,8 +364,8 @@ fun RewardedAdPlayerModal(
                                     .fillMaxWidth()
                                     .height(6.dp)
                                     .clip(RoundedCornerShape(3.dp)),
-                                color = TailwindBlue,
-                                trackColor = Color(0xFF334155)
+                                color = ArcadeNeonGreen,
+                                trackColor = Color(0xFF1E1E2E)
                             )
                         } else {
                             Row(
@@ -344,7 +375,7 @@ fun RewardedAdPlayerModal(
                                 Icon(
                                     imageVector = Icons.Rounded.CheckCircle,
                                     contentDescription = null,
-                                    tint = EmeraldSuccess,
+                                    tint = ArcadeNeonGreen,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -356,9 +387,9 @@ fun RewardedAdPlayerModal(
                                 }
                                 Text(
                                     text = rewardLabel,
-                                    color = EmeraldSuccess,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    color = ArcadeNeonGreen,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 15.sp
                                 )
                             }
                         }
@@ -368,37 +399,37 @@ fun RewardedAdPlayerModal(
                 // Bottom Action Button
                 if (isFinished) {
                     Button(
-                        onClick = {
-                            onAdCompleted()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = EmeraldSuccess),
-                        shape = RoundedCornerShape(14.dp),
+                        onClick = { onAdCompleted() },
+                        colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
+                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp)
                             .testTag("claim_ad_reward_button")
                     ) {
                         val buttonLabel = when (purpose) {
-                            AdPurpose.EARN_COINS -> "Claim +50 Coins & Continue"
-                            AdPurpose.UNLOCK_LEVEL -> "Play Unlocked Level"
-                            else -> "Claim Reward & Continue"
+                            AdPurpose.EARN_COINS -> "CLAIM +50 COINS & CONTINUE"
+                            AdPurpose.UNLOCK_LEVEL -> "PLAY UNLOCKED LEVEL"
+                            else -> "CLAIM REWARD & CONTINUE"
                         }
                         Text(
                             text = buttonLabel,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp,
+                            color = Color.Black
                         )
                     }
                 } else {
                     OutlinedButton(
                         onClick = { showWarningDialog = true },
                         shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, ArcadeBorder),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(bottom = 8.dp)
                     ) {
-                        Text("Skip (Lose Reward)", color = Color.LightGray, fontSize = 12.sp)
+                        Text("Skip (Lose Reward)", color = ArcadeTextMuted, fontSize = 12.sp)
                     }
                 }
             }
@@ -407,8 +438,9 @@ fun RewardedAdPlayerModal(
         if (showWarningDialog) {
             Dialog(onDismissRequest = { showWarningDialog = false }) {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color.White,
+                    shape = RoundedCornerShape(20.dp),
+                    color = ArcadeCard,
+                    border = BorderStroke(1.dp, ArcadeBorderBright),
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Column(
@@ -417,15 +449,15 @@ fun RewardedAdPlayerModal(
                     ) {
                         Text(
                             text = "Skip Video Early?",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
-                            color = Slate900
+                            color = ArcadeText
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "If you close before the video ends, the stage or hint will remain locked.",
-                            fontSize = 13.sp,
-                            color = Slate700,
+                            text = "If you close before the video ends, the stage or power-up will remain locked.",
+                            fontSize = 12.5.sp,
+                            color = ArcadeTextDim,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -438,18 +470,19 @@ fun RewardedAdPlayerModal(
                                     showWarningDialog = false
                                     onClose()
                                 },
-                                shape = RoundedCornerShape(10.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, ArcadeBorder),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Close", color = Color(0xFFEF4444), fontSize = 13.sp)
+                                Text("Close", color = Color(0xFFEF4444), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                             Button(
                                 onClick = { showWarningDialog = false },
-                                colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
-                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
+                                shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Resume", color = Color.White, fontSize = 13.sp)
+                                Text("Resume", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Black)
                             }
                         }
                     }
@@ -468,9 +501,9 @@ fun LevelPlayAdLoadingModal(
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false)
     ) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White,
-            shadowElevation = 8.dp,
+            shape = RoundedCornerShape(22.dp),
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
@@ -480,25 +513,26 @@ fun LevelPlayAdLoadingModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressIndicator(
-                    color = TailwindBlue,
-                    modifier = Modifier.size(44.dp)
+                    color = ArcadeNeonCyan,
+                    modifier = Modifier.size(40.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "Loading LevelPlay Ad...",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "Placement: LevelPlay Rewarded\nAd Unit: wljj57ixzqvzvcxo",
-                    fontSize = 12.sp,
-                    color = Slate700,
+                    fontSize = 11.sp,
+                    fontFamily = FontFamily.Monospace,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center
                 )
 
@@ -506,10 +540,11 @@ fun LevelPlayAdLoadingModal(
 
                 OutlinedButton(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = Slate700, fontSize = 13.sp)
+                    Text("Cancel", color = ArcadeTextDim, fontSize = 13.sp)
                 }
             }
         }
@@ -528,9 +563,9 @@ fun LevelPlayAdErrorModal(
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White,
-            shadowElevation = 8.dp,
+            shape = RoundedCornerShape(22.dp),
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -541,8 +576,8 @@ fun LevelPlayAdErrorModal(
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFFEF2F2),
-                    modifier = Modifier.size(48.dp)
+                    color = Color(0x33EF4444),
+                    modifier = Modifier.size(46.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
@@ -558,9 +593,9 @@ fun LevelPlayAdErrorModal(
 
                 Text(
                     text = "Ad Notice",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -568,7 +603,7 @@ fun LevelPlayAdErrorModal(
                 Text(
                     text = errorMessage,
                     fontSize = 12.sp,
-                    color = Slate700,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center
                 )
 
@@ -576,13 +611,13 @@ fun LevelPlayAdErrorModal(
 
                 Button(
                     onClick = onRetry,
-                    colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
                 ) {
-                    Text("Retry Ad", fontWeight = FontWeight.SemiBold)
+                    Text("Retry Ad", fontWeight = FontWeight.Black, color = Color.Black)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -590,11 +625,12 @@ fun LevelPlayAdErrorModal(
                 OutlinedButton(
                     onClick = onFallback,
                     shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
                 ) {
-                    Text("Watch Simulation Player", color = Slate900, fontWeight = FontWeight.Medium)
+                    Text("Watch Simulation Player", color = ArcadeText, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -603,10 +639,9 @@ fun LevelPlayAdErrorModal(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Close", color = Slate700, fontSize = 13.sp)
+                    Text("Close", color = ArcadeTextDim, fontSize = 13.sp)
                 }
             }
         }
     }
 }
-

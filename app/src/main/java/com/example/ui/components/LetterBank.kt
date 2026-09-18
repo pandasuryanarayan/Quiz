@@ -1,7 +1,6 @@
 package com.example.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -21,28 +20,33 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Backspace
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.TailwindBlue
-import com.example.ui.theme.WarmBorder
-import com.example.ui.theme.WarmSurface2
-import com.example.ui.theme.WarmText
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderSubtle
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeKeyBg
+import com.example.ui.theme.ArcadeKeyBorder
+import com.example.ui.theme.ArcadeKeyDisabled
+import com.example.ui.theme.ArcadeKeyShadow
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextDisabled
+import com.example.ui.theme.ArcadeTextMuted
 
 data class BankTile(
     val id: Int,
@@ -69,156 +73,168 @@ fun LetterBank(
             .padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Controls row: Shuffle & Clear
+        // Controls row: Clear & Shuffle pills
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, Slate200),
+                shape = RoundedCornerShape(18.dp),
+                color = ArcadeCardElevated,
+                border = BorderStroke(1.dp, ArcadeBorder),
                 modifier = Modifier
-                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                    .clickable { onShuffle() }
-                    .testTag("shuffle_button")
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Shuffle,
-                        contentDescription = "Shuffle letter bank",
-                        tint = TailwindBlue,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Shuffle",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TailwindBlue
-                    )
-                }
-            }
-
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, Slate200),
-                modifier = Modifier
-                    .shadow(1.dp, RoundedCornerShape(12.dp))
                     .clickable { onClearAll() }
                     .testTag("clear_button")
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Backspace,
-                        contentDescription = "Clear all slots",
-                        tint = Color(0xFFEF4444),
-                        modifier = Modifier.size(16.dp)
+                        imageVector = Icons.Rounded.Refresh,
+                        contentDescription = "Clear",
+                        tint = ArcadeTextDim,
+                        modifier = Modifier.size(15.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = "Clear",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFFEF4444)
+                        text = "CLEAR",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp,
+                        color = ArcadeTextDim
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Surface(
+                shape = RoundedCornerShape(18.dp),
+                color = ArcadeCardElevated,
+                border = BorderStroke(1.dp, ArcadeBorder),
+                modifier = Modifier
+                    .clickable { onShuffle() }
+                    .testTag("shuffle_button")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Shuffle,
+                        contentDescription = "Shuffle",
+                        tint = ArcadeTextDim,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = "SHUFFLE",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp,
+                        color = ArcadeTextDim
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
-        // First row of tiles
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        // Keyboard Container
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = ArcadeCardSecondary,
+            border = BorderStroke(1.dp, ArcadeBorderSubtle),
             modifier = Modifier.fillMaxWidth()
         ) {
-            firstRow.forEach { tile ->
-                BankTileItem(tile = tile, onClick = { onTileClick(tile.id) })
-            }
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // First row of letters
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
+                ) {
+                    firstRow.forEach { tile ->
+                        BankKeyTile(
+                            tile = tile,
+                            onClick = { onTileClick(tile.id) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("bank_tile_${tile.id}")
+                        )
+                    }
+                }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Second row of tiles
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            secondRow.forEach { tile ->
-                BankTileItem(tile = tile, onClick = { onTileClick(tile.id) })
+                // Second row of letters
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
+                ) {
+                    secondRow.forEach { tile ->
+                        BankKeyTile(
+                            tile = tile,
+                            onClick = { onTileClick(tile.id) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("bank_tile_${tile.id}")
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun BankTileItem(
+private fun BankKeyTile(
     tile: BankTile,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val isVisible = !tile.isUsed && !tile.isRemovedByHint
-
-    Box(
-        modifier = Modifier.size(width = 44.dp, height = 48.dp),
-        contentAlignment = Alignment.Center
+    AnimatedVisibility(
+        visible = !tile.isRemovedByHint,
+        enter = fadeIn() + scaleIn(),
+        exit = fadeOut() + scaleOut(),
+        modifier = modifier
     ) {
-        AnimatedVisibility(
-            visible = isVisible,
-            enter = fadeIn(tween(150)) + scaleIn(tween(150)),
-            exit = fadeOut(tween(150)) + scaleOut(tween(150))
-        ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .shadow(elevation = 1.dp, shape = RoundedCornerShape(8.dp))
-                    .clickable { onClick() }
-                    .testTag("bank_tile_${tile.id}"),
-                shape = RoundedCornerShape(8.dp),
-                color = WarmSurface2,
-                border = BorderStroke(1.dp, WarmBorder)
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = tile.char.toString(),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = WarmText
-                    )
-                }
-            }
-        }
+        val isEnabled = !tile.isUsed && !tile.isRemovedByHint
 
-        if (tile.isRemovedByHint) {
-            // Disabled crossed-out placeholder
-            Surface(
+        Surface(
+            modifier = Modifier
+                .height(52.dp)
+                .clickable(enabled = isEnabled) { onClick() },
+            shape = RoundedCornerShape(14.dp),
+            color = if (isEnabled) ArcadeKeyBg else ArcadeKeyDisabled,
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (isEnabled) ArcadeBorderSubtle else ArcadeKeyBorder
+            )
+        ) {
+            Box(
                 modifier = Modifier.fillMaxSize(),
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFF1F5F9),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+                contentAlignment = Alignment.Center
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = tile.char.toString(),
-                        fontSize = 18.sp,
-                        color = Slate400,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                Text(
+                    text = tile.char.toString(),
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Black,
+                    color = if (isEnabled) ArcadeText else ArcadeTextDisabled
+                )
             }
         }
+    }
+
+    if (tile.isRemovedByHint) {
+        Spacer(modifier = modifier.height(52.dp))
     }
 }

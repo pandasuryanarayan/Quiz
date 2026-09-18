@@ -42,11 +42,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.data.QuizLevel
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate500
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
 
 @Composable
 fun LockedLevelDialog(
@@ -75,12 +76,13 @@ fun LockedLevelDialog(
     ) {
         Surface(
             shape = RoundedCornerShape(26.dp),
-            color = Color.White,
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(scale)
-                .shadow(12.dp, RoundedCornerShape(26.dp))
-                .padding(16.dp)
+                .shadow(16.dp, RoundedCornerShape(26.dp))
+                .padding(4.dp)
                 .testTag("locked_level_dialog")
         ) {
             Column(
@@ -89,39 +91,39 @@ fun LockedLevelDialog(
             ) {
                 // Lock Icon Emblem
                 Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFFEF2F2),
-                    border = BorderStroke(1.5.dp, Color(0xFFFECACA)),
-                    modifier = Modifier.size(68.dp)
+                    shape = RoundedCornerShape(18.dp),
+                    color = Color(0x33EF4444),
+                    border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                    modifier = Modifier.size(60.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Rounded.Lock,
                             contentDescription = "Locked",
-                            tint = Color(0xFFDC2626),
-                            modifier = Modifier.size(34.dp)
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(30.dp)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
                     text = "Logo ${targetLevel.levelNumber} is Locked",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "Complete Logo ${requiredLevel.levelNumber} first to unlock this logo!\nAll logos unlock in sequence as you solve them.",
-                    fontSize = 14.sp,
-                    color = Slate700,
+                    fontSize = 12.5.sp,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 17.sp
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -132,7 +134,7 @@ fun LockedLevelDialog(
                         onPlayRequiredLevel(requiredLevel.id)
                     },
                     shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TailwindBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
@@ -141,13 +143,16 @@ fun LockedLevelDialog(
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = null,
+                        tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Play Logo ${requiredLevel.levelNumber}",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        text = "PLAY LOGO ${requiredLevel.levelNumber}",
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 0.5.sp,
+                        color = Color.Black
                     )
                 }
 
@@ -157,7 +162,7 @@ fun LockedLevelDialog(
                 OutlinedButton(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Slate200),
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
@@ -165,9 +170,9 @@ fun LockedLevelDialog(
                 ) {
                     Text(
                         text = "Close",
-                        color = Slate500,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                        color = ArcadeTextDim,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

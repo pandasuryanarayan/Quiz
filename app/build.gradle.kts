@@ -17,16 +17,13 @@ android {
     applicationId = "com.suryalabs.logoquiz"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 2
+    versionName = "1.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     // Keep only English strings: ad/network SDKs bundle 100+ locales we don't need.
     resourceConfigurations += listOf("en")
-
-    // Drop x86/x86_64 (emulator-only ABIs). Real phones are arm64-v8a/armeabi-v7a.
-    ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
   }
 
   signingConfigs {
@@ -64,7 +61,7 @@ android {
     abi {
       isEnable = true
       reset()
-      include("armeabi-v7a", "arm64-v8a")
+      include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
       isUniversalApk = true
     }
   }

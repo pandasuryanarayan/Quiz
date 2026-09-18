@@ -53,6 +53,15 @@ object RemoteLogoSyncManager {
                 if (rawUrl.isNullOrBlank() || !rawUrl.startsWith(CDN_BASE_URL)) {
                     continue
                 }
+                // Avoid loading cached duplicates of bundled authentic levels
+                val isDuplicateOfBundled = QuizPackData.bundledLevels.any { bundled ->
+                    bundled.id == obj.getString("id") ||
+                            (bundled.packId == obj.getString("packId") && bundled.answer.equals(obj.getString("answer"), ignoreCase = true)) ||
+                            bundled.imageUrl.equals(rawUrl, ignoreCase = true)
+                }
+                if (isDuplicateOfBundled) {
+                    continue
+                }
                 list.add(
                     QuizLevel(
                         id = obj.getString("id"),
@@ -134,17 +143,19 @@ object RemoteLogoSyncManager {
                     seenInThisRun.add(cleanAnswer)
 
                     val cdnUrl = QuizPackData.buildCdnUrl(folderName, fileName)
+                    val resolved = resolveBrandMeta(folderName, fileName, packCategory.title)
 
                     // Check if already registered
                     val alreadyRegistered = existingPackLevels.any { lvl ->
-                        lvl.imageUrl == cdnUrl ||
+                        lvl.imageUrl.equals(cdnUrl, ignoreCase = true) ||
                                 lvl.answer.equals(cleanAnswer, ignoreCase = true) ||
-                                lvl.logoKey.equals(cleanAnswer, ignoreCase = true)
+                                lvl.answer.equals(resolved.answer, ignoreCase = true) ||
+                                lvl.logoKey.equals(cleanAnswer, ignoreCase = true) ||
+                                lvl.originalName.equals(resolved.originalName, ignoreCase = true)
                     }
 
                     if (!alreadyRegistered) {
                         val newLevelNumber = (existingPackLevels.maxOfOrNull { it.levelNumber } ?: 0) + 1
-                        val resolved = resolveBrandMeta(folderName, fileName, packCategory.title)
 
                         val newLevel = QuizLevel(
                             id = "${packCategory.id}_$newLevelNumber",

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -52,6 +53,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,12 +64,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate500
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.Slate900
-import com.example.ui.theme.TailwindBlue
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextMuted
 import com.example.util.AdminSecurity
 
 @Composable
@@ -101,13 +106,12 @@ fun AdminPasswordDialog(
             return
         }
 
-        // Cryptographic verification via SHA-256 hash
-        val isVerified = AdminSecurity.verifyPassword(passwordInput.trim())
-        if (isVerified) {
+        if (AdminSecurity.verifyPassword(passwordInput.trim())) {
+            isError = false
             onSuccess()
         } else {
             isError = true
-            errorMessage = "Incorrect password. Access denied."
+            errorMessage = "Invalid admin password"
         }
     }
 
@@ -117,13 +121,13 @@ fun AdminPasswordDialog(
     ) {
         Surface(
             shape = RoundedCornerShape(26.dp),
-            color = Color.White,
-            contentColor = Slate900,
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = Modifier
                 .fillMaxWidth()
                 .scale(scale)
                 .shadow(16.dp, RoundedCornerShape(26.dp))
-                .padding(16.dp)
+                .padding(4.dp)
                 .testTag("admin_password_dialog")
         ) {
             Column(
@@ -132,49 +136,45 @@ fun AdminPasswordDialog(
             ) {
                 // Emblem
                 Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFEFF6FF),
-                    border = BorderStroke(1.5.dp, Color(0xFFBFDBFE)),
-                    modifier = Modifier.size(64.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF0E2A1A),
+                    border = BorderStroke(1.dp, ArcadeNeonGreen.copy(alpha = 0.5f)),
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.background(
-                            Brush.linearGradient(
-                                listOf(Color(0xFF2563EB), Color(0xFF1D4ED8))
-                            )
-                        )
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.AdminPanelSettings,
                             contentDescription = "Admin verification",
-                            tint = Color.White,
-                            modifier = Modifier.size(34.dp)
+                            tint = ArcadeNeonGreen,
+                            modifier = Modifier.size(30.dp)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
-                    text = "Admin Access",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Slate900,
+                    text = "Admin Sandbox Login",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Enter the security password to unlock all logos across every category for testing.",
-                    fontSize = 13.sp,
-                    color = Slate500,
+                    text = "Enter the security password to unlock all logos across every category for sandbox testing.",
+                    fontSize = 12.sp,
+                    color = ArcadeTextDim,
                     textAlign = TextAlign.Center,
-                    lineHeight = 18.sp
+                    lineHeight = 16.sp
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 // Password TextField
                 OutlinedTextField(
@@ -187,12 +187,12 @@ fun AdminPasswordDialog(
                         }
                     },
                     textStyle = TextStyle(
-                        color = Slate900,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium
+                        color = ArcadeText,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     ),
-                    label = { Text("Password", color = if (isError) Color(0xFFDC2626) else Slate700) },
-                    placeholder = { Text("Enter admin password", color = Slate400) },
+                    label = { Text("Password", color = if (isError) Color(0xFFEF4444) else ArcadeTextDim) },
+                    placeholder = { Text("Enter admin password", color = ArcadeTextMuted) },
                     singleLine = true,
                     isError = isError,
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -207,8 +207,8 @@ fun AdminPasswordDialog(
                         Icon(
                             imageVector = Icons.Rounded.Lock,
                             contentDescription = null,
-                            tint = if (isError) Color(0xFFDC2626) else TailwindBlue,
-                            modifier = Modifier.size(20.dp)
+                            tint = if (isError) Color(0xFFEF4444) else ArcadeNeonGreen,
+                            modifier = Modifier.size(18.dp)
                         )
                     },
                     trailingIcon = {
@@ -219,25 +219,25 @@ fun AdminPasswordDialog(
                             Icon(
                                 imageVector = if (isPasswordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
                                 contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
-                                tint = if (isPasswordVisible) TailwindBlue else Slate400,
-                                modifier = Modifier.size(20.dp)
+                                tint = ArcadeTextDim,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     },
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Slate900,
-                        unfocusedTextColor = Slate900,
-                        focusedContainerColor = Color(0xFFF8FAFC),
-                        unfocusedContainerColor = Color(0xFFF8FAFC),
-                        focusedBorderColor = TailwindBlue,
-                        unfocusedBorderColor = Slate200,
-                        focusedLabelColor = TailwindBlue,
-                        unfocusedLabelColor = Slate500,
-                        cursorColor = TailwindBlue,
-                        errorTextColor = Slate900,
-                        errorBorderColor = Color(0xFFDC2626),
-                        errorCursorColor = Color(0xFFDC2626)
+                        focusedTextColor = ArcadeText,
+                        unfocusedTextColor = ArcadeText,
+                        focusedContainerColor = ArcadeCardSecondary,
+                        unfocusedContainerColor = ArcadeCardSecondary,
+                        focusedBorderColor = ArcadeNeonGreen,
+                        unfocusedBorderColor = ArcadeBorder,
+                        focusedLabelColor = ArcadeNeonGreen,
+                        unfocusedLabelColor = ArcadeTextDim,
+                        cursorColor = ArcadeNeonGreen,
+                        errorTextColor = ArcadeText,
+                        errorBorderColor = Color(0xFFEF4444),
+                        errorCursorColor = Color(0xFFEF4444)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -258,26 +258,26 @@ fun AdminPasswordDialog(
                         Icon(
                             imageVector = Icons.Rounded.ErrorOutline,
                             contentDescription = null,
-                            tint = Color(0xFFDC2626),
+                            tint = Color(0xFFEF4444),
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = errorMessage,
-                            color = Color(0xFFDC2626),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
+                            color = Color(0xFFEF4444),
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 // Actions: Verify & Cancel
                 Button(
                     onClick = { attemptVerify() },
                     shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
+                    colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
@@ -286,15 +286,15 @@ fun AdminPasswordDialog(
                     Icon(
                         imageVector = Icons.Rounded.Check,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = Color.Black,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Verify & Proceed",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Black
                     )
                 }
 
@@ -303,7 +303,7 @@ fun AdminPasswordDialog(
                 OutlinedButton(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Slate200),
+                    border = BorderStroke(1.dp, ArcadeBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
@@ -311,9 +311,9 @@ fun AdminPasswordDialog(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = Slate500,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                        color = ArcadeTextDim,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

@@ -60,4 +60,10 @@ interface QuizDao {
 
     @Query("UPDATE user_profile SET adsWatched = adsWatched + 1 WHERE id = 1")
     suspend fun incrementAdsWatched()
+
+    @Query("UPDATE level_progress SET isCompleted = 0, stars = 0, hintsUsed = 0, solvedTimestamp = 0, isUnlocked = CASE WHEN levelNumber = 1 THEN 1 ELSE 0 END")
+    suspend fun resetAllLevelProgress()
+
+    @Query("UPDATE user_profile SET coins = :defaultCoins, totalXp = 0, levelsSolved = 0, adsWatched = 0 WHERE id = 1")
+    suspend fun resetUserProfile(defaultCoins: Int = 150)
 }

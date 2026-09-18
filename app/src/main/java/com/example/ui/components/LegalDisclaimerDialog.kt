@@ -1,8 +1,5 @@
 package com.example.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -22,56 +20,48 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Gavel
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.WarmBg
-import com.example.ui.theme.WarmBorder
-import com.example.ui.theme.WarmBorderBright
-import com.example.ui.theme.WarmSurface2
-import com.example.ui.theme.WarmText
-import com.example.ui.theme.WarmTextDim
-import com.example.ui.theme.WireAmber
-import com.example.ui.theme.WireAmberDim
-import com.example.ui.theme.WireTeal
-import com.example.ui.theme.WireTealDim
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeBorderSubtle
+import com.example.ui.theme.ArcadeCanvas
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeCardSecondary
+import com.example.ui.theme.ArcadeFlame
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonCyan
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadePurple
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextMuted
 
-/**
- * Dialog displaying legal disclaimer, brand trademark ownership disclosures,
- * indicative representation notices, and nominative fair use compliance.
- *
- * @param isAgreementMode If true, requires the user to scroll to the bottom to enable "I Agree".
- * @param onAgree Invoked when user agrees to the disclaimer terms.
- * @param onDismiss Invoked when user dismisses or declines.
- */
 @Composable
 fun LegalDisclaimerDialog(
     isAgreementMode: Boolean = false,
@@ -80,19 +70,6 @@ fun LegalDisclaimerDialog(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    var hasScrolledToBottom by remember { mutableStateOf(false) }
-
-    // Track scroll completion: once scrolled near bottom or if content fits without scrolling
-    LaunchedEffect(scrollState.value, scrollState.maxValue) {
-        if (scrollState.maxValue > 0) {
-            if (scrollState.value >= scrollState.maxValue - 24) {
-                hasScrolledToBottom = true
-            }
-        } else {
-            // Fits within viewport without scrolling (e.g., large tablets)
-            hasScrolledToBottom = true
-        }
-    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -103,274 +80,180 @@ fun LegalDisclaimerDialog(
         )
     ) {
         Surface(
+            shape = RoundedCornerShape(26.dp),
+            color = ArcadeCard,
+            border = BorderStroke(1.dp, ArcadeBorderBright),
             modifier = modifier
-                .padding(horizontal = 20.dp, vertical = 28.dp)
-                .widthIn(max = 500.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            color = Color.White,
-            shadowElevation = 12.dp,
-            border = BorderStroke(1.dp, WarmBorderBright)
+                .fillMaxWidth(0.92f)
+                .widthIn(max = 520.dp)
+                .heightIn(max = 620.dp)
+                .testTag("legal_disclaimer_dialog")
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp)
-            ) {
-                // Header Bar
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Rainbow Top Gradient Strip
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
+                        .height(5.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(ArcadeFlame, ArcadeGold, ArcadeNeonGreen, ArcadePurple)
+                            )
+                        )
+                )
+
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(
-                            shape = CircleShape,
-                            color = WireTealDim,
-                            modifier = Modifier.size(42.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            color = ArcadeFlame,
+                            modifier = Modifier.size(40.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Brush.linearGradient(listOf(ArcadeFlame, ArcadeGold))),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Icon(
-                                    imageVector = Icons.Rounded.Gavel,
+                                    imageVector = Icons.Rounded.Description,
                                     contentDescription = null,
-                                    tint = WireTeal,
+                                    tint = ArcadeCanvas,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
                         }
+
                         Spacer(modifier = Modifier.width(12.dp))
+
                         Column {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = WireAmberDim,
-                                modifier = Modifier.padding(bottom = 2.dp)
-                            ) {
-                                Text(
-                                    text = "LEGAL & TRADEMARK NOTICE",
-                                    fontSize = 9.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = WireAmber,
-                                    letterSpacing = 0.5.sp,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
                             Text(
-                                text = "Terms & Disclaimer",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = WarmText
+                                text = "Legal & Trademark Notice",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Black,
+                                color = ArcadeText
+                            )
+                            Text(
+                                text = "QUEST LORE • FAIR USE DOCTRINE",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp,
+                                color = ArcadeFlame
                             )
                         }
                     }
 
-                    if (!isAgreementMode) {
-                        IconButton(
-                            onClick = onDismiss,
-                            modifier = Modifier.testTag("disclaimer_close_icon_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Close,
-                                contentDescription = "Close",
-                                tint = WarmTextDim
-                            )
-                        }
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = "Close",
+                            tint = ArcadeTextDim,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
-                HorizontalDivider(color = WarmBorder, thickness = 1.dp)
-
-                // Scrollable Content
+                // Scrollable Lore Body
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 440.dp)
-                        .weight(1f, fill = false)
-                        .verticalScroll(scrollState)
-                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    // Region Chips Banner
+                    LoreNoticeCard(
+                        title = "Brand Ownership",
+                        text = "All brand names, trademarks, logos, and registered visual marks displayed in this application are the exclusive property of their respective trademark holders and corporate owners.",
+                        icon = Icons.Rounded.Shield,
+                        accent = ArcadeFlame
+                    )
+
+                    LoreNoticeCard(
+                        title = "Fair Use Doctrine",
+                        text = "The depiction of these marks is conducted strictly under the nominative fair use doctrine of United States Trademark Law (15 U.S.C. § 1125(c)(3)) and international trademark provisions for educational trivia, cultural recognition, and descriptive puzzle identification.",
+                        icon = Icons.Rounded.Gavel,
+                        accent = ArcadeGold
+                    )
+
+                    LoreNoticeCard(
+                        title = "No Affiliation or Endorsement",
+                        text = "The creators, operators, and contributors of Logo Quiz have no direct affiliation, commercial partnership, sponsorship, or endorsement with any corporation, brand, institution, or trademark holder depicted within this game.",
+                        icon = Icons.Rounded.Public,
+                        accent = ArcadeNeonCyan
+                    )
+
+                    LoreNoticeCard(
+                        title = "As-Is Entertainment Warranty",
+                        text = "This quiz is provided entirely on an 'AS-IS' and 'AS-AVAILABLE' basis for recreational gaming. Brand information is curated for trivia enjoyment.",
+                        icon = Icons.Rounded.Security,
+                        accent = ArcadeNeonGreen
+                    )
+
+                    // Warning / Tribute Callout Banner
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = WarmSurface2,
-                        border = BorderStroke(1.dp, WarmBorder),
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0x33FF6B35),
+                        border = BorderStroke(1.dp, ArcadeFlame.copy(alpha = 0.5f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(10.dp)
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Public,
-                                contentDescription = null,
-                                tint = WireTeal,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            Text(text = "⚠️", fontSize = 18.sp)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Covering European, American, Indian, Chinese & Global Entities",
+                                text = "This is a fan-made tribute. We celebrate world-famous brands and culture, we do not claim them.",
                                 fontSize = 11.5.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = WarmText
+                                fontWeight = FontWeight.Bold,
+                                color = ArcadeText,
+                                lineHeight = 16.sp
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    DisclaimerSection(
-                        icon = Icons.Rounded.Shield,
-                        title = "1. Brand Ownership & Proprietary Rights",
-                        body = "All brand logos, trademarks, registered trademarks, service marks, trade dress, and product names referenced, displayed, or depicted in this application are the sole and exclusive intellectual property of their respective corporate owners, parent enterprises, and authorized affiliates.\n\nThe independent developer of this application has NO ownership rights, copyright claims, or proprietary interest in any of the displayed logos, trade names, or brand assets."
-                    )
-
-                    DisclaimerSection(
-                        icon = Icons.Rounded.Gavel,
-                        title = "2. Indicative & Stylized Representation",
-                        body = "Logos and graphical emblems presented in this trivia quiz are purely indicative and stylized for puzzle identification and educational gameplay. They may differ in color fidelity, geometry, or typography and may not match the official or current corporate design guidelines of the respective brand holders."
-                    )
-
-                    DisclaimerSection(
-                        icon = Icons.Rounded.Public,
-                        title = "3. Global Enterprise Scope",
-                        body = "This trivia game incorporates brand recognition challenges from diverse global jurisdictions, including but not limited to:\n" +
-                                "• European Enterprises: Iconic automotive, luxury fashion, and digital services (e.g., Ferrari, Porsche, BMW, Mercedes-Benz, Audi, Renault, Alfa Romeo, Spotify, etc.)\n" +
-                                "• American Corporations: Global technology leaders, consumer brands, and fast-food giants (e.g., Apple, Google, Microsoft, Amazon, Tesla, Nike, McDonald's, KFC, etc.)\n" +
-                                "• Indian Heritage & Modern Conglomerates: Automotive manufacturers, food & beverage titans, and dairy cooperatives (e.g., Tata Motors, Mahindra, Haldiram's, Parle, ITC, Mother Dairy, etc.)\n" +
-                                "• Chinese Multinational Mobility & Tech: Electric mobility innovators, smart manufacturing, and consumer tech (e.g., BYD, Geely, NIO, XPeng, Zeekr, etc.)\n" +
-                                "• As well as prominent brands from Japan, South Korea, and around the world."
-                    )
-
-                    DisclaimerSection(
-                        icon = Icons.Rounded.Shield,
-                        title = "4. Nominative Fair Use & Non-Affiliation",
-                        body = "The use of low-resolution or stylized brand marks in this application is strictly for non-commercial trivia, cultural recognition, and public education under the doctrine of Nominative Fair Use and comparable international fair dealing provisions.\n\nThis application is NOT affiliated with, sponsored by, endorsed by, or in partnership with any of the companies, brands, or trademark holders featured."
-                    )
-
-                    DisclaimerSection(
-                        icon = Icons.Rounded.Check,
-                        title = "5. Inquiries & Takedown Requests",
-                        body = "If you are a verified trademark owner or legal representative and have questions, modification requests, or takedown inquiries regarding any mark shown, please submit your notice via the application feedback or developer contact. Inquiries will be addressed promptly in good faith."
-                    )
 
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                HorizontalDivider(color = WarmBorder, thickness = 1.dp)
-
-                // Scroll Prompt if agreement mode and user hasn't scrolled to bottom yet
-                if (isAgreementMode && !hasScrolledToBottom) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+                // Bottom Action Footer
+                Surface(
+                    color = ArcadeCardElevated,
+                    border = BorderStroke(1.dp, ArcadeBorder),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+                            .padding(16.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = WireAmber,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Please scroll down to the bottom to agree",
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = WireAmber
-                        )
-                    }
-                }
-
-                // Action Buttons
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                ) {
-                    if (isAgreementMode) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedButton(
-                                onClick = onDismiss,
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, WarmBorderBright),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = WarmTextDim
-                                ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(48.dp)
-                                    .testTag("disclaimer_decline_button")
-                            ) {
-                                Text(
-                                    text = "Cancel",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Button(
-                                onClick = onAgree,
-                                enabled = hasScrolledToBottom,
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = WireTeal,
-                                    contentColor = Color.White,
-                                    disabledContainerColor = WarmSurface2,
-                                    disabledContentColor = WarmTextDim
-                                ),
-                                modifier = Modifier
-                                    .weight(1.3f)
-                                    .height(48.dp)
-                                    .testTag("disclaimer_agree_button")
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    if (hasScrolledToBottom) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Check,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                    }
-                                    Text(
-                                        text = "I Agree",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                    } else {
                         Button(
-                            onClick = onDismiss,
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = WireTeal,
-                                contentColor = Color.White
-                            ),
+                            onClick = {
+                                if (isAgreementMode) onAgree() else onDismiss()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = ArcadeNeonGreen),
+                            shape = RoundedCornerShape(16.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(48.dp)
-                                .testTag("disclaimer_understood_button")
+                                .testTag("legal_confirm_button")
                         ) {
                             Text(
-                                text = "Understood",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
+                                text = "✓ UNDERSTOOD, LET'S PLAY",
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp,
+                                color = Color.Black
                             )
                         }
                     }
@@ -381,47 +264,57 @@ fun LegalDisclaimerDialog(
 }
 
 @Composable
-private fun DisclaimerSection(
-    icon: ImageVector,
+private fun LoreNoticeCard(
     title: String,
-    body: String,
-    modifier: Modifier = Modifier
+    text: String,
+    icon: ImageVector,
+    accent: Color
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = WarmBg,
-        border = BorderStroke(1.dp, WarmBorder),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp)
+        shape = RoundedCornerShape(16.dp),
+        color = ArcadeCardSecondary,
+        border = BorderStroke(1.dp, ArcadeBorderSubtle),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = accent.copy(alpha = 0.15f),
+                modifier = Modifier.size(34.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = WireTeal,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(17.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = WarmText
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Black,
+                    color = ArcadeText
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = text,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = ArcadeTextDim,
+                    lineHeight = 15.sp
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = body,
-                fontSize = 12.sp,
-                color = WarmTextDim,
-                lineHeight = 17.sp
-            )
         }
     }
 }

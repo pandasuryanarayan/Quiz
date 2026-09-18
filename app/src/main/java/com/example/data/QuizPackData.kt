@@ -1250,13 +1250,43 @@ object QuizPackData {
         get() = dynamicLevelsList.toList()
 
     fun updateLevels(newLevels: List<QuizLevel>) {
+        val seenIds = mutableSetOf<String>()
+        val seenAnswers = mutableSetOf<String>()
+        val seenUrls = mutableSetOf<String>()
+        val deduplicated = mutableListOf<QuizLevel>()
+
+        for (lvl in newLevels) {
+            val ansKey = "${lvl.packId}:${lvl.answer.uppercase()}"
+            val urlKey = lvl.imageUrl?.lowercase()
+            val urlAlreadySeen = urlKey != null && urlKey in seenUrls
+            if (lvl.id !in seenIds && ansKey !in seenAnswers && !urlAlreadySeen) {
+                seenIds.add(lvl.id)
+                seenAnswers.add(ansKey)
+                if (urlKey != null) seenUrls.add(urlKey)
+                deduplicated.add(lvl)
+            }
+        }
         dynamicLevelsList.clear()
-        dynamicLevelsList.addAll(newLevels)
+        dynamicLevelsList.addAll(deduplicated)
     }
 
     fun addLevels(newLevels: List<QuizLevel>) {
-        val currentIds = dynamicLevelsList.map { it.id }.toSet()
-        val toAdd = newLevels.filter { it.id !in currentIds }
+        val existingIds = dynamicLevelsList.map { it.id }.toMutableSet()
+        val existingAnswers = dynamicLevelsList.map { "${it.packId}:${it.answer.uppercase()}" }.toMutableSet()
+        val existingUrls = dynamicLevelsList.mapNotNull { it.imageUrl?.lowercase() }.toMutableSet()
+
+        val toAdd = mutableListOf<QuizLevel>()
+        for (lvl in newLevels) {
+            val ansKey = "${lvl.packId}:${lvl.answer.uppercase()}"
+            val urlKey = lvl.imageUrl?.lowercase()
+            val urlAlreadySeen = urlKey != null && urlKey in existingUrls
+            if (lvl.id !in existingIds && ansKey !in existingAnswers && !urlAlreadySeen) {
+                existingIds.add(lvl.id)
+                existingAnswers.add(ansKey)
+                if (urlKey != null) existingUrls.add(urlKey)
+                toAdd.add(lvl)
+            }
+        }
         if (toAdd.isNotEmpty()) {
             dynamicLevelsList.addAll(toAdd)
         }

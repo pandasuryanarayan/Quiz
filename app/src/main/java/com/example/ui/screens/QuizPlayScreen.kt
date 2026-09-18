@@ -1,5 +1,10 @@
 package com.example.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,8 +24,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.MonetizationOn
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,11 +44,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.QuizLevel
@@ -53,18 +60,19 @@ import com.example.ui.components.LevelCompleteDialog
 import com.example.ui.components.LogoCard
 import com.example.ui.components.SlotItem
 import com.example.ui.components.SlotState
-import com.example.ui.theme.AmberStar
-import com.example.ui.theme.WarmBg
-import com.example.ui.theme.WarmBorder
-import com.example.ui.theme.WarmBorderBright
-import com.example.ui.theme.WarmSurface
-import com.example.ui.theme.WarmSurface2
-import com.example.ui.theme.WarmText
-import com.example.ui.theme.WarmTextDim
-import com.example.ui.theme.WireAmber
-import com.example.ui.theme.WireSage
-import com.example.ui.theme.WireTeal
-import com.example.ui.theme.WireTealDim
+import com.example.ui.theme.ArcadeBg
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeBorderBright
+import com.example.ui.theme.ArcadeCanvas
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeCardElevated
+import com.example.ui.theme.ArcadeFlame
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonCyan
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDim
+import com.example.ui.theme.ArcadeTextMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,81 +107,142 @@ fun QuizPlayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                navigationIcon = {
+                    Surface(
+                        shape = CircleShape,
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .size(38.dp)
+                            .clickable { onBack() }
+                            .testTag("back_button")
                     ) {
-                        // Sleek progress bar
-                        LinearProgressIndicator(
-                            progress = { progressFraction },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp)),
-                            color = WireTeal,
-                            trackColor = WarmBorder
-                        )
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        // Game Count e.g. "Logo 3/10"
-                        Text(
-                            text = "${level.levelNumber}/10",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = WarmTextDim
-                        )
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = "Close",
+                                tint = ArcadeText,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.testTag("back_button")
+                title = {
+                    // Level progress pill: level bubble + progress bar
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder),
+                        modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "Close",
-                            tint = WarmTextDim,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = ArcadeFlame,
+                                modifier = Modifier.size(20.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "${level.levelNumber}",
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 11.sp,
+                                        color = ArcadeCanvas
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            LinearProgressIndicator(
+                                progress = { progressFraction },
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .height(5.dp)
+                                    .clip(RoundedCornerShape(3.dp)),
+                                color = ArcadeFlame,
+                                trackColor = Color(0xFF0F0F18)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = "LEVEL ${level.levelNumber}",
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp,
+                                color = ArcadeTextDim
+                            )
+                        }
                     }
                 },
                 actions = {
                     // Coins Pill
                     Surface(
-                        shape = RoundedCornerShape(14.dp),
-                        color = Color(0xFFFEF3C7),
-                        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
+                        shape = RoundedCornerShape(16.dp),
+                        color = ArcadeCardElevated,
+                        border = BorderStroke(1.dp, ArcadeBorder),
                         modifier = Modifier
                             .clickable { onEarnCoinsClick() }
                             .testTag("play_earn_coins_button")
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.MonetizationOn,
-                                contentDescription = "Coins",
-                                tint = AmberStar,
-                                modifier = Modifier.size(15.dp)
-                            )
+                            Text(text = "🪙", fontSize = 12.sp)
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
                                 text = "$coins",
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Black,
                                 fontSize = 12.sp,
-                                color = Color(0xFFB45309)
+                                color = ArcadeText
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = "+",
+                                fontWeight = FontWeight.Black,
+                                fontSize = 11.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Hint Button in Top Bar
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = ArcadeGold,
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .size(34.dp)
+                            .clickable { onOpenHint() }
+                            .testTag("top_hint_button")
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Brush.linearGradient(listOf(ArcadeFlame, ArcadeGold))),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Lightbulb,
+                                contentDescription = "Hints",
+                                tint = Color.Black,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = ArcadeBg)
             )
         },
-        containerColor = WarmBg
+        containerColor = ArcadeBg
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -191,28 +260,16 @@ fun QuizPlayScreen(
             ) {
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Logo Area Box (Wireframe logo-box styling)
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = WarmSurface2,
-                    border = BorderStroke(2.dp, WarmBorderBright),
-                    modifier = Modifier
-                        .size(160.dp)
-                        .testTag("logo_display_card")
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LogoCard(
-                            logoKey = level.logoKey,
-                            imageUrl = level.imageUrl,
-                            cardSize = 150.dp
-                        )
-                    }
-                }
+                // Logo Area Box
+                LogoCard(
+                    logoKey = level.logoKey,
+                    imageUrl = level.imageUrl,
+                    clueText = level.hintSentence.ifBlank { "GUESS THE BRAND" },
+                    categoryName = level.packId,
+                    cardSize = 175.dp
+                )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Answer Slots Row
                 LetterSlotsRow(
@@ -223,7 +280,40 @@ fun QuizPlayScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                // Celebration Toast Banner if Correct
+                AnimatedVisibility(
+                    visible = slotState == SlotState.CORRECT,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = ArcadeNeonGreen,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                tint = Color.Black,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "CORRECT! +50 XP",
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.sp,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
             }
 
             // Scrambled Letter Bank & Controls at Bottom
@@ -240,72 +330,48 @@ fun QuizPlayScreen(
                     onClearAll = onClearAll
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Game action buttons: Hint & Clear & Shuffle row
+                // Bottom Action Button: Hint Superpower Button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    OutlinedButton(
+                    Button(
                         onClick = onOpenHint,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = WarmSurface2,
-                            contentColor = WarmText
-                        ),
-                        border = BorderStroke(1.dp, WarmBorder),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ArcadeCardElevated),
+                        border = BorderStroke(1.dp, ArcadeBorder),
                         modifier = Modifier
                             .weight(1f)
+                            .height(48.dp)
                             .testTag("hint_button")
                     ) {
-                        Text(
-                            text = "Hint",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = onClearAll,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = WarmSurface2,
-                            contentColor = WarmText
-                        ),
-                        border = BorderStroke(1.dp, WarmBorder),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Clear",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Button(
-                        onClick = onShuffle,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = WireTeal,
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.weight(1.2f)
-                    ) {
-                        Text(
-                            text = "Shuffle",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Lightbulb,
+                                contentDescription = null,
+                                tint = ArcadeGold,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (freeHintAvailable) "FREE HINT" else "HINT • 40 🪙",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp,
+                                color = if (freeHintAvailable) ArcadeNeonGreen else ArcadeText
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    // Hint Dialog (Preserving ad hint & coins logic)
+    // Hint Dialog
     if (showHintDialog) {
         HintDialog(
             freeHintAvailable = freeHintAvailable,
@@ -318,7 +384,7 @@ fun QuizPlayScreen(
         )
     }
 
-    // Level Complete Dialog (Wireframe Screen 4)
+    // Level Complete Dialog
     if (showLevelComplete) {
         LevelCompleteDialog(
             level = level,

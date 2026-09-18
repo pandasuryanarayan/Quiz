@@ -182,6 +182,7 @@ fun LogoQuizApp(
                     onQuickPlayClick = viewModel::startQuickPlay,
                     onEarnCoinsClick = viewModel::promptEarnCoinsAd,
                     onSwitchMode = { viewModel.setAppMode(null) },
+                    onResetProgressClick = viewModel::resetPlayerProgress,
                     isRefreshing = isRefreshingLevels,
                     onRefreshClick = { viewModel.refreshRemoteLogos() },
                     refreshMessage = refreshStatusMessage,

@@ -2,7 +2,6 @@ package com.example.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -33,19 +30,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.ArcadeBorder
+import com.example.ui.theme.ArcadeCard
+import com.example.ui.theme.ArcadeGold
+import com.example.ui.theme.ArcadeNeonGreen
+import com.example.ui.theme.ArcadeText
+import com.example.ui.theme.ArcadeTextDisabled
 import com.example.ui.theme.CoralRed
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.Slate200
-import com.example.ui.theme.Slate400
-import com.example.ui.theme.Slate700
-import com.example.ui.theme.TailwindBlue
-import com.example.ui.theme.WarmBorderBright
-import com.example.ui.theme.WarmSurface2
-import com.example.ui.theme.WarmTextDim
-import com.example.ui.theme.WireAmber
-import com.example.ui.theme.WireRose
-import com.example.ui.theme.WireSage
-import com.example.ui.theme.WireTeal
 import kotlin.math.roundToInt
 
 enum class SlotState {
@@ -91,23 +82,29 @@ fun LetterSlotsRow(
     }
 
     // Adaptive sizing depending on answer length
-    val slotSize: Dp = when {
+    val slotWidth: Dp = when {
         slots.size <= 5 -> 50.dp
-        slots.size <= 7 -> 42.dp
+        slots.size <= 7 -> 44.dp
         slots.size <= 9 -> 36.dp
-        else -> 32.dp
+        else -> 30.dp
+    }
+    val slotHeight: Dp = when {
+        slots.size <= 5 -> 60.dp
+        slots.size <= 7 -> 54.dp
+        slots.size <= 9 -> 46.dp
+        else -> 40.dp
     }
     val fontSize = when {
         slots.size <= 5 -> 22.sp
         slots.size <= 7 -> 19.sp
         slots.size <= 9 -> 16.sp
-        else -> 14.sp
+        else -> 13.sp
     }
 
     Row(
         modifier = modifier
             .offset { IntOffset(x = shakeOffset.value.roundToInt(), y = 0) }
-            .padding(horizontal = 8.dp, vertical = 12.dp),
+            .padding(horizontal = 4.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -115,7 +112,8 @@ fun LetterSlotsRow(
             LetterSlotTile(
                 slot = slot,
                 slotState = slotState,
-                size = slotSize,
+                width = slotWidth,
+                height = slotHeight,
                 fontSize = fontSize,
                 onClick = { onSlotClick(index) },
                 modifier = Modifier.testTag("letter_slot_$index")
@@ -128,7 +126,8 @@ fun LetterSlotsRow(
 private fun LetterSlotTile(
     slot: SlotItem,
     slotState: SlotState,
-    size: Dp,
+    width: Dp,
+    height: Dp,
     fontSize: androidx.compose.ui.unit.TextUnit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -137,11 +136,11 @@ private fun LetterSlotTile(
 
     val borderColor by animateColorAsState(
         targetValue = when {
-            slotState == SlotState.CORRECT -> WireSage
-            slotState == SlotState.ERROR -> WireRose
-            slot.isRevealedByHint -> WireAmber
-            isFilled -> WireTeal
-            else -> WarmBorderBright
+            slotState == SlotState.CORRECT -> ArcadeNeonGreen
+            slotState == SlotState.ERROR -> CoralRed
+            slot.isRevealedByHint -> ArcadeGold
+            isFilled -> Color.White
+            else -> ArcadeBorder
         },
         animationSpec = tween(durationMillis = 200),
         label = "slotBorderColor"
@@ -149,33 +148,33 @@ private fun LetterSlotTile(
 
     val bgColor by animateColorAsState(
         targetValue = when {
-            slotState == SlotState.CORRECT -> WireSage
-            slotState == SlotState.ERROR -> WireRose
-            slot.isRevealedByHint -> WireAmber
-            isFilled -> WireTeal
-            else -> WarmSurface2
+            slotState == SlotState.CORRECT -> ArcadeNeonGreen
+            slotState == SlotState.ERROR -> CoralRed
+            slot.isRevealedByHint -> ArcadeGold
+            isFilled -> Color.White
+            else -> ArcadeCard
         },
         animationSpec = tween(durationMillis = 200),
         label = "slotBgColor"
     )
 
     val textColor = when {
-        slotState == SlotState.CORRECT -> Color.White
+        slotState == SlotState.CORRECT -> Color.Black
         slotState == SlotState.ERROR -> Color.White
-        slot.isRevealedByHint -> Color.White
-        isFilled -> Color.White
-        else -> WarmTextDim
+        slot.isRevealedByHint -> Color.Black
+        isFilled -> Color.Black
+        else -> ArcadeTextDisabled
     }
 
     Surface(
         modifier = modifier
-            .size(size)
+            .size(width = width, height = height)
             .shadow(
-                elevation = if (isFilled) 2.dp else 0.dp,
-                shape = RoundedCornerShape(8.dp)
+                elevation = if (isFilled) 6.dp else 0.dp,
+                shape = RoundedCornerShape(14.dp)
             )
             .clickable(enabled = isFilled && !slot.isRevealedByHint) { onClick() },
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(14.dp),
         color = bgColor,
         border = BorderStroke(if (isFilled) 2.dp else 1.5.dp, borderColor)
     ) {
@@ -187,24 +186,15 @@ private fun LetterSlotTile(
                 Text(
                     text = slot.char.toString(),
                     fontSize = fontSize,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = textColor
                 )
             } else {
-                // Subtle underline marker in blank slot
-                Box(
-                    modifier = Modifier
-                        .size(width = 12.dp, height = 2.dp)
-                        .align(Alignment.BottomCenter)
-                        .offset(y = (-6).dp)
-                        .scale(1f)
-                ) {
-                    Surface(
-                        color = Slate400.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(1.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {}
-                }
+                Text(
+                    text = "•",
+                    fontSize = 18.sp,
+                    color = ArcadeTextDisabled
+                )
             }
         }
     }

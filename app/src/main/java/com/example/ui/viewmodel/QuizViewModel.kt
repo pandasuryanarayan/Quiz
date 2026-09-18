@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Collections
@@ -80,7 +81,8 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         val isAdmin = (mode == AppMode.ADMIN)
         PackCategory.entries.map { pack ->
             val packLevels = QuizPackData.getLevelsForPack(pack.id)
-            val packProgress = progressList.filter { it.packId == pack.id }
+            val validLevelIds = packLevels.map { it.id }.toSet()
+            val packProgress = progressList.filter { it.id in validLevelIds }
             val unlockedCount = if (isAdmin) {
                 packLevels.size
             } else {
@@ -99,6 +101,37 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Overall campaign progress summary showing exact total authentic logo counts
+    data class OverallCampaignSummary(
+        val totalLogos: Int,
+        val totalSolved: Int,
+        val totalStars: Int,
+        val maxStars: Int,
+        val totalPacks: Int
+    )
+
+    val overallSummary: StateFlow<OverallCampaignSummary> = packSummaries.map { summaries ->
+        val totalLogos = summaries.sumOf { it.totalLevels }
+        val totalSolved = summaries.sumOf { it.completedLevels }
+        val totalStars = summaries.sumOf { it.totalStars }
+        val maxStars = totalLogos * 3
+        OverallCampaignSummary(
+            totalLogos = totalLogos,
+            totalSolved = totalSolved,
+            totalStars = totalStars,
+            maxStars = maxStars,
+            totalPacks = summaries.size
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), OverallCampaignSummary(101, 0, 0, 303, 8))
+
+    fun resetPlayerProgress() {
+        viewModelScope.launch {
+            repository.resetPlayerProgress()
+            _dynamicLevelsTrigger.value++
+            _refreshStatusMessage.value = "Player progress has been reset to brand new state."
+        }
+    }
 
     fun refreshRemoteLogos(targetPackId: String? = null, silent: Boolean = false) {
         viewModelScope.launch {
@@ -373,7 +406,11 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             // Correct Answer!
             _slotState.value = SlotState.CORRECT
             viewModelScope.launch {
-                repository.completeLevel(level.id, stars = 3, coinsAwarded = 50, xpAwarded = 100)
+                val isAdmin = _appMode.value == AppMode.ADMIN
+                // Strict isolation: admin testing does not mark user progress or modify user database
+                if (!isAdmin) {
+                    repository.completeLevel(level.id, stars = 3, coinsAwarded = 50, xpAwarded = 100)
+                }
                 _showLevelComplete.value = true
             }
         } else {
@@ -412,6 +449,13 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun useCoinHint() {
+        val isAdmin = _appMode.value == AppMode.ADMIN
+        if (isAdmin) {
+            // Admin testing: free letter reveal without spending user coins
+            revealNextCorrectLetter(isFree = true)
+            _showHintDialog.value = false
+            return
+        }
         val profile = userProfile.value ?: return
         if (profile.coins < 40) return
 
@@ -481,13 +525,16 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onAdPlayerFinished(purpose: AdPurpose? = null) {
         _showAdPlayer.value = false
+        val isAdmin = _appMode.value == AppMode.ADMIN
         val activePurpose = purpose ?: _pendingAdPurpose.value
         when (activePurpose) {
             AdPurpose.UNLOCK_LEVEL -> {
                 val level = _pendingUnlockLevel.value
                 if (level != null) {
                     viewModelScope.launch {
-                        repository.unlockLevel(level.id)
+                        if (!isAdmin) {
+                            repository.unlockLevel(level.id)
+                        }
                         setupLevel(level)
                         _currentLevelId.value = level.id
                         _pendingUnlockLevel.value = null
@@ -502,7 +549,9 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             }
             AdPurpose.EARN_COINS -> {
                 viewModelScope.launch {
-                    repository.rewardAdWatch(50)
+                    if (!isAdmin) {
+                        repository.rewardAdWatch(50)
+                    }
                     if (_advanceAfterAd.value) {
                         _advanceAfterAd.value = false
                         goToNextLevel()
