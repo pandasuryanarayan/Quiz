@@ -123,7 +123,17 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             maxStars = maxStars,
             totalPacks = summaries.size
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), OverallCampaignSummary(101, 0, 0, 303, 8))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        OverallCampaignSummary(
+            totalLogos = QuizPackData.allLevels.size,
+            totalSolved = 0,
+            totalStars = 0,
+            maxStars = QuizPackData.allLevels.size * 3,
+            totalPacks = 8
+        )
+    )
 
     fun resetPlayerProgress() {
         viewModelScope.launch {

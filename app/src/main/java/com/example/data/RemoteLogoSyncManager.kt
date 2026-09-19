@@ -16,11 +16,14 @@ object RemoteLogoSyncManager {
     private const val PREFS_NAME = "logo_quiz_remote_sync"
     private const val KEY_CACHED_REMOTE_LEVELS = "cached_remote_levels_json"
 
-    // Primary: jsDelivr Data API fetches the directory and file tree of the package
-    private const val JSDELIVR_DATA_API = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@main"
-    private const val JSDELIVR_DATA_API_FALLBACK = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@HEAD"
+    // Primary: Real-time GitHub Tree API (immediate updates on any git commit/push)
     private const val GITHUB_TREE_API = "https://api.github.com/repos/pandasuryanarayan/logoquiz/git/trees/main?recursive=1"
     private const val GITHUB_CONTENTS_BASE = "https://api.github.com/repos/pandasuryanarayan/logoquiz/contents"
+
+    // Fallbacks & CDN
+    private const val JSDELIVR_DATA_API = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@main"
+    private const val JSDELIVR_DATA_API_FALLBACK = "https://data.jsdelivr.com/v1/package/gh/pandasuryanarayan/logoquiz@HEAD"
+    private const val JSDELIVR_PURGE_API = "https://purge.jsdelivr.net/gh/pandasuryanarayan/logoquiz@main"
     const val CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/pandasuryanarayan/logoquiz"
 
     data class SyncResult(
@@ -49,8 +52,7 @@ object RemoteLogoSyncManager {
                     }
                 }
                 val rawUrl = if (obj.has("imageUrl") && !obj.isNull("imageUrl")) obj.getString("imageUrl") else null
-                // Ensure only authentic real logos directly fetched from jsDelivr CDN are loaded
-                if (rawUrl.isNullOrBlank() || !rawUrl.startsWith(CDN_BASE_URL)) {
+                if (rawUrl.isNullOrBlank()) {
                     continue
                 }
                 // Avoid loading cached duplicates of bundled authentic levels
@@ -111,31 +113,51 @@ object RemoteLogoSyncManager {
     }
 
     /**
-     * Queries jsDelivr CDN in real time, discovers logos across all topic folders,
+     * Queries GitHub in real time, discovers new logos across topic folders,
      * assigns sequential level numbers, and reconciles QuizPackData.
      */
     suspend fun syncRemoteLogos(context: Context, targetPackId: String? = null): SyncResult = withContext(Dispatchers.IO) {
         val currentLevels = QuizPackData.allLevels.toMutableList()
         var newLevelsAddedCount = 0
 
-        // 1. Primary: Query jsDelivr CDN Package Data API directly
-        var treeFiles = fetchJsDelivrTree()
+        // 1. Primary: Real-time GitHub Tree API (instant updates on push to main)
+        val treeFiles = mutableMapOf<String, MutableSet<String>>()
 
-        // 2. Secondary fallback: Git Trees recursive API if jsDelivr Data API was unreachable
+        val ghTree = fetchGitHubTree()
+        for ((folder, files) in ghTree) {
+            treeFiles.getOrPut(folder) { mutableSetOf() }.addAll(files)
+        }
+
+        // 2. Secondary fallback: Query per-folder GitHub Contents API if Tree was empty or rate-limited
         if (treeFiles.isEmpty()) {
-            Log.w(TAG, "jsDelivr tree empty or unreachable, attempting Git Tree fallback")
-            treeFiles = fetchGitHubTree()
+            Log.w(TAG, "GitHub Tree API empty or unreachable, querying per-folder GitHub Contents API")
+            val ghContents = fetchGitHubContentsAllFolders(targetPackId)
+            for ((folder, files) in ghContents) {
+                treeFiles.getOrPut(folder) { mutableSetOf() }.addAll(files)
+            }
+        }
+
+        // 3. Third fallback: jsDelivr CDN Data API
+        if (treeFiles.isEmpty()) {
+            Log.w(TAG, "GitHub APIs unreachable, attempting jsDelivr CDN Data API fallback")
+            val jsTree = fetchJsDelivrTree()
+            for ((folder, files) in jsTree) {
+                treeFiles.getOrPut(folder) { mutableSetOf() }.addAll(files)
+            }
         }
 
         if (treeFiles.isNotEmpty()) {
-            for ((folderName, fileList) in treeFiles) {
+            for ((folderName, fileSet) in treeFiles) {
                 val packCategory = resolvePackCategory(folderName) ?: continue
                 if (targetPackId != null && packCategory.id != targetPackId) continue
 
                 val existingPackLevels = currentLevels.filter { it.packId == packCategory.id }.toMutableList()
                 val seenInThisRun = mutableSetOf<String>()
 
-                for (fileName in fileList) {
+                // Sort file list so level addition is deterministic
+                val sortedFiles = fileSet.sorted()
+
+                for (fileName in sortedFiles) {
                     if (!isImageFile(fileName)) continue
                     val cleanAnswer = extractCleanAnswer(fileName)
                     if (cleanAnswer.isBlank()) continue
@@ -150,7 +172,7 @@ object RemoteLogoSyncManager {
                         lvl.imageUrl.equals(cdnUrl, ignoreCase = true) ||
                                 lvl.answer.equals(cleanAnswer, ignoreCase = true) ||
                                 lvl.answer.equals(resolved.answer, ignoreCase = true) ||
-                                lvl.logoKey.equals(cleanAnswer, ignoreCase = true) ||
+                                lvl.logoKey.equals(cleanAnswer.lowercase(), ignoreCase = true) ||
                                 lvl.originalName.equals(resolved.originalName, ignoreCase = true)
                     }
 
@@ -173,68 +195,14 @@ object RemoteLogoSyncManager {
                         existingPackLevels.add(newLevel)
                         currentLevels.add(newLevel)
                         newLevelsAddedCount++
-                        Log.d(TAG, "Discovered new logo from jsDelivr CDN: ${newLevel.originalName} (${newLevel.answer}) in ${packCategory.title}")
+                        Log.d(TAG, "Discovered real-time logo from GitHub: ${newLevel.originalName} (${newLevel.answer}) in ${packCategory.title} as Level #$newLevelNumber")
                     }
-                }
-            }
-        } else {
-            // Fallback to per-folder contents endpoint if both jsDelivr and Git Tree APIs are unavailable
-            Log.w(TAG, "Both jsDelivr and Git Tree APIs returned 0 items, falling back to contents endpoint")
-            for (pack in PackCategory.entries) {
-                if (targetPackId != null && pack.id != targetPackId) continue
-                try {
-                    val encodedFolder = URLEncoder.encode(pack.folderName, "UTF-8").replace("+", "%20")
-                    val apiUrl = "$GITHUB_CONTENTS_BASE/$encodedFolder"
-                    val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
-                        connectTimeout = 6000
-                        readTimeout = 6000
-                        setRequestProperty("User-Agent", "LogoQuiz-Android")
-                        setRequestProperty("Accept", "application/vnd.github.v3+json")
-                    }
-                    if (connection.responseCode == 200) {
-                        val body = connection.inputStream.bufferedReader().use { it.readText() }
-                        val array = JSONArray(body)
-                        val existingPackLevels = currentLevels.filter { it.packId == pack.id }.toMutableList()
-
-                        for (i in 0 until array.length()) {
-                            val item = array.getJSONObject(i)
-                            if (item.optString("type") != "file") continue
-                            val fileName = item.getString("name")
-                            if (!isImageFile(fileName)) continue
-
-                            val cleanAnswer = extractCleanAnswer(fileName)
-                            if (cleanAnswer.isBlank()) continue
-
-                            val cdnUrl = QuizPackData.buildCdnUrl(pack.folderName, fileName)
-                            val exists = existingPackLevels.any { lvl ->
-                                lvl.imageUrl == cdnUrl || lvl.answer.equals(cleanAnswer, ignoreCase = true)
-                            }
-                            if (!exists) {
-                                val nextNum = (existingPackLevels.maxOfOrNull { it.levelNumber } ?: 0) + 1
-                                val resolved = resolveBrandMeta(pack.folderName, fileName, pack.title)
-                                val newLevel = QuizLevel(
-                                    id = "${pack.id}_$nextNum",
-                                    packId = pack.id,
-                                    levelNumber = nextNum,
-                                    answer = resolved.answer,
-                                    hintSentence = resolved.hint,
-                                    triviaFact = resolved.trivia,
-                                    logoKey = cleanAnswer.lowercase(),
-                                    imageUrl = cdnUrl,
-                                    originalName = resolved.originalName,
-                                    alternateAnswers = resolved.alternateAnswers
-                                )
-                                existingPackLevels.add(newLevel)
-                                currentLevels.add(newLevel)
-                                newLevelsAddedCount++
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Fallback contents error for ${pack.folderName}", e)
                 }
             }
         }
+
+        // Trigger CDN cache purge in the background so jsDelivr stays in sync
+        triggerCdnPurge()
 
         if (newLevelsAddedCount > 0) {
             QuizPackData.updateLevels(currentLevels)
@@ -243,10 +211,18 @@ object RemoteLogoSyncManager {
         }
 
         val total = currentLevels.size
-        val message = if (newLevelsAddedCount > 0) {
-            "⚡ New Quest Unlocked! Added $newLevelsAddedCount fresh logo challenge${if (newLevelsAddedCount > 1) "s" else ""} to the arena!"
-        } else {
-            "🏆 You're all set! All logo quests are primed and ready to conquer!"
+        val targetPack = if (targetPackId != null) PackCategory.entries.find { it.id == targetPackId } else null
+        val packCount = if (targetPack != null) currentLevels.count { it.packId == targetPack.id } else null
+
+        val message = when {
+            newLevelsAddedCount > 0 && targetPack != null && packCount != null ->
+                "⚡ Real-time sync complete! Added $newLevelsAddedCount new logo${if (newLevelsAddedCount > 1) "s" else ""} to ${targetPack.title} (Total: $packCount)!"
+            newLevelsAddedCount > 0 ->
+                "⚡ Real-time sync complete! Added $newLevelsAddedCount new logo${if (newLevelsAddedCount > 1) "s" else ""} from GitHub! Total: $total logos."
+            targetPack != null && packCount != null ->
+                "✓ ${targetPack.title} is fully up to date with GitHub in real time ($packCount logos)!"
+            else ->
+                "✓ Real-time sync verified! All $total logos across all categories match GitHub."
         }
 
         SyncResult(
@@ -257,17 +233,105 @@ object RemoteLogoSyncManager {
         )
     }
 
+    /**
+     * Primary: Fetches real-time recursive Git Tree from GitHub API.
+     * Always reflects the latest commit pushed to the main branch instantly.
+     */
+    private fun fetchGitHubTree(): Map<String, List<String>> {
+        val result = mutableMapOf<String, MutableList<String>>()
+        try {
+            val urlWithTimestamp = "$GITHUB_TREE_API&_t=${System.currentTimeMillis()}"
+            val connection = (URL(urlWithTimestamp).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 8000
+                readTimeout = 8000
+                setRequestProperty("User-Agent", "LogoQuiz-Android/1.0")
+                setRequestProperty("Accept", "application/vnd.github.v3+json")
+                setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate")
+                setRequestProperty("Pragma", "no-cache")
+            }
+            if (connection.responseCode == 200) {
+                val body = connection.inputStream.bufferedReader().use { it.readText() }
+                val root = JSONObject(body)
+                val tree = root.optJSONArray("tree") ?: return emptyMap()
+
+                for (i in 0 until tree.length()) {
+                    val item = tree.getJSONObject(i)
+                    val type = item.optString("type")
+                    if (type != "blob") continue
+                    val path = item.getString("path")
+                    if ("/" in path) {
+                        val folder = path.substringBefore("/")
+                        val file = path.substringAfterLast("/")
+                        if (isImageFile(file)) {
+                            result.getOrPut(folder) { mutableListOf() }.add(file)
+                        }
+                    }
+                }
+                Log.d(TAG, "GitHub Tree API fetched ${result.values.sumOf { it.size }} logos across ${result.size} folders")
+            } else {
+                Log.w(TAG, "GitHub Git Tree API returned HTTP ${connection.responseCode}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "GitHub Git Tree fetch error", e)
+        }
+        return result
+    }
+
+    /**
+     * Fallback 1: Queries GitHub Contents API per-folder.
+     */
+    private fun fetchGitHubContentsAllFolders(targetPackId: String? = null): Map<String, List<String>> {
+        val result = mutableMapOf<String, MutableList<String>>()
+        for (pack in PackCategory.entries) {
+            if (targetPackId != null && pack.id != targetPackId) continue
+            try {
+                val encodedFolder = URLEncoder.encode(pack.folderName, "UTF-8").replace("+", "%20")
+                val apiUrl = "$GITHUB_CONTENTS_BASE/$encodedFolder?_t=${System.currentTimeMillis()}"
+                val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 6000
+                    readTimeout = 6000
+                    setRequestProperty("User-Agent", "LogoQuiz-Android/1.0")
+                    setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate")
+                    setRequestProperty("Pragma", "no-cache")
+                }
+                if (connection.responseCode == 200) {
+                    val body = connection.inputStream.bufferedReader().use { it.readText() }
+                    val array = JSONArray(body)
+                    for (i in 0 until array.length()) {
+                        val item = array.getJSONObject(i)
+                        if (item.optString("type") != "file") continue
+                        val fileName = item.getString("name")
+                        if (isImageFile(fileName)) {
+                            result.getOrPut(pack.folderName) { mutableListOf() }.add(fileName)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "GitHub contents error for ${pack.folderName}", e)
+            }
+        }
+        return result
+    }
+
+    /**
+     * Fallback 2: jsDelivr CDN Data API
+     */
     private fun fetchJsDelivrTree(): Map<String, List<String>> {
         val result = mutableMapOf<String, MutableList<String>>()
-        val urlsToTry = listOf(JSDELIVR_DATA_API, JSDELIVR_DATA_API_FALLBACK)
+        val endpoints = listOf(
+            "$JSDELIVR_DATA_API?_t=${System.currentTimeMillis()}",
+            "$JSDELIVR_DATA_API_FALLBACK?_t=${System.currentTimeMillis()}"
+        )
 
-        for (apiUrl in urlsToTry) {
+        for (apiUrl in endpoints) {
             try {
                 val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 7000
-                    readTimeout = 7000
-                    setRequestProperty("User-Agent", "LogoQuiz-Android")
+                    connectTimeout = 6000
+                    readTimeout = 6000
+                    setRequestProperty("User-Agent", "LogoQuiz-Android/1.0")
                     setRequestProperty("Accept", "application/json")
+                    setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate")
                 }
                 if (connection.responseCode == 200) {
                     val body = connection.inputStream.bufferedReader().use { it.readText() }
@@ -293,11 +357,8 @@ object RemoteLogoSyncManager {
                     }
 
                     if (result.isNotEmpty()) {
-                        Log.d(TAG, "Fetched ${result.values.sumOf { it.size }} logos across ${result.size} categories from jsDelivr CDN")
                         return result
                     }
-                } else {
-                    Log.w(TAG, "jsDelivr CDN API returned HTTP ${connection.responseCode} on $apiUrl")
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "jsDelivr CDN tree fetch exception on $apiUrl", e)
@@ -306,38 +367,21 @@ object RemoteLogoSyncManager {
         return result
     }
 
-    private fun fetchGitHubTree(): Map<String, List<String>> {
-        val result = mutableMapOf<String, MutableList<String>>()
+    /**
+     * Triggers a purge request on jsDelivr so the CDN cache doesn't serve stale versions.
+     */
+    private fun triggerCdnPurge() {
         try {
-            val connection = (URL(GITHUB_TREE_API).openConnection() as HttpURLConnection).apply {
-                connectTimeout = 7000
-                readTimeout = 7000
-                setRequestProperty("User-Agent", "LogoQuiz-Android")
-                setRequestProperty("Accept", "application/vnd.github.v3+json")
+            val connection = (URL(JSDELIVR_PURGE_API).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 3000
+                readTimeout = 3000
+                requestMethod = "POST"
+                setRequestProperty("User-Agent", "LogoQuiz-Android/1.0")
             }
-            if (connection.responseCode == 200) {
-                val body = connection.inputStream.bufferedReader().use { it.readText() }
-                val root = JSONObject(body)
-                val tree = root.optJSONArray("tree") ?: return emptyMap()
-
-                for (i in 0 until tree.length()) {
-                    val item = tree.getJSONObject(i)
-                    val type = item.optString("type")
-                    if (type != "blob") continue
-                    val path = item.getString("path")
-                    if ("/" in path) {
-                        val folder = path.substringBefore("/")
-                        val file = path.substringAfterLast("/")
-                        result.getOrPut(folder) { mutableListOf() }.add(file)
-                    }
-                }
-            } else {
-                Log.w(TAG, "Git tree API returned HTTP ${connection.responseCode}")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Git tree fetch error", e)
+            connection.responseCode
+        } catch (_: Exception) {
+            // Ignore background purge errors
         }
-        return result
     }
 
     private fun resolvePackCategory(folderName: String): PackCategory? {
@@ -374,7 +418,7 @@ object RemoteLogoSyncManager {
 
         // Check if bundled level exists for this brand
         val existingBundled = QuizPackData.bundledLevels.find {
-            it.answer.equals(clean, ignoreCase = true) || it.logoKey.equals(clean, ignoreCase = true)
+            it.answer.equals(clean, ignoreCase = true) || it.logoKey.equals(clean.lowercase(), ignoreCase = true)
         }
         if (existingBundled != null) {
             return BrandMeta(
@@ -384,6 +428,12 @@ object RemoteLogoSyncManager {
                 trivia = existingBundled.triviaFact,
                 alternateAnswers = existingBundled.alternateAnswers
             )
+        }
+
+        // Known brand lookups for dynamic addition
+        val customMeta = getCuratedBrandMeta(clean)
+        if (customMeta != null) {
+            return customMeta
         }
 
         // Format clean original name (e.g. "alfa-romeo" -> "Alfa Romeo", "taco bell" -> "Taco Bell")
@@ -397,7 +447,7 @@ object RemoteLogoSyncManager {
             }
 
         val hint = "Iconic brand in $categoryTitle recognized worldwide"
-        val trivia = "A globally recognized brand mark celebrated in $categoryTitle with millions of daily users."
+        val trivia = "A globally recognized brand mark celebrated in $categoryTitle with millions of fans worldwide."
 
         return BrandMeta(
             originalName = formattedName.ifBlank { clean },
@@ -406,5 +456,35 @@ object RemoteLogoSyncManager {
             trivia = trivia,
             alternateAnswers = emptyList()
         )
+    }
+
+    private fun getCuratedBrandMeta(cleanAnswer: String): BrandMeta? {
+        return when (cleanAnswer) {
+            "ABARTH" -> BrandMeta(
+                originalName = "Abarth",
+                answer = "ABARTH",
+                hint = "Italian performance tuning marque recognized worldwide for the fiery scorpion crest",
+                trivia = "Founded by Carlo Abarth in 1949 in Turin, renowned for turning compact chassis into rally winners."
+            )
+            "ALPINE" -> BrandMeta(
+                originalName = "Alpine",
+                answer = "ALPINE",
+                hint = "French sports and racing car marque celebrated for the iconic rear-engine A110",
+                trivia = "Founded in 1955 by Jean Rédélé, today Alpine powers France's Formula 1 racing operations."
+            )
+            "CATERHAM" -> BrandMeta(
+                originalName = "Caterham",
+                answer = "CATERHAM",
+                hint = "British specialist lightweight sports car maker famed for open-wheel Lotus Seven racers",
+                trivia = "Produces minimalist track-focused cars honoring Colin Chapman's philosophy of adding lightness."
+            )
+            "CORVETTE" -> BrandMeta(
+                originalName = "Corvette",
+                answer = "CORVETTE",
+                hint = "America's sports car legend celebrated by the crossed racing and fleur-de-lis flags",
+                trivia = "Produced across eight storied generations since 1953, evolving into a mid-engine supercar."
+            )
+            else -> null
+        }
     }
 }

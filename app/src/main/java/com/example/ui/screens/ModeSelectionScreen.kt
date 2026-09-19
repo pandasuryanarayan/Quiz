@@ -190,7 +190,7 @@ fun ModeSelectionScreen(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "101 Real Brand Logos • 8 Distinct Worlds",
+                    text = "${com.example.data.QuizPackData.allLevels.size} Real Brand Logos • 8 Distinct Worlds",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = ArcadeTextDim,

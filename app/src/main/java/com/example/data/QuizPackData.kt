@@ -22,7 +22,7 @@ object QuizPackData {
     }
 
     val bundledLevels: List<QuizLevel> = listOf(
-        // ==================== AUTOMOTIVE (65 REAL LOGOS FROM GITHUB) ====================
+        // ==================== AUTOMOTIVE (69 REAL LOGOS FROM GITHUB) ====================
         QuizLevel(
             id = "automotive_1",
             packId = "automotive",
@@ -801,6 +801,54 @@ object QuizPackData {
             logoKey = "zeekr",
             imageUrl = buildCdnUrl("Automotive", "Zeekr.webp"),
             originalName = "Zeekr",
+            alternateAnswers = emptyList()
+        ),
+        QuizLevel(
+            id = "automotive_66",
+            packId = "automotive",
+            levelNumber = 66,
+            answer = "ABARTH",
+            hintSentence = "Italian performance tuning marque recognized worldwide for the fiery scorpion crest",
+            triviaFact = "Founded by Carlo Abarth in 1949 in Turin, renowned for turning compact chassis into rally winners.",
+            logoKey = "abarth",
+            imageUrl = buildCdnUrl("Automotive", "Abarth.webp"),
+            originalName = "Abarth",
+            alternateAnswers = emptyList()
+        ),
+        QuizLevel(
+            id = "automotive_67",
+            packId = "automotive",
+            levelNumber = 67,
+            answer = "ALPINE",
+            hintSentence = "French sports and racing car marque celebrated for the iconic rear-engine A110",
+            triviaFact = "Founded in 1955 by Jean Rédélé, today Alpine powers France's Formula 1 racing operations.",
+            logoKey = "alpine",
+            imageUrl = buildCdnUrl("Automotive", "Alpine.webp"),
+            originalName = "Alpine",
+            alternateAnswers = emptyList()
+        ),
+        QuizLevel(
+            id = "automotive_68",
+            packId = "automotive",
+            levelNumber = 68,
+            answer = "CATERHAM",
+            hintSentence = "British specialist lightweight sports car maker famed for open-wheel Lotus Seven racers",
+            triviaFact = "Produces minimalist track-focused cars honoring Colin Chapman's philosophy of adding lightness.",
+            logoKey = "caterham",
+            imageUrl = buildCdnUrl("Automotive", "Caterham.webp"),
+            originalName = "Caterham",
+            alternateAnswers = emptyList()
+        ),
+        QuizLevel(
+            id = "automotive_69",
+            packId = "automotive",
+            levelNumber = 69,
+            answer = "CORVETTE",
+            hintSentence = "America's sports car legend celebrated by the crossed racing and fleur-de-lis flags",
+            triviaFact = "Produced across eight storied generations since 1953, evolving into a mid-engine supercar.",
+            logoKey = "corvette",
+            imageUrl = buildCdnUrl("Automotive", "Corvette.webp"),
+            originalName = "Corvette",
             alternateAnswers = emptyList()
         ),
         // ==================== FOOD & BEVERAGES (13 REAL LOGOS FROM GITHUB) ====================

@@ -29,11 +29,11 @@ class ExampleRobolectricTest {
   @Test
   fun `verify quiz packs catalog and CDN mappings`() {
     val levels = com.example.data.QuizPackData.allLevels
-    assertEquals(101, levels.size)
+    assertEquals(105, levels.size)
 
     // Verify Automotive sequence
     val automotive = com.example.data.QuizPackData.getLevelsForPack("automotive")
-    assertEquals(65, automotive.size)
+    assertEquals(69, automotive.size)
     assertEquals("TOYOTA", automotive[0].answer)
     assertEquals("BMW", automotive[1].answer)
     automotive.forEach { lvl ->

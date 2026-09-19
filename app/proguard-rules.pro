@@ -59,3 +59,14 @@
 #javascript
 -keepattributes JavascriptInterface
 -keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+
+# Room Database & Entities
+-keep class androidx.room.** { *; }
+-dontwarn androidx.room.**
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao interface * { *; }
+
+# App Data Models
+-keep class com.example.data.** { *; }
+
